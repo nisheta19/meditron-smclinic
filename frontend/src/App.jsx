@@ -3,22 +3,23 @@ import { USE_MOCK, API_URL, capsReady, demo } from './api';
 import { CURRENT_DOCTOR } from './config';
 import { fmtDateTime } from './lib/format';
 import { Revision, Toast, go, useMedia, useRoute } from './lib/hooks';
-import { Archive, ArrowLeft, Briefcase, Inbox, Logo, Tool } from './components/Icons';
+import { Archive, ArrowLeft, Briefcase, GridIcon, Inbox, Logo } from './components/Icons';
 import Findings from './pages/Findings';
 import Patients from './pages/Patients';
 import PatientCard from './pages/PatientCard';
 import Dictionary from './pages/Dictionary';
+import Dashboard from './pages/Dashboard';
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
 const isDocsPath = () => /\/open-api\/?$/.test(location.pathname);
 
-// Пункты меню — как в макете
+// Пункты меню — как в макете (в последней версии «Настройки» убраны из меню: словарь открывается по блоку врача внизу)
 const NAV = [
+  ['dashboard', 'Дашборд', GridIcon],
   ['inbox', 'Входящие', Inbox],
   ['findings', 'Находки', Briefcase],
   ['archive', 'Картотека', Archive],
-  ['settings', 'Настройки', Tool],
 ];
 const STEPS = [[24, '+24 ч'], [72, '+72 ч'], [168, '+7 дн'], [720, '+30 дн']];
 
@@ -49,7 +50,7 @@ export default function App() {
     : section === 'patients' && id ? <PatientCard id={id} />
     : section === 'inbox' ? <Patients key="inbox" preset="inbox" />
     : section === 'archive' ? <Patients key="archive" preset="archive" />
-    : section === 'settings' ? <Dictionary /> : <Findings />;
+    : section === 'settings' ? <Dictionary /> : section === 'dashboard' ? <Dashboard /> : <Findings />;
   const current = section === 'patients' ? 'findings' : section;   // карточка открывается из «Находок»
 
   return (
@@ -67,10 +68,11 @@ export default function App() {
               ))}
             </nav>
             <div className="nav-bottom">
-              <span className="nav-user" title={CURRENT_DOCTOR}>
+              <a className="nav-user" href="#/settings" title={`${CURRENT_DOCTOR}: настройки и словарь находок`}
+                aria-current={section === 'settings' ? 'page' : undefined}>
                 <span className="nav-avatar" aria-hidden="true">{CURRENT_DOCTOR.split(/\s+/).slice(0, 2).map((w) => w[0]).join('')}</span>
                 <span className="nav-user-text"><span>{CURRENT_DOCTOR}</span><small>Врач</small></span>
-              </span>
+              </a>
               {!narrow && <button className="nav-item faint" onClick={() => setCollapsed((v) => !v)} aria-expanded={!collapsed} title={collapsed ? 'Развернуть' : 'Свернуть'}>
                 <ArrowLeft size={16} className={collapsed ? 'flip' : undefined} /><span>Свернуть</span>
               </button>}

@@ -79,11 +79,10 @@ export default function Findings() {
         filters={<PatientFilters value={filters} onChange={setFilters} pathologies={pathologies} />} />
       <ChipRow value={chip} onChange={setChip}
         items={CHIPS.map(([key, label, fn]) => ({ key, label, count: scoped.filter(fn).length }))}
-        selectAll={caps.notifications && <Checkbox size="all" checked={all} mixed={!all && ids.some((id) => sel.sel.has(id))} label="Выбрать всех"
+        selectAll={<Checkbox size="all" checked={all} mixed={!all && ids.some((id) => sel.sel.has(id))} label="Выбрать всех"
           onChange={() => sel.setAll(ids, !all)} />} />
-      {!byRoutes && <p className="mode-note">Сервер пока не поддерживает маршруты: показаны находки пациентов. Срок записи считается от поступления протокола по сроку из словаря.</p>}
       {list.error ? <ErrorBox error={list.error} onRetry={list.reload} /> : (
-        <RowList cols={COLS} rows={sorted} rowKey={(r) => r.routeId} sort={sort} onSort={toggle} selection={caps.notifications ? sel : null}
+        <RowList cols={COLS} rows={sorted} rowKey={(r) => r.routeId} sort={sort} onSort={toggle} selection={sel}
           onRow={(r) => go(`patients/${r.patientId}`)} loading={list.loading || cards.loading}
           empty={byRoutes ? 'Под выбранные условия маршрутов нет.' : 'Под выбранные условия находок нет.'} />
       )}

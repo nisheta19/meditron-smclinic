@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { api } from '../api';
+import { api, caps } from '../api';
 import { CHANNEL } from '../lib/format';
 import { Dialog } from './ui';
 
@@ -15,7 +15,7 @@ export default function NotifyDialog({ routeIds, recent = 0, onClose, onDone }) 
     const res = { sent: 0, tooFrequent: 0, errors: [] };
     for (const id of routeIds) {
       try { await api.notify(id, { channel, ...(text.trim() && { text: text.trim() }) }); res.sent++; }
-      catch (e) { e.status === 429 ? res.tooFrequent++ : res.errors.push(e.message); }
+      catch (e) { e.status === 429 ? res.tooFrequent++ : res.errors.push(e.notImplemented ? 'сервер пока не принимает уведомления (метод не реализован)' : e.message); }
     }
     setResult(res); setBusy(false); onDone?.(res);
   };
@@ -35,6 +35,8 @@ export default function NotifyDialog({ routeIds, recent = 0, onClose, onDone }) 
       <button className="btn ghost" onClick={onClose}>Отмена</button>
       <button className="btn primary" disabled={busy} onClick={send}>{busy ? 'Отправляем…' : 'Отправить'}</button>
     </>}>
+      {!caps.notifications && <p className="callout">Сервер пока не сообщил, что принимает уведомления. Попробуем отправить — если метод
+        не поддерживается, в итоге будет указано, какие сообщения не ушли.</p>}
       {recent > 0 && <p className="callout">Уже получили сообщение за последние 24 ч: {recent}. Сервер их пропустит, чтобы не перегружать пациентов.</p>}
       <fieldset>
         <legend>Канал</legend>

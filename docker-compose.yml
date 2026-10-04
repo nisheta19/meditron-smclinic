@@ -50,7 +50,7 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_USE_MOCK: ${FRONTEND_USE_MOCK:-false}   # true — демо на заглушках, без backend
+        VITE_USE_MOCK: ${FRONTEND_USE_MOCK:-true}   # true — демо на заглушках, без backend
         VITE_API_URL: /                              # тот же origin: nginx проксирует /api в backend
         BACKEND_PORT: ${BACKEND_PORT:-8080}
     environment:

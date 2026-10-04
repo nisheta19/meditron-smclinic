@@ -61,7 +61,7 @@ small { display: block; color: var(--gray-medium); font-size: 12px; }
 }
 .nav-item svg { flex: none; transition: transform 0.34s var(--ease); }
 .nav-item > span { transition: opacity 0.22s ease 0.1s, transform 0.34s var(--ease); }
-.nav-item[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }   /* Выбрано */
+.nav-item[aria-current="page"] { background: var(--accent-soft); color: var(--accent); border-radius: 14px; }   /* Выбрано */
 .nav-item.static { cursor: default; }
 .nav-item.faint { color: var(--gray-light); }
 .flip { transform: scaleX(-1); }
@@ -542,7 +542,8 @@ mark.flash { animation: flash 1.2s ease-out; }
 
 
 /* ---------- Карточка пациента (макет «Сеч_Хакатон_Вёрстка») ---------- */
-.nav-user { display: flex; align-items: center; gap: 8px; width: 190px; max-width: 100%; height: 36px; padding: 0 10px 0 11px; color: var(--gray-medium); overflow: hidden;
+.nav-user { text-decoration: none; border-radius: 12px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; width: 190px; max-width: 100%; height: 36px; padding: 0 10px 0 11px; color: var(--gray-medium); overflow: hidden;
   transition: width 0.34s var(--ease), padding 0.34s var(--ease); }
 .nav-avatar { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #d9d9d9; color: var(--gray-dark); font-size: 12px; }
 .nav-user-text { display: grid; gap: 4px; min-width: 0; font-size: 14px; line-height: 1; white-space: nowrap; transition: opacity 0.22s ease 0.1s; }
@@ -592,7 +593,9 @@ mark.flash { animation: flash 1.2s ease-out; }
 .pc-table { margin-top: 20px; }
 .pc-thead { padding: 0 14px 12px 25px; }
 .pc-thead .col-head { justify-self: start; }
-.f-cols { display: grid; grid-template-columns: 255px minmax(0, 1fr) auto; align-items: center; }
+.f-cols { display: grid; grid-template-columns: 255px minmax(0, 185px) minmax(0, 1fr) auto; align-items: center; }
+.pc-fname { color: var(--black); padding-right: 12px; }
+.pc-level { color: var(--black); }
 .pc-row { margin-bottom: 8px; background: var(--page); border-radius: 20px; color: var(--gray-dark); font-size: 14px; }
 .pc-row-main { min-height: 52px; padding: 8px 14px 8px 25px; cursor: pointer; border-radius: 20px; }
 .pc-fname { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
@@ -694,7 +697,7 @@ div.pc-event .pc-event-arrow { opacity: 0.35; }
   .pc-stats > div { gap: 20px; }
   .pc-protocol { padding: 16px; }
   .pc-thead { display: none; }
-  .f-cols { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+  .f-cols { grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 10px; }
   .f-cols > span:first-child { grid-column: 1 / -1; font-size: 12px; color: var(--gray-medium); }
   .pc-row-main { padding: 12px 12px 12px 16px; }
   .r-cols { grid-template-columns: 24px minmax(0, 1fr); gap: 8px; }
@@ -703,6 +706,107 @@ div.pc-event .pc-event-arrow { opacity: 0.35; }
   .pc-date, .pc-step .pc-actions { grid-column: 2; justify-self: start; }
   .pc-date .pc-pill { min-width: 0; }
   .pc-history { padding: 22px 16px; border-radius: 26px; }
+}
+
+
+/* ---------- Обновление макета 3: карточка одной плашкой, крестик, заголовки Manrope ---------- */
+.pc-top { display: flex; justify-content: flex-end; margin: 20px 12px 16px 0; }
+.pc-close {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--white); color: var(--gray-dark); transition: background-color 0.15s ease;
+}
+.pc-close:hover { background-image: linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)); }    /* по общему правилу: ховер +10% */
+.pc-close:active { background-image: linear-gradient(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.2)); }   /* прессед +20% */
+.pc-grid { grid-template-columns: minmax(0, 1fr) 1px 279px; gap: 0; align-items: stretch; background: var(--white); border-radius: 36px; }
+.pc-main { padding: 35px 28px 29px 13px; background: none; border-radius: 0; }
+.pc-vline { background: var(--gray-accent); margin: 36px 0 28px; }
+.pc-history { align-self: start; margin-left: 5px; padding: 30px 5px 17px 15px; background: none; border-radius: 0; }
+.pc-main h2, .pc-history h2, .pc-person h3 { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 600; }
+.pc-info { grid-template-columns: 235px minmax(0, 1fr); gap: 0 40px; margin-top: 0; }
+
+/* ---------- Дашборд ---------- */
+.dash-controls { display: flex; justify-content: flex-end; gap: 8px; margin: 20px 0; }
+.dash-controls .dd { width: auto; }
+.dash-controls .dd-btn { min-height: 38px; height: 38px; padding: 0 10px 0 14px; gap: 6px; border-color: transparent; border-radius: 16px; background: var(--white); }
+.dash-controls .dd-btn svg { color: var(--black); width: 20px; height: 20px; }
+.dash-note { margin: -8px 0 14px 4px; }
+/* Одна сетка: слева карта (2 ряда) и «Результативность уведомлений», справа зелёная карточка и 2×2 показателя.
+   Ряды общие, поэтому нижние карточки обеих половин всегда на одном уровне. */
+.dash { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); grid-auto-rows: minmax(278px, auto); gap: 6px; }
+.dash-map { grid-column: 1; grid-row: 1 / span 2; }
+.dash-hero { grid-column: 2 / span 2; grid-row: 1; }
+.dash-funnel { grid-column: 1; grid-row: 3; }
+.dash-card { position: relative; overflow: hidden; padding: 30px; background: var(--white); border-radius: 26px; }
+.dash-card h2 { font-size: 26px; font-weight: 400; line-height: 1; }
+.dash-go {
+  position: absolute; top: 14px; right: 14px; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border: 0; border-radius: 50%; background: #ededed; color: var(--gray-dark);
+}
+.dash-go svg { transform: rotate(135deg); transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.dash-go:hover { background-image: linear-gradient(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.06)); }
+.dash-go:hover svg { transform: rotate(135deg) translateX(-2px); }
+.dash-go:active { background-image: linear-gradient(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.12)); }
+
+.dash-map { min-height: 562px; }
+.dash-mapsvg { display: block; width: min(330px, 100%); height: auto; margin: 48px auto 0; }
+/* Наведение — на одну клинику: «сота» из 7 точек увеличивается целиком вокруг своего центра */
+.dash-mapsvg .clinic { cursor: pointer; transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.dash-mapsvg .clinic:hover { transform: scale(1.45); }
+.dash-mapsvg .clinic-hit { fill: transparent; }
+
+.dash-funnel { min-height: 278px; display: flex; flex-direction: column; padding: 30px 30px 22px; }
+.dash-funnel h2 { font-size: 20px; }
+.funnel-bars { display: grid; gap: 12px; margin-top: 24px; }
+.funnel-bar {
+  position: relative; display: flex; align-items: center; height: 42px; max-width: 100%; padding: 0 60px 0 18px;
+  border-radius: 64px; background: var(--page); transition: width 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.funnel-bar span { font-size: 12px; color: var(--gray-medium); white-space: nowrap; }
+.funnel-pct {
+  position: absolute; right: 4px; top: 4px; display: grid; place-items: center; min-width: 51px; height: 34px; padding: 0 10px;
+  border-radius: 100px; color: var(--white); font-size: 12px; font-weight: 400;
+}
+@keyframes bar-in { from { clip-path: inset(0 100% 0 0 round 64px); } to { clip-path: inset(0 0 0 0 round 64px); } }
+.funnel-bar { animation: bar-in 0.7s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.funnel-row:nth-child(2) .funnel-bar { animation-delay: 0.08s; } .funnel-row:nth-child(3) .funnel-bar { animation-delay: 0.16s; }
+.nav-user:hover { background: rgb(0 0 0 / 0.04); }
+.nav-user[aria-current="page"] { background: var(--accent-soft); }
+.funnel-pct.c0 { background: var(--gray-dark); } .funnel-pct.c1 { background: var(--accent); } .funnel-pct.c2 { background: var(--sm-main); }
+.funnel-axis { display: flex; justify-content: space-between; margin-top: auto; padding-top: 22px; font-size: 14px; color: var(--gray-medium); }
+
+.dash-hero { min-height: 278px; padding: 30px 28px; background: var(--sm-main); color: var(--white); }
+.dash-hero h2 { position: relative; z-index: 1; font-weight: 600; }
+.dash-hero p { position: relative; z-index: 1; margin: 17px 0 0; font-size: 20px; line-height: 0.9; color: rgb(255 255 255 / 0.7); }
+.dash-hero strong { position: relative; z-index: 1; display: block; margin-top: 39px; font: 600 64px/1 Manrope, Inter, sans-serif; }
+.dash-wave { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.dash-metric { display: flex; flex-direction: column; min-height: 278px; padding: 28px 22px 22px; }
+.dash-icon { color: var(--black); flex: none; }
+.dash-metric h3 { max-width: 152px; margin-top: 14px; font-size: 20px; font-weight: 400; line-height: 1; }
+.dash-metric strong { margin-top: auto; padding-top: 16px; font: 700 64px/1 Manrope, Inter, sans-serif; }
+.dash-metric strong.orange { color: var(--accent); } .dash-metric strong.green { color: var(--sm-main); } .dash-metric strong.none { color: var(--gray-light); }
+.dash-delta { align-self: flex-start; display: inline-flex; align-items: center; height: 27px; margin-top: 15px; padding: 0 10px; border: 1px solid var(--gray-light); border-radius: 14px; color: var(--gray-light); font-size: 12px; }
+
+@media (max-width: 1100px) {
+  .pc-grid { grid-template-columns: 1fr; }
+  .pc-vline { margin: 0 28px; height: 1px; }
+  .pc-history { margin: 0; padding: 24px 20px; }
+  .dash { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-map, .dash-hero, .dash-funnel { grid-column: 1 / -1; grid-row: auto; }
+  .dash-funnel { order: 1; }
+}
+@media (max-width: 720px) {
+  .pc-top { margin: 8px 0; }
+  .pc-grid { border-radius: 26px; }
+  .pc-main { padding: 22px 10px 16px; }
+  .pc-info { grid-template-columns: 1fr; gap: 20px; }
+  .dash-controls { margin: 12px 0; }
+  .dash-card { padding: 22px 18px; border-radius: 22px; }
+  .dash-map { min-height: 0; }
+  .dash-hero strong, .dash-metric strong { font-size: 48px; }
+  .dash-metric { min-height: 220px; padding: 20px 16px 16px; }
+  .dash-metric h3 { font-size: 16px; }
+  .dash-go { width: 38px; height: 38px; top: 10px; right: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

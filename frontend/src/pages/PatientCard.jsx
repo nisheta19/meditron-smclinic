@@ -6,7 +6,7 @@ import { api, caps } from '../api';
 import { CANCEL_REASON, NOT_TRIGGERED, PROCESSING, REVIEW, ROUTE, STEP, STUDY, ATTR, attrValue, fmtDate, fmtDateTime, fmtStamp, now, stepLabel, LEVEL, flagLabel } from '../lib/format';
 import { go, useAction, useAsync, useToast } from '../lib/hooks';
 import { CURRENT_DOCTOR } from '../config';
-import { ArrowDown, ArrowLeft, CheckMark, Chevron, Close, Copy, FileIcon, Mail, Phone } from '../components/Icons';
+import { ArrowDown, ArrowLeft, CheckMark, Chevron, Close, CloseLg, Copy, FileIcon, Mail, Phone } from '../components/Icons';
 import { SearchBar } from '../components/kit';
 import { Dialog, ErrorBox, ReasonDialog } from '../components/ui';
 import ProtocolText, { focusEvidence } from '../components/ProtocolText';
@@ -51,8 +51,14 @@ export default function PatientCard({ id }) {
   return (
     <>
       <SearchBar value="" onSearch={(q) => q && go(`findings?q=${encodeURIComponent(q)}`)} placeholder="Поиск" />
-      <button className="back-btn" onClick={() => (history.length > 1 ? history.back() : go('findings'))}><ArrowLeft size={16} />Назад</button>
+      {/* Макет: вместо «Назад» слева — круглый крестик справа над карточкой */}
+      <div className="pc-top">
+        <button className="pc-close" aria-label="Закрыть карточку" title="Закрыть" onClick={() => (history.length > 1 ? history.back() : go('findings'))}>
+          <CloseLg size={22} />
+        </button>
+      </div>
 
+      {/* Одна карточка: слева данные, протокол, находки и маршрут; справа за разделителем — история приёмов */}
       <div className="pc-grid">
         <section className="pc-main">
           <PatientInfo c={c} onMore={() => setDialog({ type: 'more' })} />
@@ -111,6 +117,7 @@ export default function PatientCard({ id }) {
             : <p className="pc-add disabled">{suggested.length ? 'Подтвердите находки, чтобы составить маршрут' : c.routes.length ? 'Все подтверждённые находки уже в маршруте' : 'Нет подтверждённых находок для маршрута'}</p>}
         </section>
 
+        <span className="pc-vline" aria-hidden="true" />
         <History c={c} protocols={protocols} findings={allFindings} onOpenProtocol={(pid) => { setSelected(pid); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
       </div>
 
@@ -160,7 +167,6 @@ function PatientInfo({ c, onMore }) {
         </ul>
         <button className="pc-id" onClick={copy} title="Скопировать ID пациента в МИС">id {c.externalId}<Copy size={10} /></button>
       </div>
-      <span className="pc-divider" aria-hidden="true" />
       <div className="pc-stats">
         <div>
           <Stat label="Возраст">{c.age}</Stat>
@@ -202,7 +208,9 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm
   const [sort, setSort] = useState({ key: 'organ', dir: 1 });
   const [open, setOpen] = useState(null);
   const organ = (f) => ORGAN[protoById[f.protocolId]?.studyType ?? fallbackStudy] ?? 'Не указан';
-  const rows = [...findings].sort((a, b) => (sort.key === 'organ' ? organ(a).localeCompare(organ(b), 'ru') : a.name.localeCompare(b.name, 'ru')) * sort.dir);
+  const RANK = { EMERGENCY: 0, URGENT: 1, PLANNED: 2 };
+  const key = { organ: (f) => organ(f), name: (f) => f.name, level: (f) => RANK[f.level] ?? 3 }[sort.key];
+  const rows = [...findings].sort((a, b) => { const x = key(a), y = key(b); return (typeof x === 'string' ? x.localeCompare(y, 'ru') : x - y) * sort.dir; });
   const head = (key, label) => (
     <button className={`col-head${sort.key === key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key, dir: s.key === key ? -s.dir : 1 }))}>
       {label}<ArrowDown size={12} className={sort.key === key && sort.dir > 0 ? undefined : 'asc'} />
@@ -212,7 +220,7 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm
 
   return (
     <div className="pc-table">
-      <div className="pc-thead f-cols">{head('organ', 'Орган')}{head('name', 'Находка')}</div>
+      <div className="pc-thead f-cols">{head('organ', 'Орган')}{head('name', 'Находка')}{head('level', 'Статус')}</div>
       {rows.map((f) => {
         const isOpen = open === f.id;
         const attrs = Object.entries(f.attributes ?? {}).filter(([k]) => k !== 'level');
@@ -227,9 +235,10 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm
                 {f.status === 'CONFIRMED' && <em className="tag">{f.routeId ? 'в маршруте' : 'подтверждена'}</em>}
                 {f.status === 'REJECTED' && <em className="tag">отклонена</em>}
                 {f.source === 'MANUAL' && <em className="tag">добавлена врачом</em>}
-                {['EMERGENCY', 'URGENT'].includes(f.level) && <em className={`lvl ${f.level.toLowerCase()}`}>{LEVEL[f.level][0].toLowerCase()}</em>}
                 {f.flags?.map((fl) => <em key={fl.code} className="tag warn" title={fl.note}>{flagLabel(fl).toLowerCase()}</em>)}
               </span>
+              {/* Колонка «Статус» из макета: уровень срочности находки (level backend) */}
+              <span className={`pc-level ${f.level?.toLowerCase() ?? ''}`}>{f.level ? LEVEL[f.level][0] : '—'}</span>
               {editable && (
                 <span className="pc-actions" onClick={(e) => e.stopPropagation()}>
                   {f.status === 'SUGGESTED' && <>
