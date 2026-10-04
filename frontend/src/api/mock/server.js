@@ -203,9 +203,19 @@ function patientShort(p) {
   const all = protocolsOf(p.id), last = all.find((x) => x.status !== 'ANNULLED') ?? all[0];
   const pending = db.findings.filter((f) => f.patientId === p.id && f.status === 'SUGGESTED').length;
   const { id, externalId, fullName, birthDate, sex, cardNumber } = p;
+  const clean = (part) => part?.trim().replace(/\s+/gu, ' ') || null;
+  const legacy = clean(fullName)?.split(' ') ?? [];
+  const [lastName, firstName, middleName] = clean(p.lastName) || clean(p.firstName)
+    ? [clean(p.lastName), clean(p.firstName), clean(p.middleName)]
+    : [legacy[0] || null, legacy[1] || null, legacy.slice(2).join(' ') || null];
+  const initial = (part) => part ? `${[...part][0]}.` : null;
+  const shortName = [lastName, initial(firstName), initial(middleName)].filter(Boolean).join(' ');
   return {
-    id, externalId, fullName, birthDate, sex, cardNumber, age: ageOf(birthDate),
+    id, externalId, fullName: [lastName, firstName, middleName].filter(Boolean).join(' '),
+    lastName, firstName, middleName, shortName, birthDate, sex, cardNumber, age: ageOf(birthDate),
     reviewState: last && (last.status === 'FAILED' || !last.conclusionFound) ? 'ATTENTION' : pending ? 'PENDING' : 'OK',
+    needsRouteReview: all.some((pr) => pr.status === 'FAILED' || pr.status === 'DONE' && !pr.conclusionFound
+      && !db.findings.some((f) => f.protocolId === pr.id && f.status === 'CONFIRMED')),
     receivedAt: all.map((x) => x.receivedAt).sort().at(-1), pendingFindings: pending,
     activeRoutes: db.routes.filter((r) => r.patientId === p.id && OPEN.includes(r.status)).length,
     lastStudyDate: last?.studyDate,
@@ -265,13 +275,28 @@ const reply = (fn) => new Promise((resolve, reject) => setTimeout(() => {
   try { resolve(JSON.parse(JSON.stringify(fn() ?? null, (k, v) => (k.startsWith('_') ? undefined : v)))); } catch (e) { reject(e); }
 }, 150));
 
+function patientOrder(q) {
+  const value = (p) => ({ patient: p.fullName, finding: p.topFindings?.[0]?.name,
+    due: p.topFindings?.[0]?.targetDays, receivedAt: p.receivedAt, studyDate: p.lastStudyDate })[q.sortBy];
+  return (a, b) => {
+    if (!q.sortBy || q.sortBy === 'default') return (RANK[b.maxLevel] ?? 0) - (RANK[a.maxLevel] ?? 0)
+      || (b.receivedAt ?? '').localeCompare(a.receivedAt ?? '') || a.id.localeCompare(b.id);
+    const x = value(a), y = value(b);
+    if (x == null || y == null) return (x == null ? 1 : 0) - (y == null ? 1 : 0) || a.id.localeCompare(b.id);
+    const cmp = typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'ru', { sensitivity: 'accent' });
+    return cmp * (q.sortDirection === 'desc' ? -1 : 1) || a.id.localeCompare(b.id);
+  };
+}
+
 export const mockApi = {
   patients: (q = {}) => reply(() => page(db.patients.map(patientShort).filter((p) =>
     (!q.search || has(p.fullName, q.search) || has(p.cardNumber, q.search) || has(p.externalId, q.search))
     && (!q.reviewState || p.reviewState === q.reviewState)
+    && (q.needsRouteReview == null || p.needsRouteReview === q.needsRouteReview)
+    && (!q.maxLevel || p.maxLevel === q.maxLevel)
     && (!q.studyType || db.protocols.some((x) => x.patientId === p.id && x.studyType === q.studyType))
     && (!q.dateFrom || p.lastStudyDate >= q.dateFrom) && (!q.dateTo || p.lastStudyDate <= q.dateTo))
-    .sort((a, b) => b.receivedAt.localeCompare(a.receivedAt)), q)),
+    .sort(patientOrder(q)), q)),
   patient: (id) => reply(() => patientCard(id)),
   protocol: (id) => reply(() => {
     const pr = byId(db.protocols, id, 'PROTOCOL');

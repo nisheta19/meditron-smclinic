@@ -1,0 +1,16 @@
+# Run with: docker compose -p meditron-verification -f docker-compose.yml -f compose.verification.yaml up --build -d --wait
+# Separate project means separate PostgreSQL and ML volumes. Never points at the working database.
+name: meditron-verification
+services:
+  postgres:
+    ports: !override
+      - "127.0.0.1:15433:5432"
+  backend:
+    ports: !override
+      - "127.0.0.1:18081:8080"
+  ml:
+    ports: !override
+      - "127.0.0.1:18001:8000"
+  frontend:
+    ports: !override
+      - "127.0.0.1:13000:80"

@@ -19,7 +19,7 @@ from app.demo import docx
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--frontend', default='http://127.0.0.1:3000')
+    parser.add_argument('--frontend', default='http://127.0.0.1:13000')
     parser.add_argument('--output', type=Path, default=ROOT / '.local/frontend-fixtures.json')
     args = parser.parse_args()
     run = 'ui-' + uuid4().hex[:10]
@@ -33,9 +33,14 @@ def main():
         return response.json()
 
     def meta(label, study='PELVIS_FEMALE'):
-        return {'eventId': f'{run}-{label}', 'eventType': 'PROTOCOL_SIGNED',
-                'patient': {'externalId': f'{run}-{label}', 'fullName': f'Пациент проверки интерфейса {label}', 'birthDate': '1990-01-01', 'sex': 'F'},
+        event = {'eventId': f'{run}-{label}', 'eventType': 'PROTOCOL_SIGNED',
+                'patient': {'externalId': f'{run}-{label}', 'fullName': 'Петрова-Водкина Анна Мария Ивановна',
+                            'lastName': 'Петрова-Водкина', 'firstName': 'Анна Мария', 'middleName': 'Ивановна',
+                            'birthDate': '1990-01-01', 'sex': 'F'},
                 'protocol': {'externalId': f'{run}-protocol-{label}', 'version': 1, 'studyType': study, 'studyDate': '2026-09-07'}}
+        if label == 'normal':
+            event['patient'].update(fullName='Smith Jane', lastName='Smith', firstName='Jane', middleName=None)
+        return event
 
     def send(m, text, expected='DONE'):
         if m['eventType'] == 'PROTOCOL_ANNULLED':
@@ -69,6 +74,8 @@ def main():
     cases['missing'] = send(meta('missing'), 'Описание\nПолип эндометрия 9 мм.')
     cases['normal'] = send(meta('normal', 'BREAST'), 'Описание\nПатологии не выявлено.\nЗаключение\nBI-RADS 1 справа. BI-RADS 1 слева.')
     cases['emergency'] = send(meta('emergency', 'LOWER_LIMB_VESSELS'), 'Описание\nТромбоз глубоких вен левой голени.\nЗаключение\nТромбоз глубоких вен левой голени.')
+    cases['urgent'] = send(meta('urgent', 'SOFT_TISSUE'), 'Описание\nВоспалительные изменения ПЖК.\nЗаключение\nВоспалительные изменения ПЖК.')
+    assert cases['urgent']['findings'][0]['level'] == 'URGENT'
     v1 = meta('versions')
     old = send(v1, positive)
     v2 = deepcopy(v1); v2['eventId'] += '-v2'; v2['eventType'] = 'PROTOCOL_CORRECTED'; v2['protocol']['version'] = 2

@@ -437,5 +437,401 @@
       }
     },
     "allContainersHealthy": true
+  },
+  "patientNames": {
+    "checkedAt": "2026-10-04T17:24:47.789418+00:00",
+    "passed": true,
+    "fields": [
+      "lastName",
+      "firstName",
+      "middleName"
+    ],
+    "listDisplay": "shortName",
+    "fullNameStillRequired": true,
+    "mlPreservesRawPatientMetadata": true,
+    "compoundNamesPreserved": true,
+    "missingMiddleNameSupported": true,
+    "legacyUpgrade": {
+      "legacyReceiptRetry": "passed",
+      "existingPatientFallback": "passed",
+      "runtimeSchemasRefreshed": true
+    },
+    "mlTests": 169,
+    "backendTests": 28,
+    "frontendUnitTests": 20,
+    "integrationScenarios": 14,
+    "apiCoverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 15
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "frontendE2e": 17,
+    "designScenarios": 7,
+    "filterScenarios": 11,
+    "allContainersHealthy": true
+  },
+  "urgencyAndWorkQueues": {
+    "checkedAt": "2026-10-04T18:10:06.362972+00:00",
+    "passed": true,
+    "mlTests": 169,
+    "backendTests": 38,
+    "frontendUnitTests": 21,
+    "integrationScenarios": 15,
+    "frontendE2e": 19,
+    "designScenarios": 7,
+    "filterScenarios": 11,
+    "totalChecks": 280,
+    "corpusDocuments": 89,
+    "apiCoverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 15
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "allContainersHealthy": true,
+    "testProject": "meditron-verification",
+    "workingProject": "meditron-final",
+    "liveReadOnlyCheck": {
+      "passed": true,
+      "patients": 90,
+      "uniqueSourceDocuments": 89,
+      "sourceFindings": 137,
+      "inboxPatients": 50,
+      "findingsPagePatients": 40,
+      "urgentPatients": 2,
+      "levels": {
+        "URGENT": 2,
+        "PLANNED": 73,
+        "NONE": 15
+      },
+      "allEvidenceMatchesSourceText": true,
+      "syntheticPatientsRemaining": 0
+    },
+    "liveBrowserCheck": {
+      "passed": true,
+      "patients": 90,
+      "pageErrors": [],
+      "queuesMatchApi": true,
+      "urgentBadges": true,
+      "settingsAndArchiveDisabled": true,
+      "demoDisabled": true
+    },
+    "cleanup": {
+      "before": {
+        "patients": 391,
+        "protocols": 442,
+        "findings": 488,
+        "receipts": 479
+      },
+      "after": {
+        "patients": 90,
+        "protocols": 90,
+        "findings": 137,
+        "receipts": 90
+      },
+      "removedPatients": 301,
+      "sourceDocumentsPreserved": 89,
+      "sourceFindingsUnchanged": true,
+      "mlJournal": {
+        "before": 357,
+        "after": 90,
+        "removed": 267
+      }
+    },
+    "sourceProtocolBackupsLocalOnly": true,
+    "dictionaryChanged": false,
+    "workingImageDeployment": "tested backend/ML images reused after Docker Hub metadata timeout; frontend built successfully"
+  },
+  "deadlinePresentation": {
+    "checkedAt": "2026-10-04T18:27:39.947469+00:00",
+    "passed": true,
+    "deadlineColors": {
+      "0": "#ff3636",
+      "1-3": "#a66a00",
+      "4+": "normal",
+      "unknown": "normal"
+    },
+    "colorIndependentOfMedicalLevel": true,
+    "standaloneUrgencyBadgesRemoved": true,
+    "mockEscalationText": "Немедленно",
+    "backendAndDictionaryUnchanged": true,
+    "mlTests": 169,
+    "backendTests": 38,
+    "frontendUnitTests": 21,
+    "integrationScenarios": 15,
+    "frontendE2e": 19,
+    "designScenarios": 7,
+    "filterScenarios": 11,
+    "totalChecks": 280,
+    "apiCoverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 15
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "liveBrowserCheck": {
+      "passed": true,
+      "patients": 90,
+      "pageErrors": [],
+      "queuesMatchApi": true,
+      "urgencyBadgesAbsent": true,
+      "deadlineTextColored": true,
+      "settingsAndArchiveDisabled": true,
+      "demoDisabled": true
+    },
+    "workingDataVerification": {
+      "passed": true,
+      "patients": 90,
+      "uniqueSourceDocuments": 89,
+      "sourceFindings": 137,
+      "inboxPatients": 50,
+      "findingsPagePatients": 40,
+      "urgentPatients": 2,
+      "levels": {
+        "URGENT": 2,
+        "PLANNED": 73,
+        "NONE": 15
+      },
+      "allEvidenceMatchesSourceText": true,
+      "syntheticPatientsRemaining": 0
+    },
+    "testDatabaseIsolated": true
+  },
+  "demoSortingAndAuth": {
+    "verifiedAt": "2026-10-04T19:03:56.517461+00:00",
+    "passed": true,
+    "tests": {
+      "ml": 169,
+      "backend": 45,
+      "frontendUnit": 21,
+      "integration": 17,
+      "browserE2E": 19,
+      "browserDesign": 7,
+      "browserFilters": 11,
+      "browserSorting": 6
+    },
+    "testTotal": 295,
+    "coverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/auth/csrf",
+          "GET /api/auth/me",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/auth/login",
+          "POST /api/auth/logout",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 19
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "demoScenarios": 17,
+    "demoIdempotenceVerified": true,
+    "workingData": {
+      "sourcePatientsUnchanged": 90,
+      "testedScenarios": 17,
+      "total": 107
+    },
+    "authRequiredHttpCheck": {
+      "passed": true,
+      "authRequired": true,
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/patients",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 401
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/auth/login",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/auth/login",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/csrf",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/login",
+          "status": 403
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/login",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/patients",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/patients/00000000-0000-0000-0000-000000000000/findings",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/csrf",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/patients/00000000-0000-0000-0000-000000000000/findings",
+          "status": 400
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/logout",
+          "status": 204
+        },
+        {
+          "method": "GET",
+          "path": "/api/patients",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/dictionary/findings",
+          "status": 200
+        }
+      ]
+    },
+    "mainAuthRequired": false,
+    "singleDemoAccount": "123",
+    "noLoginUiAdded": true,
+    "layoutChecksPassed": true,
+    "sortingBeforePagination": true,
+    "nullsLastBothDirections": true,
+    "stageAndNotificationRemainStubs": true,
+    "dictionaryUnchanged": true,
+    "dictionarySha256": "E8A4A9DC163B4F68956F190DB7ACF59706E0D4777AED3312EB4A795ED3AEE66B",
+    "notes": [
+      "Existing 90 patient cards and protocol responses matched their pre-change SHA-256 hashes.",
+      "All 17 new patients are fictional, explicitly marked and passed through backend -> ML -> backend.",
+      "No new corpus F1 measurement was needed: extraction and dictionary are unchanged.",
+      "Required login was verified on the isolated test backend; the main UI remains accessible until its login form is added."
+    ]
   }
 }

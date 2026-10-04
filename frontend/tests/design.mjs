@@ -82,26 +82,45 @@ try {
       }
     }
   });
-  await test('urgent and flagged data never add decorations outside the mockup', async () => {
+  await test('deadline alone is colored by days, without urgency badges or side stripes', async () => {
     await page.setViewportSize({ width: 1280, height: 900 });
-    for (const level of ['EMERGENCY', 'URGENT']) {
-      patients.forEach((p) => { p.maxLevel = level; p.activeFindings = 3; });
-      await page.goto(`${base}/#/findings`); await page.locator('.row-card').first().waitFor(); await ready();
+    for (const level of ['EMERGENCY', 'URGENT', 'PLANNED']) {
+      for (const days of [[0, 1, 2, 3], [4, 7, null, undefined]]) {
+      patients.forEach((p, i) => { p.maxLevel = level; p.activeFindings = 3; p.topFindings[0].targetDays = days[i]; });
+      await page.goto(`${base}/#/findings`); await page.reload(); await page.locator('.row-card').first().waitFor(); await ready();
       assert.equal(await page.locator('.row-card .badge, .row-card .lvl, .row-card small').count(), 0);
       const styles = await page.locator('.row-card').evaluateAll((rows) => rows.map((el) => ({ shadow: getComputedStyle(el).boxShadow, border: getComputedStyle(el).borderLeftWidth })));
       assert.ok(styles.every((s) => s.shadow === 'none' && s.border === '0px'));
+      assert.equal(await page.locator('.row-card .urgency-badge').count(), 0);
       assert.ok(!(await page.locator('.rowlist').innerText()).match(/Экстренно|Срочно|Новые находки|Этап не задан|Нет данных/u));
+      const cells = await page.locator('.row-card').evaluateAll((rows) => rows.map((row) => {
+        const due = row.querySelector('.cell-due .s-main');
+        return { color: getComputedStyle(due).color, background: getComputedStyle(due).backgroundColor,
+          normal: getComputedStyle(row.querySelector('.cell-patient .s-main')).color,
+          text: due.textContent, lines: row.querySelectorAll('.cell-due .stack > *').length };
+      }));
+      cells.forEach((cell, i) => {
+        const n = days[i];
+        assert.equal(cell.color, n === 0 ? 'rgb(255, 54, 54)' : n >= 1 && n <= 3 ? 'rgb(166, 106, 0)' : cell.normal);
+        assert.equal(cell.background, 'rgba(0, 0, 0, 0)');
+        assert.equal(cell.lines, 1);
+        assert.equal(cell.text, n == null ? '—' : n === 0 ? 'Немедленно' : `В течение ${n} ${n === 1 ? 'дня' : 'дней'}`);
+      });
+      if (level === 'PLANNED' && days[0] === 0) await page.screenshot({ path: resolve(root, '.local/design-deadline-colors.png'), fullPage: true });
+      }
     }
     protocol.flags = [{ code: 'INCOMPLETE', note: 'Синтетический флаг', setBy: 'ML' }];
     protocol.conclusionFound = false;
     protocol.notTriggered = [{ code: 'THYROID_NODULE', reason: 'BELOW_THRESHOLD', evidence: patientCard.currentFindings[0].evidence }];
     for (const status of ['SUGGESTED', 'CONFIRMED', 'REJECTED']) {
-      patientCard.currentFindings.forEach((f) => Object.assign(f, { status, level: 'EMERGENCY', source: 'MANUAL', flags: protocol.flags }));
-      await page.goto(`${base}/#/patients/design-0`); await page.locator('.pc-protocol mark').first().waitFor(); await ready();
+      patientCard.patient.maxLevel = 'URGENT';
+      patientCard.currentFindings.forEach((f) => Object.assign(f, { status, level: 'URGENT', source: 'MANUAL', flags: protocol.flags }));
+      await page.goto(`${base}/#/patients/design-0`); await page.reload(); await page.locator('.pc-protocol mark').first().waitFor(); await ready();
       assert.equal(await page.locator('.pc-main .tag, .pc-main .lvl, .pc-main .pc-note, .pc-main .pc-all, .pc-main .pc-nt, .pc-main .pc-flags, .pc-main mark.nt').count(), 0);
       assert.equal(await page.locator('.pc-head button').count(), 0);
+      assert.equal(await page.locator('.pc-main .urgency-badge').count(), 0);
       assert.deepEqual(await page.locator('.pc-fname').allTextContents(), patientCard.currentFindings.map((f) => f.name));
-      assert.ok(!(await page.locator('.pc-main').innerText()).match(/экстренно|ждёт проверки|добавлена врачом|Подтвердить все|текущий|Синтетический флаг/u));
+      assert.ok(!(await page.locator('.pc-main').innerText()).match(/экстренно|Срочно|ждёт проверки|добавлена врачом|Подтвердить все|текущий|Синтетический флаг/u));
     }
     await page.locator('.pc-more').click();
     assert.ok((await page.getByRole('dialog').innerText()).includes('Синтетический флаг'));

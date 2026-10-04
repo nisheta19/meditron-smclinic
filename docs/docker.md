@@ -68,7 +68,8 @@ PostgreSQL и журнал доставки ML хранятся в томах `m
 
 ## Повторная проверка
 
-Тесты создают вымышленных пациентов; используйте демонстрационную базу.
+Тесты создают вымышленных пациентов. Запускайте их в отдельном проекте
+`meditron-verification`: его PostgreSQL и очередь ML изолированы от рабочего интерфейса.
 Модульные тесты frontend запускаются при сборке его образа. Команды браузерной
 проверки и подготовки вымышленных DOCX: [frontend/README](../frontend/README.md#проверки).
 JUnit запускается при сборке backend-образа. ML-тесты выполняются внутри того же
@@ -76,17 +77,28 @@ JUnit запускается при сборке backend-образа. ML-тес
 
 ```powershell
 docker run --rm --mount "type=bind,source=C:/hackaton/final/ml/tests,target=/app/tests,readonly" --mount "type=bind,source=C:/hackaton/final/ml/examples,target=/app/examples,readonly" meditron-final-ml python -m unittest discover -s tests -v
-.\ml\.venv\Scripts\python.exe -X utf8 tests/integration.py --backend http://127.0.0.1:8080 --ml http://127.0.0.1:8000 --report .local/docker-integration.json
+docker compose -p meditron-verification -f docker-compose.yml -f compose.verification.yaml up --build -d --wait
+.\ml\.venv\Scripts\python.exe -X utf8 tests/integration.py --backend http://127.0.0.1:18081 --ml http://127.0.0.1:18001 --report .local/docker-integration.json
 ```
 
 Для обработки локального корпуса добавьте к последней команде
 `--corpus "C:\hackaton\src\протоколы"`. Документы читаются без изменения;
-извлечённые данные сохраняются в локальных томах.
-
-Проверка отказов и сохранности данных временно остановит сервисы этого Compose-проекта:
+извлечённые данные сохраняются в тестовых томах. Тестовый frontend доступен
+на `13000`, PostgreSQL — на `15433`. Рабочий frontend остаётся на `3000`.
+Остановить тестовый стенд без удаления его данных:
 
 ```powershell
+docker compose -p meditron-verification -f docker-compose.yml -f compose.verification.yaml stop
+```
+
+Проверка отказов и сохранности данных временно остановит сервисы проекта.
+Направьте её на тестовый стенд:
+
+```powershell
+$env:COMPOSE_PROJECT_NAME='meditron-verification'
+$env:COMPOSE_FILE='docker-compose.yml;compose.verification.yaml'
 .\ml\.venv\Scripts\python.exe -X utf8 tests/docker_resilience.py
+Remove-Item Env:COMPOSE_PROJECT_NAME, Env:COMPOSE_FILE
 ```
 
 Она проверяет ответ 502 без ML, повторную доставку без backend, сохранность SQLite

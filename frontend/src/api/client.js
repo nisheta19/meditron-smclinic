@@ -17,7 +17,7 @@ export class ApiError extends Error {
 }
 
 async function request(method, path, { query, body } = {}) {
-  const qs = new URLSearchParams(Object.entries(query ?? {}).filter(([, v]) => v !== undefined && v !== '' && v !== null && v !== false));
+  const qs = new URLSearchParams(Object.entries(query ?? {}).filter(([, v]) => v !== undefined && v !== '' && v !== null));
   const res = await fetch(`${API_URL}${path}${qs.size ? `?${qs}` : ''}`, {
     method,
     signal: AbortSignal.timeout(20000),

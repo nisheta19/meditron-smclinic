@@ -86,7 +86,7 @@ export default function PatientCard({ id }) {
           <button className="pc-add" disabled={!editable} onClick={() => setDialog({ type: 'add' })}>+ Добавить</button>
 
           <h2 className="pc-subtitle pc-route-title">Маршрут</h2>
-          {!caps.routes && <RoutePlaceholder findings={findings} />}
+          {!caps.routes && <RoutePlaceholder findings={findings} needsReview={c.needsRouteReview} />}
           {c.routes.map((r) => (
             <RouteBlock key={r.id} route={r} findings={allFindings} onChanged={card.reload}
               onNotify={() => setDialog({ type: 'notify', r })} onCancel={() => setDialog({ type: 'cancel', r })} />
@@ -138,11 +138,12 @@ function PatientInfo({ c, onMore }) {
     catch { toast('Не удалось скопировать', 'error'); }
   };
   const Stat = ({ label, children }) => <div className="pc-stat"><span>{label}</span><b>{children}</b></div>;
+  const nameParts = [c.lastName, c.firstName, c.middleName].filter(Boolean);
 
   return (
     <div className="pc-info">
       <div className="pc-person">
-        <h3>{c.fullName.split(/\s+/).map((word, i) => <span key={i}>{word}{' '}</span>)}</h3>
+        <h3>{(nameParts.length ? nameParts : [c.fullName || '—']).map((part, i) => <span key={i}>{part}{' '}</span>)}</h3>
         <ul className="pc-contacts">
           <li><Mail size={12} />{c.email ?? '—'}</li>
           <li><Phone size={12} />{c.phone ?? '—'}</li>
@@ -250,7 +251,7 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, emptyText
 }
 
 /* ---------- Маршрут ---------- */
-function RoutePlaceholder({ findings }) {
+function RoutePlaceholder({ findings, needsReview }) {
   const directions = [...new Set(findings.filter((f) => f.status !== 'REJECTED').map((f) => f.targetSpecialty).filter(Boolean))];
   return <div className="route-placeholder" aria-label="Маршрут — заглушка">
     <div className="pc-table">
@@ -259,7 +260,7 @@ function RoutePlaceholder({ findings }) {
       </div>
       <div className="pc-row pc-step route-placeholder-cols">
         <span>1.</span>
-        <button className="pc-pill stub-select" disabled title="Заглушка записи; направление рассчитано по находкам"><span>{directions[0] ?? 'Не выбран'}</span><Chevron size={20} /></button>
+        <button className="pc-pill stub-select" disabled title={needsReview ? 'Направление требует решения врача' : 'Заглушка записи; направление рассчитано по находкам'}><span>{needsReview ? 'Не определён' : directions[0] ?? 'Не выбран'}</span><Chevron size={20} /></button>
         <div className="pc-date"><span className="pc-do">до</span><button className="pc-pill stub-select" disabled title="Дата посещения не назначена"><span>Не назначена</span><Chevron size={20} /></button></div>
         <div className="pc-actions" aria-label="Действия маршрута — заглушки">
           <button className="stub-arrow" disabled aria-label="Переместить этап вверх"><ArrowDown size={16} className="up" /></button>

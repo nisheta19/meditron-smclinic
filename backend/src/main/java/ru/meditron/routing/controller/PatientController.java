@@ -30,16 +30,19 @@ public class PatientController {
     }
 
     @GetMapping
-    @Operation(summary = "Инбокс: «Новые» = reviewState=PENDING, ATTENTION — протокол не прочитан или без заключения")
+    @Operation(summary = "Пациенты: needsRouteReview=true — входящие без определённого направления; false — остальные")
     public PatientPageDto list(@RequestParam(required = false) String search,
                                @RequestParam(required = false) ReviewState reviewState,
                                @RequestParam(required = false) StudyType studyType,
                                @RequestParam(required = false) FindingLevel maxLevel,
+                               @RequestParam(required = false) Boolean needsRouteReview,
                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
                                @RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "20") int size) {
-        return query.list(search, reviewState, studyType, maxLevel, dateFrom, dateTo, page, size);
+                               @RequestParam(defaultValue = "20") int size,
+                               @RequestParam(defaultValue = "default") String sortBy,
+                               @RequestParam(defaultValue = "asc") String sortDirection) {
+        return query.list(search, reviewState, studyType, maxLevel, dateFrom, dateTo, needsRouteReview, page, size, sortBy, sortDirection);
     }
 
     @GetMapping("/{patientId}")

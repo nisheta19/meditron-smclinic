@@ -24,6 +24,152 @@ tags:
   - name: Notifications
 
 paths:
+  /api/auth/logout:
+    post:
+      tags:
+      - Auth
+      operationId: logout
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '204':
+          description: No Content
+  /api/auth/login:
+    post:
+      tags:
+      - Auth
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Account'
+  /api/auth/me:
+    get:
+      tags:
+      - Auth
+      operationId: me
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Account'
+  /api/auth/csrf:
+    get:
+      tags:
+      - Auth
+      operationId: csrf
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Csrf'
   # ---------- Вход от ML (не для фронта) ----------
   /api/integration/ml/results:
     post:
@@ -50,8 +196,11 @@ paths:
       tags: [Patients]
       summary: Список пациентов для архива
       parameters:
+        - { name: sortBy, in: query, schema: { type: string, enum: [default, patient, finding, due, receivedAt, studyDate], default: default }, description: Сортировка до пагинации; пустые значения последние }
+        - { name: sortDirection, in: query, schema: { type: string, enum: [asc, desc], default: asc } }
         - { name: search, in: query, schema: { type: string }, description: Поиск по ФИО / номеру карты }
         - { name: reviewState, in: query, schema: { $ref: '#/components/schemas/ReviewState' }, description: «Новые» = PENDING; ATTENTION — протокол не прочитан или без заключения (флаг NO_CONCLUSION) }
+        - { name: needsRouteReview, in: query, schema: { type: boolean }, description: 'true — только случаи без определённого направления; false — остальные; без параметра — все пациенты' }
         - { name: studyType, in: query, schema: { $ref: '#/components/schemas/StudyType' } }
         - { name: maxLevel, in: query, schema: { $ref: '#/components/schemas/FindingLevel' }, description: Чип «Экстренные» — maxLevel=EMERGENCY }
         - { name: dateFrom, in: query, schema: { type: string, format: date }, description: По дате исследования }
@@ -383,6 +532,38 @@ components:
       content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   schemas:
+    Account:
+      type: object
+      properties:
+        login:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    Login:
+      type: object
+      properties:
+        login:
+          type: string
+          maxLength: 128
+          minLength: 0
+        password:
+          type: string
+          maxLength: 128
+          minLength: 0
+      required:
+      - login
+      - password
+    Csrf:
+      type: object
+      properties:
+        token:
+          type: string
+        headerName:
+          type: string
+        parameterName:
+          type: string
     Error:
       type: object
       properties:
@@ -440,11 +621,16 @@ components:
         id: { type: string }
         externalId: { type: string, description: ID пациента в МИС }
         fullName: { type: string }
+        lastName: { type: string, nullable: true, description: Фамилия }
+        firstName: { type: string, nullable: true, description: Имя }
+        middleName: { type: string, nullable: true, description: Отчество при наличии }
+        shortName: { type: string, example: 'Белова Н. О.', description: Готовая строка для списка }
         birthDate: { type: string, format: date }
         age: { type: integer, description: Вычисляется на сервере }
         sex: { type: string, enum: [F, M] }
         cardNumber: { type: string }
         reviewState: { $ref: '#/components/schemas/ReviewState' }
+        needsRouteReview: { type: boolean, description: Требуется решение врача по направлению }
         maxLevel:
           allOf: [ { $ref: '#/components/schemas/FindingLevel' } ]
           nullable: true
@@ -726,6 +912,9 @@ components:
           properties:
             externalId: { type: string }
             fullName: { type: string }
+            lastName: { type: string, nullable: true }
+            firstName: { type: string, nullable: true }
+            middleName: { type: string, nullable: true }
             birthDate: { type: string, format: date }
             sex: { type: string, enum: [F, M] }
         protocol:

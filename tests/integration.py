@@ -29,8 +29,8 @@ from app.parser import extract_text, parse_text
 from app.validation import validate_for_dictionary
 
 CLI = argparse.ArgumentParser(description=__doc__)
-CLI.add_argument('--backend', default='http://127.0.0.1:18080')
-CLI.add_argument('--ml', default='http://127.0.0.1:18000')
+CLI.add_argument('--backend', default='http://127.0.0.1:18081')
+CLI.add_argument('--ml', default='http://127.0.0.1:18001')
 CLI.add_argument('--corpus', type=Path)
 CLI.add_argument('--report', type=Path, default=ROOT / '.local/integration-report.json')
 ARGS = CLI.parse_args()
@@ -124,6 +124,9 @@ class Integration(unittest.TestCase):
 
     def test_02_docx_roundtrip_and_doctor_actions(self):
         meta, file, c = self.positive('doctor')
+        self.assertEqual(c['patient']['lastName'], 'Пациент')
+        self.assertEqual(c['patient']['firstName'], 'тест')
+        self.assertEqual(c['patient']['middleName'], f'{RUN} doctor')
         self.assertEqual(c['patient']['reviewState'], 'PENDING')
         self.assertEqual(c['currentProtocol']['version'], 1)
         self.assertEqual(c['patient']['birthDate'], meta['patient']['birthDate'])
@@ -333,6 +336,125 @@ class Integration(unittest.TestCase):
                 result['patient']['externalId']=RUN+'-'+result['patient']['externalId']
                 result['protocol']['externalId']=RUN+'-'+result['protocol']['externalId']
                 call('POST','/api/integration/ml/results',202,json=result)
+
+    def test_13_structured_names_roundtrip_search_and_corrections(self):
+        meta = metadata('structured-name')
+        meta['patient'].update(fullName='Устаревшее ФИО', lastName=' де ла Крус ', firstName=' Анна   Мария ', middleName=' ')
+        file = make_file('structured-name', 'Заключение\nПолип эндометрия 8 мм.')
+        upload(meta, file); delivered(meta)
+        expected = {'lastName': 'де ла Крус', 'firstName': 'Анна Мария', 'middleName': None,
+                    'fullName': 'де ла Крус Анна Мария', 'shortName': 'де ла Крус А.'}
+        patient = card(meta)['patient']
+        for key, value in expected.items(): self.assertEqual(patient[key], value, key)
+        found = call('GET', '/api/patients', params={'search': 'ДЕ ЛА КРУС', 'size': 200})
+        row = next(p for p in found['items'] if p['id'] == patient['id'])
+        for key, value in expected.items(): self.assertEqual(row[key], value, key)
+
+        # Raw metadata is preserved by ML; only the backend normalizes the patient row.
+        result = process_event(event_with_file(meta, file), lambda: DICTIONARY)
+        self.assertEqual(result['patient'], meta['patient'])
+        result['resultId'] = f'{RUN}-name-fingerprint'
+        call('POST', '/api/integration/ml/results', 202, json=result)
+        call('POST', '/api/integration/ml/results', 202, json=result)
+        altered = deepcopy(result); altered['patient']['firstName'] = 'Другое имя'
+        call('POST', '/api/integration/ml/results', 409, json=altered)
+
+        corrected = deepcopy(meta); corrected['eventId'] += '-v2'
+        corrected['eventType'] = 'PROTOCOL_CORRECTED'; corrected['protocol']['version'] = 2
+        corrected['patient']['middleName'] = 'Ивановна'
+        upload(corrected, file); delivered(corrected)
+        self.assertEqual(card(corrected)['patient']['shortName'], 'де ла Крус А. И.')
+        self.assertEqual(card(corrected)['patient']['id'], patient['id'])
+        annulled = deepcopy(corrected); annulled['eventId'] += '-annul'
+        annulled['eventType'] = 'PROTOCOL_ANNULLED'
+        call('POST', '/api/integration/events', 202, json=annulled); delivered(annulled, 'ANNULLED')
+        self.assertEqual(card(annulled)['patient']['middleName'], 'Ивановна')
+
+        schema = call('GET', '/v3/api-docs')['components']['schemas']
+        self.assertTrue({'lastName', 'firstName', 'middleName', 'shortName'} <= schema['PatientShortDto']['properties'].keys())
+        self.assertIn('fullName', schema['PatientPart']['required'])
+
+    def test_14_invalid_name_parts_rejected_before_processing(self):
+        file = make_file('bad-name', 'Заключение\nПолип эндометрия 8 мм.')
+        for field in ('lastName', 'firstName', 'middleName'):
+            invalid = metadata('bad-' + field); invalid['patient'][field] = ['not a string']
+            upload(invalid, file, 400)
+        missing = metadata('missing-fullname'); missing['patient'].pop('fullName')
+        missing['patient'].update(lastName='Соколова', firstName='Анна')
+        upload(missing, file, 400)
+
+    def test_15_direction_queues_and_urgent_status(self):
+        def queue(meta, expected):
+            patient = card(meta)['patient']
+            self.assertEqual(patient['needsRouteReview'], expected)
+            for flag in (True, False):
+                page = call('GET', '/api/patients', params={
+                    'search': meta['patient']['externalId'], 'needsRouteReview': str(flag).lower(), 'size': 1})
+                self.assertEqual(page['total'], int(flag == expected))
+                self.assertEqual(len(page['items']), int(flag == expected))
+            return patient
+
+        auto, _, _ = self.positive('queue-auto')
+        queue(auto, False)  # SUGGESTED alone does not mean an undetermined direction.
+        missing = metadata('queue-missing')
+        upload(missing, make_file('queue-missing', 'Описание\nПолип эндометрия 8 мм.')); delivered(missing)
+        patient = queue(missing, True)
+        f = card(missing)['currentFindings'][0]
+        call('POST', f"/api/patients/{patient['id']}/findings/confirm", json={'findingIds': [f['id']], 'doctor': 'Тестовый врач'})
+        queue(missing, False)
+
+        urgent = metadata('queue-urgent', 'SOFT_TISSUE')
+        upload(urgent, make_file('queue-urgent', 'Описание\nВоспалительные изменения ПЖК.\nЗаключение\nВоспалительные изменения ПЖК.')); delivered(urgent)
+        self.assertEqual(queue(urgent, False)['maxLevel'], 'URGENT')
+        page = call('GET', '/api/patients', params={'search': urgent['patient']['externalId'], 'maxLevel': 'URGENT', 'needsRouteReview': 'false'})
+        self.assertEqual(page['total'], 1)
+        self.assertEqual(page['items'][0]['topFindings'][0]['targetDays'], 3)
+
+        unknown = metadata('queue-unknown', 'ABDOMEN')
+        upload(unknown, make_file('queue-unknown', 'Заключение\nАневризма брюшной аорты.')); delivered(unknown)
+        patient = queue(unknown, True)
+        fs = card(unknown)['currentFindings']
+        self.assertTrue(any(f['code'] == 'UNRECOGNIZED_ABNORMALITY' for f in fs))
+        call('POST', f"/api/patients/{patient['id']}/findings/confirm", json={'findingIds': [f['id'] for f in fs]})
+        queue(unknown, True)  # Confirmation without a concrete direction cannot hide the case.
+        unknown['eventId'] += '-annul'; unknown['eventType'] = 'PROTOCOL_ANNULLED'
+        call('POST', '/api/integration/events', 202, json=unknown); delivered(unknown, 'ANNULLED')
+        queue(unknown, False)
+
+
+    def test_16_session_authentication(self):
+        schema = call('GET', '/v3/api-docs')
+        self.assertFalse(schema['paths']['/api/auth/csrf']['get'].get('parameters'))
+        call('GET', '/api/auth/me', 401)
+        call('POST', '/api/auth/login', 403, json={'login': '123', 'password': '123'})
+        token = call('GET', '/api/auth/csrf')
+        headers = {token['headerName']: token['token']}
+        call('POST', '/api/auth/login', 401, headers=headers, json={'login': '123', 'password': 'bad'})
+        session_before = CLIENT.cookies.get('JSESSIONID')
+        account = call('POST', '/api/auth/login', headers=headers, json={'login': '123', 'password': '123'})
+        self.assertEqual(account, {'login': '123', 'roles': ['DOCTOR']})
+        self.assertNotEqual(CLIENT.cookies.get('JSESSIONID'), session_before)
+        self.assertEqual(call('GET', '/api/auth/me'), account)
+        call('POST', '/api/auth/logout', 403)
+        call('POST', '/api/auth/logout', 403, headers=headers)  # old CSRF token revoked on login
+        token = call('GET', '/api/auth/csrf')
+        call('POST', '/api/auth/logout', 204, headers={token['headerName']: token['token']})
+        call('GET', '/api/auth/me', 401)
+
+    def test_17_server_sort_and_pagination(self):
+        for key in ('patient', 'finding', 'due', 'receivedAt', 'studyDate'):
+            for direction in ('asc', 'desc'):
+                query = {'search': RUN, 'sortBy': key, 'sortDirection': direction}
+                all_items = call('GET', '/api/patients', params=dict(query, size=200))['items']
+                pages = [call('GET', '/api/patients', params=dict(query, size=3, page=p))['items'] for p in range((len(all_items) + 2) // 3)]
+                self.assertEqual([p['id'] for chunk in pages for p in chunk], [p['id'] for p in all_items])
+                if key == 'due':
+                    values = [p['topFindings'][0]['targetDays'] if p['topFindings'] else None for p in all_items]
+                    ordered = sorted([v for v in values if v is not None], reverse=direction == 'desc')
+                    self.assertEqual(values, ordered + [None] * values.count(None))
+        for key in ('stage', 'notified', 'invalid'):
+            call('GET', '/api/patients', 400, params={'sortBy': key})
+        call('GET', '/api/patients', 400, params={'sortDirection': 'invalid'})
 
 
 def coverage():

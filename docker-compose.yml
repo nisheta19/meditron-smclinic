@@ -27,6 +27,10 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-meditron}
       ML_SERVICE_URL: http://ml:8000
       DEMO_SEED: "false"
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-false}
+      AUTH_LOGIN: ${AUTH_LOGIN:-123}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-123}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
     healthcheck:

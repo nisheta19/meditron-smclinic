@@ -7,7 +7,6 @@ import { Archive, ArrowLeft, Briefcase, Grid, Inbox, Logo, Tool } from './compon
 import Findings from './pages/Findings';
 import Patients from './pages/Patients';
 import PatientCard from './pages/PatientCard';
-import Dictionary from './pages/Dictionary';
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
@@ -48,8 +47,7 @@ export default function App() {
   const page = !ready ? <p className="state">Подключаемся к серверу…</p>
     : section === 'patients' && id ? <PatientCard key={id} id={id} />
     : section === 'inbox' ? <Patients key="inbox" preset="inbox" />
-    : section === 'archive' ? <Patients key="archive" preset="archive" />
-    : section === 'settings' ? <Dictionary /> : <Findings />;
+    : ['archive', 'settings'].includes(section) ? <p className="state" role="status">Раздел пока недоступен</p> : <Findings />;
   const current = section === 'patients' ? 'findings' : section;   // карточка открывается из «Находок»
 
   return (
@@ -61,7 +59,9 @@ export default function App() {
             <a className="brand" href="#/findings" aria-label="СМ-Клиника, на главную"><Logo /></a>
             <nav className="nav" aria-label="Разделы">
               {section === 'patients' && <button className="nav-item dashboard-stub" disabled title="Дашборд — заглушка"><Grid size={16} /><span>Дашборд</span></button>}
-              {NAV.map(([key, label, Icon]) => (
+              {NAV.map(([key, label, Icon]) => ['archive', 'settings'].includes(key) ? (
+                <button key={key} className="nav-item" disabled title={`${label} — заглушка`}><Icon size={16} /><span>{label}</span></button>
+              ) : (
                 <a key={key} href={`#/${key}`} className="nav-item" aria-current={current === key ? 'page' : undefined} title={label}>
                   <Icon size={16} /><span>{label}</span>
                 </a>

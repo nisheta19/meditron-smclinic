@@ -7,6 +7,14 @@ test('real backend and same-origin requests are the defaults', () => {
   assert.equal(USE_MOCK, false);
   assert.equal(API_URL, '');
 });
+
+test('both queue filter values reach the backend', async () => {
+  const urls = [];
+  globalThis.fetch = async (url) => { urls.push(url); return new Response('{"items":[],"total":0}'); };
+  await httpApi.patients({ needsRouteReview: false });
+  await httpApi.patients({ needsRouteReview: true });
+  assert.deepEqual(urls, ['/api/patients?needsRouteReview=false', '/api/patients?needsRouteReview=true']);
+});
 test('nested patient and protocol DTOs preserve fields and flags', async () => {
   globalThis.fetch = async (url) => new Response(JSON.stringify(url.includes('/patients/')
     ? { patient: { id: 'p', maxLevel: 'EMERGENCY' }, currentProtocol: { id: 'r' }, history: { protocols: [] } }

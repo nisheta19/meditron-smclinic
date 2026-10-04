@@ -1,5 +1,6 @@
 package ru.meditron.routing.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -32,6 +33,10 @@ public record MlResultRequest(
     public record PatientPart(
             @NotBlank String externalId,
             @NotBlank String fullName,
+            // Omit absent new fields to keep fingerprints of pre-upgrade callbacks stable.
+            @JsonInclude(JsonInclude.Include.NON_NULL) String lastName,
+            @JsonInclude(JsonInclude.Include.NON_NULL) String firstName,
+            @JsonInclude(JsonInclude.Include.NON_NULL) String middleName,
             @NotNull LocalDate birthDate,
             @NotNull Sex sex) {
     }

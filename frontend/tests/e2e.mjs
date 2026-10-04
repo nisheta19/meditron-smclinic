@@ -30,14 +30,14 @@ try {
     await page.goto(base);
     await page.locator('.row-card').first().waitFor();
     assert.equal(await page.locator('.demo').count(), 0);
-    const server = await api('/api/patients?size=50&page=0');
+    const server = await api('/api/patients?size=50&page=0&needsRouteReview=false');
     assert.equal(await page.locator('.row-card').count(), server.items.length);
-    assert.ok((await page.locator('.row-card').first().innerText()).includes(server.items[0].fullName));
+    assert.ok((await page.locator('.row-card').first().innerText()).includes(server.items[0].shortName));
     if (server.total > 50) {
       await page.getByRole('button', { name: 'Далее', exact: true }).click();
       await until(async () => (await page.locator('.pagination').innerText()).includes('Страница 2'));
-      const second = await api('/api/patients?size=50&page=1');
-      await until(async () => (await page.locator('.row-card').first().innerText()).includes(second.items[0].fullName));
+      const second = await api('/api/patients?size=50&page=1&needsRouteReview=false');
+      await until(async () => (await page.locator('.row-card').first().innerText()).includes(second.items[0].shortName));
     }
     await search(fixture.cases.positive.externalId);
     await until(async () => await page.locator('.row-card').count() === 1);
@@ -53,7 +53,18 @@ try {
     const response = await context.request.post(`${base}/api/integration/events`, { data: event });
     assert.equal(response.status(), 202);
     await page.locator('.row-card').waitFor();
-    assert.ok((await page.locator('.row-card').innerText()).includes(event.patient.fullName));
+    const arrived = await api(`/api/patients?search=${encodeURIComponent(event.patient.externalId)}`);
+    assert.ok((await page.locator('.row-card').innerText()).includes(arrived.items[0].shortName));
+  });
+  await test('structured names preserve compound parts and omit absent middle name', async () => {
+    await card('positive');
+    assert.deepEqual((await page.locator('.pc-person h3 > span').allTextContents()).map((s) => s.trim()), ['Петрова-Водкина', 'Анна Мария', 'Ивановна']);
+    const full = (await api(`/api/patients/${fixture.cases.positive.id}`)).patient;
+    assert.equal(full.shortName, 'Петрова-Водкина А. И.');
+    assert.equal(full.firstName, 'Анна Мария');
+    await card('normal');
+    assert.deepEqual((await page.locator('.pc-person h3 > span').allTextContents()).map((s) => s.trim()), ['Smith', 'Jane']);
+    assert.equal((await api(`/api/patients/${fixture.cases.normal.id}`)).patient.middleName, null);
   });
   await test('Unicode quote highlighting and real routing deadline', async () => {
     await card('positive');
@@ -126,22 +137,58 @@ try {
       await until(async () => await page.getByRole('button', { name: '+ Добавить', exact: true }).isEnabled() === (key === 'independent'));
     }
   });
-  await test('dictionary has 48 codes, code search, no unsupported actions', async () => {
-    await page.goto(`${base}/#/settings`);
-    await until(async () => await page.locator('.row-card').count() === 48);
-    assert.equal(await page.getByRole('button', { name: 'Добавить тип находки' }).count(), 0);
-    await search('BREAST_LESION');
+  await test('settings and archive are inert stubs, dictionary still serves finding forms', async () => {
+    for (const route of ['settings', 'archive']) {
+      await page.goto(`${base}/#/${route}`);
+      await page.getByText('Раздел пока недоступен', { exact: true }).waitFor();
+      assert.equal(await page.locator('.row-card, .dict-table').count(), 0);
+      for (const name of ['Картотека', 'Настройки']) assert.ok(await page.getByRole('button', { name, exact: true }).isDisabled());
+    }
+    assert.equal((await api('/api/dictionary/findings')).length, 48);
+  });
+  await test('urgent filter works, only deadline text is amber and patient has no badge', async () => {
+    await page.goto(`${base}/#/findings`);
+    await page.getByRole('tab', { name: /^Срочно/ }).click();
+    await search(fixture.cases.urgent.externalId);
     await until(async () => await page.locator('.row-card').count() === 1);
-    assert.ok((await page.locator('.row-card').innerText()).includes('BREAST_LESION'));
+    assert.equal(await page.locator('.row-card .urgency-badge').count(), 0);
+    assert.equal(await page.locator('.cell-due .s-main').innerText(), 'В течение 3 дней');
+    assert.equal(await page.locator('.cell-due .s-main').evaluate((el) => getComputedStyle(el).color), 'rgb(166, 106, 0)');
+    assert.ok(!(await page.locator('.row-card').innerText()).match(/Срочно|Экстренно/u));
+    await page.locator('.row-card').click();
+    await page.locator('.pc-row').first().waitFor();
+    assert.equal(await page.locator('.pc-main .urgency-badge').count(), 0);
+    assert.ok(!(await page.locator('.pc-person').innerText()).match(/Срочно|Экстренно/u));
+  });
+  await test('inbox only shows undetermined directions and updates after doctor confirmation', async () => {
+    await page.goto(`${base}/#/inbox`);
+    await search(fixture.cases.positive.externalId);
+    await page.locator('.row-empty').waitFor();
+    await search(fixture.cases.missing.externalId);
+    await page.locator('.row-card').waitFor();
+    await page.locator('.row-card').click();
+    await page.getByRole('button', { name: /^Подтвердить:/ }).first().click();
+    await until(async () => (await api(`/api/patients/${fixture.cases.missing.id}`)).patient.needsRouteReview === false);
+    await page.goto(`${base}/#/inbox`);
+    await search(fixture.cases.missing.externalId);
+    await page.locator('.row-empty').waitFor();
+    await page.goto(`${base}/#/findings`);
+    await search(fixture.cases.missing.externalId);
+    await page.locator('.row-card').waitFor();
+    assert.ok(patientQueries.some((q) => q.get('needsRouteReview') === 'true'));
+    assert.ok(patientQueries.some((q) => q.get('needsRouteReview') === 'false'));
   });
   await test('emergency and attention filters', async () => {
     await page.goto(`${base}/#/findings`);
+    await search('');
     await page.getByRole('tab', { name: /^Экстренные/ }).click();
     await until(async () => await page.locator('.row-card').count() > 0);
     await until(async () => await page.locator('.row-card:not(.emergency)').count() === 0);
     await search(fixture.cases.emergency.externalId);
     await until(async () => await page.locator('.row-card').count() === 1);
     assert.ok((await page.locator('.row-card').innerText()).includes('Немедленно'));
+    assert.equal(await page.locator('.cell-due .s-main').evaluate((el) => getComputedStyle(el).color), 'rgb(255, 54, 54)');
+    assert.ok(!(await page.locator('.row-card').innerText()).match(/Срочно|Экстренно/u));
     await page.goto(`${base}/#/inbox`);
     await page.getByRole('tab', { name: /^Требует внимания/ }).click();
     await search(fixture.cases.failed.externalId);
@@ -168,6 +215,7 @@ try {
     await page.unroute('**/api/patients?*');
     await page.getByRole('button', { name: 'Повторить', exact: true }).click();
     await page.locator('.row-card').first().waitFor();
+    assert.equal(await page.getByText('Экстренно', { exact: true }).count(), 0);
     expectedFailure = false;
   });
   await test('mobile layout does not overflow', async () => {
@@ -187,6 +235,7 @@ try {
     await until(async () => (await page.locator('body').innerText()).includes('/api/integration/protocols'));
     await page.goto(`${base}/?mock=1`);
     await page.locator('.row-card').first().waitFor();
+    assert.equal(await page.getByText('Экстренно', { exact: true }).count(), 0);
     await page.getByRole('button', { name: 'Демо', exact: true }).click();
     assert.ok((await page.locator('.demo-body').innerText()).includes('Вымышленные данные'));
   });

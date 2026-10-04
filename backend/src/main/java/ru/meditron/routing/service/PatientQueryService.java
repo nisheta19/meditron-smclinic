@@ -47,7 +47,7 @@ public class PatientQueryService {
     }
 
     private PatientShortDto shortDto(Snapshot s) {
-        int pending = (int) s.findings().stream().filter(f -> f.getStatus() == FindingStatus.SUGGESTED).count();
+        int pending = (int) active(s).stream().filter(f -> f.getStatus() == FindingStatus.SUGGESTED).count();
         Protocol c = s.current();
         ReviewState state;
         if (s.protocols().stream().filter(x -> !x.isSuperseded()).anyMatch(x -> x.getStatus() == ProcessingStatus.FAILED
@@ -59,15 +59,21 @@ public class PatientQueryService {
             state = ReviewState.OK;
         }
         Patient p = s.patient();
+        PersonName name = p.name();
         return new PatientShortDto(
                 p.getId().toString(),
                 p.getExternalId(),
-                p.getFullName(),
+                name.fullName(),
+                name.lastName(),
+                name.firstName(),
+                name.middleName(),
+                name.shortName(),
                 p.getBirthDate(),
                 mapper.age(p, null),
                 p.getSex(),
                 null,
                 state,
+                needsRouteReview(s),
                 maxLevel(s),
                 c == null ? null : c.getReceivedAt(),
                 pending,
@@ -79,6 +85,12 @@ public class PatientQueryService {
     }
 
     private static final int TOP_FINDINGS = 2;
+
+    private boolean needsRouteReview(Snapshot s) {
+        return s.protocols().stream().anyMatch(p -> RouteReviewPolicy.needsReview(p,
+                s.findings().stream().filter(f -> f.getProtocol() != null && f.getProtocol().getId().equals(p.getId())).toList()))
+                || s.findings().stream().filter(f -> f.getProtocol() == null).anyMatch(RouteReviewPolicy::needsReview);
+    }
 
     /**
      * Активные находки всех незаменённых протоколов и ручные подтверждённые находки,
@@ -101,19 +113,21 @@ public class PatientQueryService {
     }
 
     public PatientPageDto list(String search, ReviewState reviewState, StudyType studyType, FindingLevel maxLevel,
-                               LocalDate dateFrom, LocalDate dateTo, int page, int size) {
+                               LocalDate dateFrom, LocalDate dateTo, Boolean needsRouteReview, int page, int size,
+                               String sortBy, String sortDirection) {
+        Comparator<PatientShortDto> order = PatientSort.comparator(sortBy, sortDirection);
         if (page < 0 || size < 1 || size > 200 || (dateFrom != null && dateTo != null && dateFrom.isAfter(dateTo))) {
             throw new BadRequestException("INVALID_FILTER", "page >= 0; size от 1 до 200; dateFrom <= dateTo");
         }
         List<PatientShortDto> all = new ArrayList<>();
         for (Patient p : patients.findAll()) {
-            Snapshot s = snapshot(p);
             if (search != null && !search.isBlank()) {
                 String q = search.toLowerCase();
                 if (!p.getFullName().toLowerCase().contains(q) && !p.getExternalId().toLowerCase().contains(q)) {
                     continue;
                 }
             }
+            Snapshot s = snapshot(p);
             if (studyType != null && s.protocols().stream().noneMatch(x -> x.getStudyType() == studyType)) {
                 continue;
             }
@@ -125,6 +139,7 @@ public class PatientQueryService {
                 continue;
             }
             PatientShortDto dto = shortDto(s);
+            if (needsRouteReview != null && dto.needsRouteReview() != needsRouteReview) continue;
             if (reviewState != null && dto.reviewState() != reviewState) {
                 continue;
             }
@@ -133,11 +148,7 @@ public class PatientQueryService {
             }
             all.add(dto);
         }
-        // Экстренные — вверху инбокса, затем срочные; внутри уровня — новые сверху.
-        all.sort(Comparator.comparing((PatientShortDto d) -> d.maxLevel() == null ? 0 : d.maxLevel().rank(),
-                        Comparator.reverseOrder())
-                .thenComparing(PatientShortDto::receivedAt,
-                        Comparator.nullsLast(Comparator.<Instant>reverseOrder())));
+        all.sort(order);
         int from = (int) Math.min((long) page * size, all.size());
         int to = Math.min(from + size, all.size());
         return new PatientPageDto(all.subList(from, to), page, size, all.size());

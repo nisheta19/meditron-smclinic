@@ -51,11 +51,13 @@ class ApprovedTransportTests(unittest.TestCase):
                 backend=BackendClient(f'http://127.0.0.1:{server.server_port}')
                 service=MLService(root/'state.sqlite3',backend,backend.dictionary)
                 event=build_event({'eventId':'approved-1','eventType':'PROTOCOL_SIGNED',
-                    'patient':{'externalId':'demo-1','fullName':'Пациент 001','birthDate':'2000-01-01','sex':'F'},
+                    'patient':{'externalId':'demo-1','fullName':'Белова Наталья Олеговна',
+                               'lastName':'Белова','firstName':'Наталья','middleName':'Олеговна','birthDate':'2000-01-01','sex':'F'},
                     'protocol':{'externalId':'proto-1','version':1,'studyType':'BREAST','studyDate':'2026-09-07'}},path)
                 try:
                     result=service.accept(event)
                     self.assertEqual(result['status'],'DONE')
+                    self.assertEqual(result['patient'],event['patient'])
                     self.assertEqual(result['findings'],[])
                     self.assertEqual(len([x for x in result['notTriggered'] if x['reason']=='NORMAL']),2)
                     service.deliver_one()

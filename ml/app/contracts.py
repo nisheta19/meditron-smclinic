@@ -47,6 +47,9 @@ def validate_event(event):
         required_string(event[key], "externalId")
     patient, protocol = event["patient"], event["protocol"]
     required_string(patient, "fullName")
+    for field in ("lastName", "firstName", "middleName"):
+        if patient.get(field) is not None and not isinstance(patient[field], str):
+            raise ContractError(f"patient.{field}: требуется строка или null")
     validate_date(patient.get("birthDate"), "patient.birthDate")
     if patient.get("sex") not in ("F", "M"):
         raise ContractError("patient.sex: ожидается F или M")

@@ -7,6 +7,8 @@ const people = [
 ];
 export const patients = people.map(([fullName, age, birthDate, name, studyType], i) => ({
   id: `design-${i}`, externalId: `design-patient-${i}`, fullName, age, birthDate, sex: 'F', studyType,
+  lastName: fullName.split(' ')[0], firstName: fullName.split(' ')[1], middleName: fullName.split(' ')[2],
+  shortName: ['Фамилия И. О.', 'Другой Н. Д.', 'Длиннофамильная В. С.', 'Некоторый И. С.'][i],
   reviewState: 'PENDING', receivedAt: '2026-10-02T05:41:00Z', activeFindings: 1,
   topFindings: [{ name, targetDays: 30 }], maxLevel: 'PLANNED',
 }));

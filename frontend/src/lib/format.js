@@ -54,7 +54,9 @@ export const plural = (n, [one, few, many]) => {
 };
 export const nWord = (n, forms) => `${n} ${plural(n, forms)}`;
 export const DAYS = ['день', 'дня', 'дней'];
-export const targetDaysText = (days) => days == null ? null : days === 0 ? 'Немедленно' : `В течение ${nWord(days, DAYS)}`;
+export const targetDaysText = (days) => days == null ? null : days === 0 ? 'Немедленно' : `В течение ${nWord(days, ['дня', 'дней', 'дней'])}`;
+// Presentation of the displayed interval; does not reclassify the backend's medical level.
+export const deadlineTone = (days) => !Number.isFinite(days) ? '' : days <= 0 ? 'red' : days <= 3 ? 'amber' : '';
 export const ageText = (n) => (n == null ? '' : nWord(n, ['год', 'года', 'лет']));
 export const notesText = (n) => nWord(n, ['уведомление', 'уведомления', 'уведомлений']);
 export const fmtStamp = (v) => (v ? `${fmtDate(v)} · ${new Date(v).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}` : '');
@@ -64,18 +66,18 @@ export const daysAgo = (v) => {
   return d < 1 ? 'Сегодня' : `${nWord(d, DAYS)} назад`;
 };
 
-/** Срок записи: [текст, акцент оранжевым] */
+/** Срок записи: [текст, цвет самого текста]. */
 export function deadlineText({ dueDate, currentStepStatus, routeStatus }, stepType) {
-  if (stepType === 'ESCALATION') return ['Экстренно', true];
-  if (routeStatus === 'COMPLETED') return ['Маршрут завершён', false];
-  if (routeStatus === 'CANCELLED') return ['Маршрут отменён', false];
-  if (['BOOKED', 'COMPLETED'].includes(currentStepStatus)) return ['Записан', false];
-  if (!dueDate) return ['—', false];
+  if (routeStatus === 'COMPLETED') return ['Маршрут завершён', ''];
+  if (routeStatus === 'CANCELLED') return ['Маршрут отменён', ''];
+  if (['BOOKED', 'COMPLETED'].includes(currentStepStatus)) return ['Записан', ''];
+  if (stepType === 'ESCALATION') return ['Немедленно', 'red'];
+  if (!dueDate) return ['—', ''];
   const today = new Date(now()).toISOString().slice(0, 10);
   const left = Math.round((Date.parse(dueDate) - Date.parse(today)) / 864e5);
-  if (left < 0) return [`Просрочено ${nWord(-left, DAYS)}`, true];
-  if (left === 0) return ['Последний день', true];
-  return [`${plural(left, ['Остался', 'Осталось', 'Осталось'])} ${nWord(left, DAYS)}`, left <= 1];
+  if (left < 0) return [`Просрочено ${nWord(-left, DAYS)}`, deadlineTone(left)];
+  if (left === 0) return ['Последний день', deadlineTone(left)];
+  return [`${plural(left, ['Остался', 'Осталось', 'Осталось'])} ${nWord(left, DAYS)}`, deadlineTone(left)];
 }
 /** «Кудрявцев Сергей Михайлович» → «Кудрявцев С. М.» — как в макете списка */
 export const shortName = (full = '') => {

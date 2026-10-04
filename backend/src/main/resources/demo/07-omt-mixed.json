@@ -5,9 +5,12 @@
   "processedAt": "2026-09-10T10:07:00+03:00",
   "patient": {
     "externalId": "mis-0007",
-    "fullName": "Пациент 007",
+    "fullName": "Захарова Ирина Алексеевна",
     "birthDate": "1987-03-03",
-    "sex": "F"
+    "sex": "F",
+    "lastName": "Захарова",
+    "firstName": "Ирина",
+    "middleName": "Алексеевна"
   },
   "protocol": {
     "externalId": "proto-omt-6",

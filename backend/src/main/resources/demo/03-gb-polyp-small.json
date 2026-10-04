@@ -5,9 +5,12 @@
   "processedAt": "2026-09-08T10:03:00+03:00",
   "patient": {
     "externalId": "mis-0003",
-    "fullName": "Пациент 003",
+    "fullName": "Кузнецов Дмитрий Андреевич",
     "birthDate": "1993-11-20",
-    "sex": "M"
+    "sex": "M",
+    "lastName": "Кузнецов",
+    "firstName": "Дмитрий",
+    "middleName": "Андреевич"
   },
   "protocol": {
     "externalId": "proto-gb-16",

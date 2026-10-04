@@ -27,6 +27,15 @@ public class Patient {
     @Column(nullable = false)
     private String fullName;
 
+    private String lastName;
+    private String firstName;
+    private String middleName;
+
+    /** Old database rows still have only full_name. */
+    public PersonName name() {
+        return PersonName.resolve(fullName, lastName, firstName, middleName);
+    }
+
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)

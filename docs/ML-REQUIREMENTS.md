@@ -63,7 +63,7 @@ ML ──результат: пациент, протокол, находки, �
 {
   "eventId": "evt-001",
   "eventType": "PROTOCOL_SIGNED",
-  "patient": { "externalId": "mis-456", "fullName": "Пациент 001", "birthDate": "1999-03-15", "sex": "F" },
+  "patient": { "externalId": "mis-456", "fullName": "Белова Наталья Олеговна", "lastName": "Белова", "firstName": "Наталья", "middleName": "Олеговна", "birthDate": "1999-03-15", "sex": "F" },
   "protocol": { "externalId": "proto-789", "version": 1, "studyType": "PELVIS_FEMALE", "studyDate": "2026-09-07" },
   "fileName": "1 Ж ОМТ (23).docx",
   "contentBase64": "..."
@@ -79,6 +79,11 @@ ML ──результат: пациент, протокол, находки, �
 `studyType` принимает значения `PELVIS_FEMALE`, `ABDOMEN`, `BREAST`, `THYROID`, `PROSTATE`, `LOWER_LIMB_VESSELS`, `KIDNEY`, `SOFT_TISSUE`. По нему ML сужает набор кандидатов: у каждого кода в словаре есть `studyTypes`.
 
 Данные пациента ML **не извлекает из текста**: ФИО в протоколах пустое, возраст и пол бэкенд берёт из метаданных.
+
+`lastName`, `firstName`, `middleName` необязательны, принимают строку или `null`.
+`fullName` пока остаётся обязательным. ML пересылает части в исходном виде,
+включая пробелы и отсутствие отчества; выбор между частями и старой строкой,
+нормализация и формирование `shortName` выполняются бэкендом.
 
 ---
 
@@ -106,7 +111,7 @@ ML вызывает `POST {BACKEND_URL}/api/integration/ml/results` с заго�
   "dictionaryVersion": "dict-v2.1",
   "processedAt": "2026-10-04T13:15:02+03:00",
 
-  "patient":  { "externalId": "mis-456", "fullName": "Пациент 001", "birthDate": "1999-03-15", "sex": "F" },
+  "patient":  { "externalId": "mis-456", "fullName": "Белова Наталья Олеговна", "lastName": "Белова", "firstName": "Наталья", "middleName": "Олеговна", "birthDate": "1999-03-15", "sex": "F" },
   "protocol": { "externalId": "proto-789", "version": 1, "studyType": "PELVIS_FEMALE", "studyDate": "2026-09-07" },
 
   "text": "УЛЬТРАЗВУКОВОЕ ИССЛЕДОВАНИЕ ОРГАНОВ МАЛОГО ТАЗА ...",

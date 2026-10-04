@@ -29,7 +29,7 @@ const COLS = [
   { key: 'stage', label: 'Этап', width: 'minmax(0, 199fr)', sort: (r) => r.progress ?? -1,
     cell: (r) => (r.progress == null ? null : <Progress value={r.progress} name={r.currentStepName ? stepLabel(r.currentStepName) : ROUTE[r.routeStatus]?.[0]} />) },
   { key: 'due', label: 'Срок записи', width: 'minmax(0, 187fr)', sort: (r) => r.dueDate ?? '9999',
-    cell: (r) => { const [text, warn] = deadlineText(r, r.stepType); return <Stack main={text} warn={warn} />; } },
+    cell: (r) => { const [text, tone] = deadlineText(r, r.stepType); return <Stack main={text} tone={tone} />; } },
   { key: 'notified', label: 'Уведомлён', width: 'minmax(0, 132fr)', sort: (r) => r.lastNotificationAt ?? '',
     cell: (r) => <Stack main={daysAgo(r.lastNotificationAt)} sub={r.notes != null && notesText(r.notes)} /> },
 ];

@@ -66,7 +66,7 @@ export function ChipRow({ items, value, onChange, selectAll, extra }) {
  * Список карточек-строк с заголовками колонок.
  * cols: [{ key, label, sort?: (row) => value, cell: (row) => node, width }]
  */
-export function RowList({ cols, rows, rowKey, sort, onSort, selection, onRow, empty, loading, className = '', decorativeSort = false }) {
+export function RowList({ cols, rows, rowKey, sort, onSort, selection, onRow, empty, loading, className = '', decorativeSort = false, mobileSort = true }) {
   // Ширины в долях (fr) по макету: на 1280 px совпадают с Figma, на широком экране тянутся на всю ширину
   const template = cols.map((c) => c.width ?? 'minmax(0, 1fr)').join(' ');
   return (
@@ -79,10 +79,10 @@ export function RowList({ cols, rows, rowKey, sort, onSort, selection, onRow, em
               aria-sort={active ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'}>
               {c.label}<ArrowDown size={12} className={active && sort.dir > 0 ? 'asc' : undefined} />
             </button>
-          ) : <span key={c.key} className="col-head">{c.label}{decorativeSort && <ArrowDown size={12} aria-hidden="true" />}</span>;
+          ) : <span key={c.key} className="col-head" title={c.title}>{c.label}{decorativeSort && <ArrowDown size={12} aria-hidden="true" />}</span>;
         })}
       </div>
-      {onSort && <div className="mobile-sort">
+      {onSort && mobileSort && <div className="mobile-sort">
         <span>Сортировка</span>
         <Dropdown compact ariaLabel="Сортировка" value={sort.key} onChange={onSort}
           options={cols.filter((c) => c.sort).map((c) => [c.key, c.label])} />
@@ -103,9 +103,9 @@ export function RowList({ cols, rows, rowKey, sort, onSort, selection, onRow, em
 }
 
 /** Ячейка из 2–3 строк: основная 16px, вторая серая, третья светло-серая */
-export const Stack = ({ main, sub, faint, warn }) => (
+export const Stack = ({ main, sub, faint, warn, tone }) => (
   <div className="stack">
-    <span className={`s-main${warn ? ' warn' : ''}`}>{main}</span>
+    <span className={`s-main${tone ? ` deadline-${tone}` : warn ? ' warn' : ''}`}>{main}</span>
     {sub && <span className="s-sub">{sub}</span>}
     {faint && <span className="s-faint">{faint}</span>}
   </div>

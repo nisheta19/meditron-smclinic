@@ -4,9 +4,11 @@ info:
   description: Выявление клинически значимых находок и маршрутизация пациента
   version: 0.0.1
 servers:
-- url: http://127.0.0.1:18080
+- url: http://127.0.0.1:18081
   description: Generated server url
 tags:
+- name: Auth
+  description: Единственный тестовый аккаунт, cookie-сессия и CSRF; формы входа пока нет
 - name: Dictionary
   description: Словарь находок (findings-dictionary.yaml)
 - name: Integration
@@ -44,8 +46,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -56,8 +58,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -94,8 +96,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -106,8 +108,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -143,8 +145,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -155,8 +157,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -195,8 +197,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -207,8 +209,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -223,8 +225,7 @@ paths:
     post:
       tags:
       - Integration
-      summary: Результат ML по одному протоколу. Повтор того же resultId — 202 без
-        изменений
+      summary: Результат ML по одному протоколу. Повтор того же resultId — 202 без изменений
       operationId: mlResult
       requestBody:
         content:
@@ -239,8 +240,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -251,8 +252,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -278,8 +279,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -290,8 +291,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -321,8 +322,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -333,8 +334,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -345,6 +346,80 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/auth/logout:
+    post:
+      tags:
+      - Auth
+      operationId: logout
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: No Content
+  /api/auth/login:
+    post:
+      tags:
+      - Auth
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Account'
   /api/findings/{findingId}:
     delete:
       tags:
@@ -369,8 +444,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -381,8 +456,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -413,8 +488,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -425,8 +500,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -456,8 +531,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -468,8 +543,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -492,8 +567,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -504,8 +579,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -522,8 +597,7 @@ paths:
     get:
       tags:
       - Patients
-      summary: 'Инбокс: «Новые» = reviewState=PENDING, ATTENTION — протокол не прочитан
-        или без заключения'
+      summary: 'Пациенты: needsRouteReview=true — входящие без определённого направления; false — остальные'
       operationId: list
       parameters:
       - name: search
@@ -563,6 +637,11 @@ paths:
           - EMERGENCY
           - URGENT
           - PLANNED
+      - name: needsRouteReview
+        in: query
+        required: false
+        schema:
+          type: boolean
       - name: dateFrom
         in: query
         required: false
@@ -589,6 +668,18 @@ paths:
           type: integer
           format: int32
           default: 20
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+          default: asc
       responses:
         '404':
           description: Not Found
@@ -596,8 +687,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -608,8 +699,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -639,8 +730,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -651,8 +742,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -682,8 +773,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -694,8 +785,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -710,8 +801,8 @@ paths:
     get:
       tags:
       - Dictionary
-      summary: 'Словарь: краткий вид для фронта; full=true — полные записи для ML
-        (атрибуты, правила извлечения, ловушки)'
+      summary: 'Словарь: краткий вид для фронта; full=true — полные записи для ML (атрибуты, правила извлечения,
+        ловушки)'
       operationId: findings_1
       parameters:
       - name: studyType
@@ -737,8 +828,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Bad Request
+        '409':
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -749,8 +840,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict
+        '400':
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -761,6 +852,78 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/auth/me:
+    get:
+      tags:
+      - Auth
+      operationId: me
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Account'
+  /api/auth/csrf:
+    get:
+      tags:
+      - Auth
+      operationId: csrf
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Csrf'
 components:
   schemas:
     ErrorResponse:
@@ -999,6 +1162,12 @@ components:
         fullName:
           type: string
           minLength: 1
+        lastName:
+          type: string
+        firstName:
+          type: string
+        middleName:
+          type: string
         birthDate:
           type: string
           format: date
@@ -1040,6 +1209,29 @@ components:
       - externalId
       - studyDate
       - studyType
+    Login:
+      type: object
+      properties:
+        login:
+          type: string
+          maxLength: 128
+          minLength: 0
+        password:
+          type: string
+          maxLength: 128
+          minLength: 0
+      required:
+      - login
+      - password
+    Account:
+      type: object
+      properties:
+        login:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
     FindingUpdateRequest:
       type: object
       properties:
@@ -1151,6 +1343,14 @@ components:
           type: string
         fullName:
           type: string
+        lastName:
+          type: string
+        firstName:
+          type: string
+        middleName:
+          type: string
+        shortName:
+          type: string
         birthDate:
           type: string
           format: date
@@ -1170,6 +1370,8 @@ components:
           - OK
           - PENDING
           - ATTENTION
+        needsRouteReview:
+          type: boolean
         maxLevel:
           type: string
           enum:
@@ -1263,3 +1465,12 @@ components:
           items: {}
         history:
           $ref: '#/components/schemas/History'
+    Csrf:
+      type: object
+      properties:
+        token:
+          type: string
+        headerName:
+          type: string
+        parameterName:
+          type: string

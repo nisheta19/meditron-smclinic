@@ -19,6 +19,20 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${AUTH_COOKIE_SECURE:false}
+
+# Включать обязательный вход после подключения формы во фронте.
+auth:
+  required: ${AUTH_REQUIRED:false}
+  login: ${AUTH_LOGIN:123}
+  password: ${AUTH_PASSWORD:123}
+  allowed-origins: ${AUTH_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173,http://127.0.0.1:13000}
 
 ml:
   service-url: ${ML_SERVICE_URL:http://localhost:8000}

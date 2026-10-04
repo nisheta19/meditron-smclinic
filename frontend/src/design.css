@@ -7,6 +7,9 @@
 .nav-user-text small { line-height: 1; }
 .chip-count { min-width: 26px; }
 .chip:disabled { opacity: 1; cursor: default; }
+.nav-item:disabled { cursor: default; opacity: 1; }
+.s-main.deadline-red { color: #ff3636; }
+.s-main.deadline-amber { color: #a66a00; }
 .col-head { align-items: center; }
 .patients-list .rowlist-head { min-height: 26px; padding-bottom: 12px; }
 .patients-list .row-card { min-height: 100px; }

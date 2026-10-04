@@ -6,9 +6,12 @@
   "processedAt": "2026-10-03T10:00:00+03:00",
   "patient": {
     "externalId": "mis-0008",
-    "fullName": "Пациент 008",
+    "fullName": "Белова Наталья Олеговна",
     "birthDate": "1979-06-03",
-    "sex": "F"
+    "sex": "F",
+    "lastName": "Белова",
+    "firstName": "Наталья",
+    "middleName": "Олеговна"
   },
   "protocol": {
     "externalId": "proto-veins-synth-02",
