@@ -5,7 +5,10 @@
   "processedAt": "2026-09-07T10:02:00+03:00",
   "patient": {
     "externalId": "mis-0002",
-    "fullName": "Пациент 002",
+    "fullName": "Морозова Ольга Викторовна",
+    "lastName": "Морозова",
+    "firstName": "Ольга",
+    "middleName": "Викторовна",
     "birthDate": "1968-02-03",
     "sex": "F"
   },

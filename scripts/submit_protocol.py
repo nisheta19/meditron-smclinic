@@ -24,7 +24,7 @@ def main():
         if not args.study_type or not args.file: cli.error('Supply --file and --study-type, or --metadata')
         identity=uuid4().hex
         meta={'eventId':'demo-event-'+identity,'eventType':'PROTOCOL_SIGNED',
-              'patient':{'externalId':'demo-patient-'+identity,'fullName':'Пациент демо '+identity[:6],
+              'patient':{'externalId':'demo-patient-'+identity,'fullName':'Демо-'+identity[:6]+' Пациент','lastName':'Демо-'+identity[:6],'firstName':'Пациент',
                          'birthDate':'1990-01-01','sex':'M' if args.study_type=='PROSTATE' else 'F'},
               'protocol':{'externalId':'demo-protocol-'+identity,'version':1,
                           'studyType':args.study_type,'studyDate':date.today().isoformat()}}

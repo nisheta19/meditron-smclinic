@@ -439,7 +439,11 @@ components:
       properties:
         id: { type: string }
         externalId: { type: string, description: ID пациента в МИС }
-        fullName: { type: string }
+        fullName: { type: string, example: Соколова Анна Сергеевна, description: ФИО одной строкой (совместимость, поиск) }
+        lastName: { type: string, nullable: true, example: Соколова }
+        firstName: { type: string, nullable: true, example: Анна }
+        middleName: { type: string, nullable: true, example: Сергеевна, description: Отчество — может отсутствовать }
+        shortName: { type: string, example: Соколова А. С., description: Готовая строка «Фамилия И. О.» для списков }
         birthDate: { type: string, format: date }
         age: { type: integer, description: Вычисляется на сервере }
         sex: { type: string, enum: [F, M] }
@@ -723,9 +727,13 @@ components:
         patient:
           type: object
           required: [externalId, fullName, birthDate, sex]
+          description: ФИО по частям из МИС; fullName пока обязателен (совместимость с ML). Если частей нет, бэкенд разбирает fullName сам.
           properties:
             externalId: { type: string }
-            fullName: { type: string }
+            fullName: { type: string, example: Соколова Анна Сергеевна }
+            lastName: { type: string, example: Соколова }
+            firstName: { type: string, example: Анна }
+            middleName: { type: string, nullable: true, example: Сергеевна }
             birthDate: { type: string, format: date }
             sex: { type: string, enum: [F, M] }
         protocol:

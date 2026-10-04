@@ -125,7 +125,11 @@ public class MlIngestionService {
     private Patient upsertPatient(MlResultRequest.PatientPart p) {
         Patient patient = patients.findByExternalId(p.externalId()).orElseGet(Patient::new);
         patient.setExternalId(p.externalId());
-        patient.setFullName(p.fullName());
+        PersonName name = PersonName.of(p.lastName(), p.firstName(), p.middleName(), p.fullName());
+        patient.setLastName(name.lastName());
+        patient.setFirstName(name.firstName());
+        patient.setMiddleName(name.middleName());
+        patient.setFullName(name.full().isEmpty() ? p.fullName() : name.full());
         patient.setBirthDate(p.birthDate());
         patient.setSex(p.sex());
         return patients.save(patient);

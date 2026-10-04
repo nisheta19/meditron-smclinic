@@ -6,7 +6,10 @@
   "processedAt": "2026-10-03T10:00:00+03:00",
   "patient": {
     "externalId": "mis-0009",
-    "fullName": "Пациент 009",
+    "fullName": "Орлова Дарья Максимовна",
+    "lastName": "Орлова",
+    "firstName": "Дарья",
+    "middleName": "Максимовна",
     "birthDate": "1999-02-07",
     "sex": "F"
   },

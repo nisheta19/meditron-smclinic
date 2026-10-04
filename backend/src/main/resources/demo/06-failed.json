@@ -5,7 +5,10 @@
   "processedAt": "2026-09-09T10:06:00+03:00",
   "patient": {
     "externalId": "mis-0006",
-    "fullName": "Пациент 006",
+    "fullName": "Новикова Екатерина Павловна",
+    "lastName": "Новикова",
+    "firstName": "Екатерина",
+    "middleName": "Павловна",
     "birthDate": "1990-01-09",
     "sex": "F"
   },

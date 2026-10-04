@@ -5,7 +5,10 @@
   "processedAt": "2026-09-09T10:05:00+03:00",
   "patient": {
     "externalId": "mis-0005",
-    "fullName": "Пациент 005",
+    "fullName": "Лебедева Татьяна Николаевна",
+    "lastName": "Лебедева",
+    "firstName": "Татьяна",
+    "middleName": "Николаевна",
     "birthDate": "1964-04-14",
     "sex": "F"
   },

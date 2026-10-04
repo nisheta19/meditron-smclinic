@@ -5,7 +5,10 @@
   "processedAt": "2026-09-07T10:01:00+03:00",
   "patient": {
     "externalId": "mis-0001",
-    "fullName": "Пациент 001",
+    "fullName": "Соколова Анна Сергеевна",
+    "lastName": "Соколова",
+    "firstName": "Анна",
+    "middleName": "Сергеевна",
     "birthDate": "1981-05-12",
     "sex": "F"
   },

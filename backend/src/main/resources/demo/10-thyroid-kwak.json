@@ -6,7 +6,10 @@
   "processedAt": "2026-10-03T10:00:00+03:00",
   "patient": {
     "externalId": "mis-0010",
-    "fullName": "Пациент 010",
+    "fullName": "Фёдорова Елена Владимировна",
+    "lastName": "Фёдорова",
+    "firstName": "Елена",
+    "middleName": "Владимировна",
     "birthDate": "1976-05-17",
     "sex": "F"
   },

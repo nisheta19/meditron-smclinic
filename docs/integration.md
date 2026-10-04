@@ -24,7 +24,10 @@
   "eventType": "PROTOCOL_SIGNED",
   "patient": {
     "externalId": "demo-patient-001",
-    "fullName": "Пациент 001",
+    "fullName": "Соколова Анна Сергеевна",
+    "lastName": "Соколова",
+    "firstName": "Анна",
+    "middleName": "Сергеевна",
     "birthDate": "1990-01-01",
     "sex": "F"
   },
@@ -36,6 +39,8 @@
   }
 }
 ```
+
+ФИО передаётся по частям: `lastName`, `firstName`, `middleName` (отчество необязательно) и строкой `fullName` (пока обязательна для ML). Если частей нет, бэкенд разбирает `fullName`: первое слово — фамилия, второе — имя, остальное — отчество.
 
 Типы исследования: `PELVIS_FEMALE`, `ABDOMEN`, `BREAST`, `THYROID`, `PROSTATE`,
 `LOWER_LIMB_VESSELS`, `KIDNEY`, `SOFT_TISSUE`. Пол `F` или `M`.

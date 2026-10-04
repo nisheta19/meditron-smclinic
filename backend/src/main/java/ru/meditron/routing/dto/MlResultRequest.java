@@ -29,9 +29,16 @@ public record MlResultRequest(
         List<@NotNull @Valid MlNotTriggered> notTriggered,
         @Valid MlError error) {
 
+    /**
+     * Пациент из МИС. ФИО по частям (lastName, firstName, middleName — отчество необязательно);
+     * fullName пока обязателен для совместимости с ML, при отсутствии частей бэкенд разбирает его сам.
+     */
     public record PatientPart(
             @NotBlank String externalId,
             @NotBlank String fullName,
+            String lastName,
+            String firstName,
+            String middleName,
             @NotNull LocalDate birthDate,
             @NotNull Sex sex) {
     }

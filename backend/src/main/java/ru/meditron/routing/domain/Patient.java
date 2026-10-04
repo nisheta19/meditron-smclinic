@@ -24,8 +24,21 @@ public class Patient {
     @Column(nullable = false, unique = true)
     private String externalId;
 
+    /** ФИО одной строкой — для совместимости и полнотекстового поиска. */
     @Column(nullable = false)
     private String fullName;
+
+    private String lastName;
+
+    private String firstName;
+
+    /** Отчество — необязательно. */
+    private String middleName;
+
+    /** «Фамилия И. О.» — части ФИО из МИС, при их отсутствии — разбор fullName. */
+    public PersonName name() {
+        return PersonName.of(lastName, firstName, middleName, fullName);
+    }
 
     private LocalDate birthDate;
 

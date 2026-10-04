@@ -5,7 +5,10 @@
   "processedAt": "2026-09-08T10:04:00+03:00",
   "patient": {
     "externalId": "mis-0004",
-    "fullName": "Пациент 004",
+    "fullName": "Волкова Марина Игоревна",
+    "lastName": "Волкова",
+    "firstName": "Марина",
+    "middleName": "Игоревна",
     "birthDate": "1975-07-30",
     "sex": "F"
   },
