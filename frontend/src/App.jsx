@@ -22,6 +22,7 @@ const NAV = [
   ['archive', 'Картотека', Archive],
 ];
 const STEPS = [[24, '+24 ч'], [72, '+72 ч'], [168, '+7 дн'], [720, '+30 дн']];
+const BACK = [[-24, '−24 ч'], [-72, '−72 ч'], [-168, '−7 дн'], [-720, '−30 дн']];
 
 export default function App() {
   const [section = 'findings', id] = useRoute();
@@ -105,7 +106,13 @@ function DemoPanel({ onChange, toast }) {
         <div className="demo-body">
           <p><b>Демо-режим.</b> Данные из docs/ml-results, изменения живут до перезагрузки.</p>
           <p className="demo-time">Модельное время: <b>{fmtDateTime(demo.now())}</b></p>
+          <p className="demo-label">Вперёд</p>
           <div className="demo-steps">{STEPS.map(([h, l]) => <button key={h} className="chip" onClick={() => { demo.advance(h); update(); }}>{l}</button>)}</div>
+          <p className="demo-label">Назад <span>откатывает всё, что произошло позже</span></p>
+          <div className="demo-steps">
+            {BACK.map(([h, l]) => <button key={h} className="chip" disabled={!demo.canRewind()} onClick={() => { demo.advance(h); update(); }}>{l}</button>)}
+            <button className="chip" disabled={!demo.canRewind()} onClick={() => { demo.reset(); update(); toast('Демо возвращено к началу'); }}>К началу</button>
+          </div>
           <button className="btn-main" disabled={!demo.queueLeft()} onClick={receive}>Поступил протокол из МИС ({demo.queueLeft()})</button>
         </div>
       )}

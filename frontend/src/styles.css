@@ -258,6 +258,9 @@ small { display: block; color: var(--gray-medium); font-size: 12px; }
 .demo-body p { margin: 0 0 8px; color: var(--gray-dark); }
 .demo-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
 .demo-steps .chip { height: 32px; padding: 0 12px; }
+.demo-steps .chip:disabled { opacity: 0.4; cursor: not-allowed; }
+.demo-body .demo-label { margin: 8px 0 4px; font-size: 12px; color: var(--gray-medium); }
+.demo-label span { color: var(--gray-light); }
 .demo-body .btn-main { width: 100%; }
 .api-note { position: fixed; right: 16px; bottom: 8px; margin: 0; color: var(--gray-light); font-size: 11px; }
 .state { padding: 60px 24px; text-align: center; color: var(--gray-medium); }

@@ -361,10 +361,41 @@ tick();
 
 // ---------- Управление демо-режимом (только мок) ----------
 let queued = 0;
+
+// ---------- Перемотка модельного времени назад ----------
+// Перед каждым шагом вперёд и поступлением протокола сохраняется снимок состояния.
+// Назад = вернуть последний снимок не позже нужного момента (всё, что «случилось» позже, откатывается),
+// затем выставить часы и досчитать автонапоминания до этого момента. Раньше начала демо отмотать нельзя.
+const START = clock;
+const snapshots = [];
+const snap = () => snapshots.push({ clock, seq, queued, db: structuredClone({ ...db }) });
+snap();   // исходное состояние — всегда первый снимок
+
+function rewindTo(target) {
+  target = Math.max(START, target);
+  while (snapshots.length > 1 && snapshots.at(-1).clock > target) snapshots.pop();
+  const s = snapshots.at(-1);
+  ({ clock, seq, queued } = s);
+  Object.assign(db, structuredClone(s.db));
+  if (target > clock) { clock = target; tick(); }
+}
+
 export const demo = {
   now: () => iso(),
-  advance(hours) { clock += hours * H; tick(); },
+  /** Сдвиг модельного времени: hours > 0 — вперёд, hours < 0 — назад */
+  advance(hours) {
+    if (hours < 0) return rewindTo(clock + hours * H);
+    snap();
+    clock += hours * H;
+    tick();
+  },
+  canRewind: () => clock > START,
+  reset: () => rewindTo(START),
   queueLeft: () => queue.length - queued,
   /** Имитирует поступление нового протокола из МИС через ML. Возвращает id пациента. */
-  receiveNext: () => (queued < queue.length ? ingest(queue[queued++], clock) : null),
+  receiveNext: () => {
+    if (queued >= queue.length) return null;
+    snap();
+    return ingest(queue[queued++], clock);
+  },
 };
