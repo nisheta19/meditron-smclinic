@@ -1,0 +1,699 @@
+openapi: 3.0.3
+info:
+  title: СМ-Клиника — маршрутизация по результатам УЗИ
+  version: 0.2.0
+  description: |
+    Контракт API для фронта по утверждённой схеме:
+    МИС → ML (извлекает текст и находки) → POST /api/integration/ml/results →
+    карточка пациента → врач подтверждает / добавляет / удаляет находки →
+    составление маршрута(ов) → уведомления → трекинг.
+    Пациенты и протоколы создаются только из результатов ML; фронт их не создаёт.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Integration
+  - name: Patients
+  - name: Protocols
+  - name: Findings
+  - name: Dictionary
+  - name: Routes
+  - name: Tracking
+  - name: Notifications
+
+paths:
+  # ---------- Вход от ML (не для фронта) ----------
+  /api/integration/ml/results:
+    post:
+      tags: [Integration]
+      summary: Результат ML по одному протоколу
+      description: |
+        Создаёт/обновляет пациента (по patient.externalId) и протокол
+        (по protocol.externalId + version), сохраняет находки как SUGGESTED.
+        Повтор того же resultId — 202 без изменений.
+        version больше прежней — пересчёт находок и маршрутов без дублей.
+        status=ANNULLED — протокол аннулируется, маршруты закрываются, уведомления останавливаются.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MlResult' }
+      responses:
+        '202': { description: Принято (или уже было принято) }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  # ---------- Пациенты (архив / дашборд) ----------
+  /api/patients:
+    get:
+      tags: [Patients]
+      summary: Список пациентов для архива
+      parameters:
+        - { name: search, in: query, schema: { type: string }, description: Поиск по ФИО / номеру карты }
+        - { name: reviewState, in: query, schema: { $ref: '#/components/schemas/ReviewState' }, description: «Новые» = PENDING; ATTENTION — протокол не прочитан или без заключения }
+        - { name: studyType, in: query, schema: { $ref: '#/components/schemas/StudyType' } }
+        - { name: dateFrom, in: query, schema: { type: string, format: date }, description: По дате исследования }
+        - { name: dateTo, in: query, schema: { type: string, format: date } }
+        - { name: page, in: query, schema: { type: integer, default: 0 } }
+        - { name: size, in: query, schema: { type: integer, default: 20 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PatientPage' }
+  /api/patients/{patientId}:
+    get:
+      tags: [Patients]
+      summary: Карточка пациента — протоколы, находки, маршруты
+      parameters: [ { $ref: '#/components/parameters/patientId' } ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PatientCard' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ---------- Протоколы УЗИ ----------
+  /api/protocols/{protocolId}:
+    get:
+      tags: [Protocols]
+      summary: Протокол с текстом и находками (для подсветки фрагментов)
+      parameters: [ { $ref: '#/components/parameters/protocolId' } ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Protocol' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ---------- Находки: подтверждение / добавление / удаление ----------
+  /api/patients/{patientId}/findings:
+    get:
+      tags: [Findings]
+      summary: Находки пациента
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/FindingStatus' } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Finding' } }
+    post:
+      tags: [Findings]
+      summary: Врач добавляет находку вручную
+      parameters: [ { $ref: '#/components/parameters/patientId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FindingCreate' }
+      responses:
+        '201':
+          description: Создана (сразу CONFIRMED, source=MANUAL)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Finding' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  /api/patients/{patientId}/findings/confirm:
+    post:
+      tags: [Findings]
+      summary: «Всё ок» — подтвердить пачку находок одним действием
+      parameters: [ { $ref: '#/components/parameters/patientId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                findingIds: { type: array, items: { type: string } }
+                doctor: { type: string }
+              required: [findingIds]
+      responses:
+        '200':
+          description: Обновлённые находки
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Finding' } }
+
+  /api/findings/{findingId}:
+    patch:
+      tags: [Findings]
+      summary: Подтвердить / отклонить / поправить одну находку
+      parameters: [ { $ref: '#/components/parameters/findingId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FindingUpdate' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Finding' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Findings]
+      summary: Удалить находку (мягко — статус REMOVED, остаётся в журнале)
+      parameters:
+        - $ref: '#/components/parameters/findingId'
+        - { name: reason, in: query, schema: { type: string } }
+      responses:
+        '204': { description: Удалена }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ---------- Словарь находок ----------
+  /api/dictionary/findings:
+    get:
+      tags: [Dictionary]
+      summary: Словарь находок (для выпадающего списка при ручном добавлении)
+      parameters:
+        - { name: studyType, in: query, schema: { $ref: '#/components/schemas/StudyType' } }
+        - { name: q, in: query, schema: { type: string }, description: Поиск по названию / синонимам }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/DictionaryEntry' } }
+    post:
+      tags: [Dictionary]
+      summary: Добавить тип находки (новый триггер без изменения кода)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DictionaryEntry' }
+      responses:
+        '201':
+          description: Создана
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DictionaryEntry' }
+
+  /api/dictionary/findings/{code}:
+    put:
+      tags: [Dictionary]
+      summary: Изменить тип находки
+      parameters: [ { name: code, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DictionaryEntry' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DictionaryEntry' }
+
+  # ---------- Маршруты ----------
+  /api/route-templates:
+    get:
+      tags: [Routes]
+      summary: Шаблоны маршрутов
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/RouteTemplate' } }
+
+  /api/patients/{patientId}/routes:
+    get:
+      tags: [Routes]
+      summary: Маршруты пациента
+      parameters: [ { $ref: '#/components/parameters/patientId' } ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Route' } }
+    post:
+      tags: [Routes]
+      summary: Составить маршрут(ы) по подтверждённым находкам
+      description: |
+        Без тела — маршруты строятся по всем CONFIRMED находкам без маршрута,
+        по шаблону из словаря. Можно передать конкретные находки и/или шаблон.
+        Одна находка — один маршрут; повторный вызов дублей не создаёт.
+      parameters: [ { $ref: '#/components/parameters/patientId' } ]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                findingIds: { type: array, items: { type: string } }
+                templateCode: { type: string, description: Переопределить шаблон из словаря }
+      responses:
+        '201':
+          description: Созданные маршруты
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Route' } }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/routes:
+    get:
+      tags: [Tracking]
+      summary: Трекинг — все маршруты для координатора
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [ACTIVE, COMPLETED, CANCELLED, NOT_ENGAGED] } }
+        - { name: stepType, in: query, schema: { type: string }, description: На каком этапе сейчас (например SPECIALIST_CONSULTATION) }
+        - { name: overdue, in: query, schema: { type: boolean }, description: Только просроченные текущие этапы }
+        - { name: search, in: query, schema: { type: string } }
+        - { name: page, in: query, schema: { type: integer, default: 0 } }
+        - { name: size, in: query, schema: { type: integer, default: 20 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TrackingPage' }
+
+  /api/routes/{routeId}/notifications:
+    get:
+      tags: [Notifications]
+      summary: История уведомлений пациенту по маршруту
+      parameters: [ { $ref: '#/components/parameters/routeId' } ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Notification' } }
+    post:
+      tags: [Notifications]
+      summary: Кнопка «Пуш» — отправить уведомление (имитация)
+      description: |
+        Канал не отправляет реально, а пишет сообщение в журнал.
+        Текущий этап маршрута переходит в NOTIFIED. Текст по умолчанию берётся
+        из шаблона этапа — нейтральный, без диагноза.
+        Защита от спама: не чаще одного сообщения в 24 ч по маршруту, иначе 429.
+      parameters: [ { $ref: '#/components/parameters/routeId' } ]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NotificationCreate' }
+      responses:
+        '201':
+          description: Отправлено
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Notification' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429':
+          description: Слишком частые уведомления
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  /api/routes/{routeId}:
+    get:
+      tags: [Routes]
+      summary: Маршрут с этапами
+      parameters: [ { $ref: '#/components/parameters/routeId' } ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Route' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Routes]
+      summary: Отменить маршрут
+      parameters:
+        - $ref: '#/components/parameters/routeId'
+        - { name: reason, in: query, schema: { type: string } }
+      responses:
+        '204': { description: Отменён (status=CANCELLED) }
+
+  /api/routes/{routeId}/steps/{stepId}:
+    patch:
+      tags: [Routes]
+      summary: Сменить статус этапа (записан, приём состоялся, неявка…)
+      parameters:
+        - $ref: '#/components/parameters/routeId'
+        - { name: stepId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { $ref: '#/components/schemas/StepStatus' }
+                comment: { type: string }
+              required: [status]
+      responses:
+        '200':
+          description: Обновлённый маршрут
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Route' }
+
+components:
+  parameters:
+    patientId: { name: patientId, in: path, required: true, schema: { type: string } }
+    protocolId: { name: protocolId, in: path, required: true, schema: { type: string } }
+    findingId: { name: findingId, in: path, required: true, schema: { type: string } }
+    routeId: { name: routeId, in: path, required: true, schema: { type: string } }
+
+  responses:
+    NotFound:
+      description: Не найдено
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    BadRequest:
+      description: Ошибка валидации или не удалось прочитать файл
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Conflict:
+      description: Нет подтверждённых находок или маршрут уже существует
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code: { type: string, example: FINDING_NOT_FOUND }
+        message: { type: string }
+
+    StudyType:
+      type: string
+      enum: [PELVIS_FEMALE, ABDOMEN, BREAST, THYROID, PROSTATE, LOWER_LIMB_VESSELS]
+
+    ReviewState:
+      type: string
+      description: |
+        OK — всё проверено врачом; PENDING — есть находки SUGGESTED;
+        ATTENTION — последний протокол FAILED или без заключения, нужна ручная проверка
+      enum: [OK, PENDING, ATTENTION]
+
+    ProcessingStatus:
+      type: string
+      enum: [DONE, FAILED, ANNULLED]
+
+    FindingStatus:
+      type: string
+      description: SUGGESTED — предложена LLM, ждёт врача
+      enum: [SUGGESTED, CONFIRMED, REJECTED, REMOVED]
+
+    StepStatus:
+      type: string
+      enum: [PENDING, NOTIFIED, BOOKED, COMPLETED, NO_SHOW, CANCELLED, SKIPPED]
+
+    PatientShort:
+      type: object
+      properties:
+        id: { type: string }
+        externalId: { type: string, description: ID пациента в МИС }
+        fullName: { type: string }
+        birthDate: { type: string, format: date }
+        age: { type: integer, description: Вычисляется на сервере }
+        sex: { type: string, enum: [F, M] }
+        cardNumber: { type: string }
+        reviewState: { $ref: '#/components/schemas/ReviewState' }
+        receivedAt: { type: string, format: date-time, description: Когда последний протокол поступил в систему }
+        pendingFindings: { type: integer, description: Сколько находок ждут подтверждения }
+        activeRoutes: { type: integer }
+        lastStudyDate: { type: string, format: date }
+
+    PatientPage:
+      type: object
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/PatientShort' } }
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer }
+
+    PatientCard:
+      allOf:
+        - $ref: '#/components/schemas/PatientShort'
+        - type: object
+          properties:
+            currentProtocol: { $ref: '#/components/schemas/ProtocolShort' }
+            currentFindings:
+              type: array
+              description: Блок «Находки» — по последнему протоколу
+              items: { $ref: '#/components/schemas/Finding' }
+            routes:
+              type: array
+              description: Блок «Составление route» — активные маршруты
+              items: { $ref: '#/components/schemas/Route' }
+            history:
+              type: object
+              description: Блок «История болезни» — всё, что было до текущего протокола
+              properties:
+                protocols: { type: array, items: { $ref: '#/components/schemas/ProtocolShort' } }
+                findings: { type: array, items: { $ref: '#/components/schemas/Finding' } }
+                routes: { type: array, items: { $ref: '#/components/schemas/Route' }, description: Завершённые и отменённые }
+
+    ProtocolShort:
+      type: object
+      properties:
+        id: { type: string }
+        externalId: { type: string, description: ID протокола в МИС }
+        version: { type: integer }
+        status: { $ref: '#/components/schemas/ProcessingStatus' }
+        studyType: { $ref: '#/components/schemas/StudyType' }
+        studyDate: { type: string, format: date }
+        conclusion: { type: string, description: Текст раздела «Заключение» }
+        conclusionFound: { type: boolean }
+        findingsCount: { type: integer }
+        receivedAt: { type: string, format: date-time }
+
+    Protocol:
+      allOf:
+        - $ref: '#/components/schemas/ProtocolShort'
+        - type: object
+          properties:
+            patientId: { type: string }
+            text: { type: string, nullable: true, description: Полный текст, если ML его прислал; от него считаются evidence.start/end }
+            modelVersion: { type: string }
+            error:
+              type: object
+              nullable: true
+              properties:
+                code: { type: string, example: UNREADABLE_FILE }
+                message: { type: string }
+            findings: { type: array, items: { $ref: '#/components/schemas/Finding' } }
+            notTriggered:
+              type: array
+              description: Почему кандидаты НЕ стали находками (отрицание, норма, ниже порога)
+              items: { $ref: '#/components/schemas/NotTriggered' }
+
+    Evidence:
+      type: object
+      description: Цитата-доказательство. start/end есть, только если у протокола есть text
+      properties:
+        text: { type: string, example: УЗ-признаки полипа эндометрия }
+        start: { type: integer, nullable: true }
+        end: { type: integer, nullable: true }
+
+    Finding:
+      type: object
+      properties:
+        id: { type: string }
+        patientId: { type: string }
+        protocolId: { type: string, nullable: true, description: null для ручных }
+        code: { type: string, example: ENDOMETRIAL_POLYP }
+        name: { type: string, example: Полип эндометрия }
+        status: { $ref: '#/components/schemas/FindingStatus' }
+        source: { type: string, enum: [ML, MANUAL] }
+        evidence: { $ref: '#/components/schemas/Evidence' }
+        attributes:
+          type: object
+          additionalProperties: true
+          example: { sizeMm: 8, side: left, category: 'BI-RADS 4', uncertain: false }
+        confidence: { type: number, format: float, minimum: 0, maximum: 1, nullable: true }
+        modelVersion: { type: string, nullable: true, example: ml-0.3, description: Версия ML, извлёкшей находку }
+        ruleVersion: { type: string, example: dict-v3, description: Версия словаря, по которой выбран специалист }
+        targetSpecialty: { type: string, example: Оперирующий гинеколог }
+        routeId: { type: string, nullable: true }
+        reviewedBy: { type: string, nullable: true }
+        reviewedAt: { type: string, format: date-time, nullable: true }
+        comment: { type: string, nullable: true }
+
+    FindingCreate:
+      type: object
+      properties:
+        code: { type: string, description: Код из словаря }
+        protocolId: { type: string }
+        attributes: { type: object, additionalProperties: true }
+        comment: { type: string }
+        doctor: { type: string }
+      required: [code]
+
+    FindingUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [CONFIRMED, REJECTED] }
+        code: { type: string, description: Исправить тип находки }
+        attributes: { type: object, additionalProperties: true }
+        comment: { type: string }
+        doctor: { type: string }
+
+    NotTriggered:
+      type: object
+      properties:
+        code: { type: string }
+        evidence: { $ref: '#/components/schemas/Evidence' }
+        reason:
+          type: string
+          description: NEGATION/NORMAL/POST_SURGERY приходят от ML; BELOW_THRESHOLD/OUT_OF_SCOPE ставит бэкенд по словарю
+          enum: [NEGATION, NORMAL, POST_SURGERY, BELOW_THRESHOLD, OUT_OF_SCOPE]
+
+    DictionaryEntry:
+      type: object
+      properties:
+        code: { type: string, example: GALLBLADDER_POLYP }
+        name: { type: string, example: Полип желчного пузыря }
+        studyTypes: { type: array, items: { $ref: '#/components/schemas/StudyType' } }
+        synonyms: { type: array, items: { type: string } }
+        targetSpecialty: { type: string, example: Хирург }
+        routeTemplateCode: { type: string, example: SURGICAL_STANDARD }
+        targetDays: { type: integer, example: 7, description: Целевой срок до консультации }
+        conditions:
+          type: object
+          additionalProperties: true
+          example: { minSizeMm: 10 }
+        urgent: { type: boolean, default: false }
+        active: { type: boolean, default: true }
+      required: [code, name, targetSpecialty]
+
+    RouteTemplate:
+      type: object
+      properties:
+        code: { type: string, example: SURGICAL_STANDARD }
+        name: { type: string }
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, example: SPECIALIST_CONSULTATION }
+              name: { type: string }
+              dueInDays: { type: integer }
+
+    Route:
+      type: object
+      properties:
+        id: { type: string }
+        patientId: { type: string }
+        findingIds: { type: array, items: { type: string } }
+        templateCode: { type: string }
+        status: { type: string, enum: [ACTIVE, COMPLETED, CANCELLED, NOT_ENGAGED] }
+        cancelReason: { type: string, nullable: true, example: PROTOCOL_ANNULLED }
+        createdAt: { type: string, format: date-time }
+        currentStepId: { type: string }
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              type: { type: string }
+              name: { type: string, example: Консультация оперирующего гинеколога }
+              status: { $ref: '#/components/schemas/StepStatus' }
+              dueDate: { type: string, format: date }
+              completedAt: { type: string, format: date-time, nullable: true }
+
+    TrackingItem:
+      type: object
+      properties:
+        routeId: { type: string }
+        patientId: { type: string }
+        patientName: { type: string }
+        findingName: { type: string, example: Полип эндометрия }
+        routeStatus: { type: string, enum: [ACTIVE, COMPLETED, CANCELLED, NOT_ENGAGED] }
+        currentStepName: { type: string, example: Консультация оперирующего гинеколога }
+        currentStepStatus: { $ref: '#/components/schemas/StepStatus' }
+        dueDate: { type: string, format: date }
+        overdue: { type: boolean }
+        lastNotificationAt: { type: string, format: date-time, nullable: true }
+
+    TrackingPage:
+      type: object
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/TrackingItem' } }
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer }
+
+    NotificationCreate:
+      type: object
+      properties:
+        channel: { type: string, enum: [PUSH, SMS, PERSONAL_ACCOUNT], default: PERSONAL_ACCOUNT }
+        text: { type: string, description: Если не передан — текст из шаблона этапа }
+
+    Notification:
+      type: object
+      properties:
+        id: { type: string }
+        routeId: { type: string }
+        stepId: { type: string }
+        channel: { type: string, enum: [PUSH, SMS, PERSONAL_ACCOUNT] }
+        text: { type: string, example: 'Ваш результат УЗИ готов. Рекомендуется консультация врача-гинеколога для определения дальнейшей тактики.' }
+        sentAt: { type: string, format: date-time }
+        sentBy: { type: string, description: Кто нажал «Пуш» или SYSTEM }
+
+    MlResult:
+      type: object
+      description: Сообщение от ML; полное описание — в документе «Требования к ML-сервису»
+      required: [resultId, status, modelVersion, processedAt, patient, protocol]
+      properties:
+        resultId: { type: string }
+        status: { $ref: '#/components/schemas/ProcessingStatus' }
+        modelVersion: { type: string }
+        processedAt: { type: string, format: date-time }
+        patient:
+          type: object
+          required: [externalId, fullName, birthDate, sex]
+          properties:
+            externalId: { type: string }
+            fullName: { type: string }
+            birthDate: { type: string, format: date }
+            sex: { type: string, enum: [F, M] }
+        protocol:
+          type: object
+          required: [externalId, version, studyType, studyDate]
+          properties:
+            externalId: { type: string }
+            version: { type: integer, minimum: 1 }
+            studyType: { $ref: '#/components/schemas/StudyType' }
+            studyDate: { type: string, format: date }
+        text: { type: string, nullable: true }
+        conclusion: { type: string }
+        conclusionFound: { type: boolean }
+        findings:
+          type: array
+          items:
+            type: object
+            required: [code, evidence]
+            properties:
+              code: { type: string }
+              evidence: { $ref: '#/components/schemas/Evidence' }
+              attributes: { type: object, additionalProperties: true }
+              confidence: { type: number, minimum: 0, maximum: 1 }
+        notTriggered:
+          type: array
+          items:
+            type: object
+            required: [code, evidence, reason]
+            properties:
+              code: { type: string }
+              evidence: { $ref: '#/components/schemas/Evidence' }
+              reason: { type: string, enum: [NEGATION, NORMAL, POST_SURGERY] }
+        error:
+          type: object
+          nullable: true
+          properties:
+            code: { type: string }
+            message: { type: string }

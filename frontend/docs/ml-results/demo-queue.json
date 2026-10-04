@@ -1,0 +1,117 @@
+[
+  {
+    "resultId": "ml-demo-q1",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-10-03T08:40:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2015",
+      "fullName": "Воронина Галина Ивановна",
+      "birthDate": "1961-12-12",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6015",
+      "version": 1,
+      "studyType": "BREAST",
+      "studyDate": "2026-10-03"
+    },
+    "text": "УЗИ МОЛОЧНЫХ ЖЕЛЁЗ\nВ правой молочной железе на 11 часах гипоэхогенное образование 21х17 мм с нечёткими спикулообразными контурами, акустической тенью, интранодулярным кровотоком.\nВ правой подмышечной области лимфоузел 15 мм с утолщённым кортикальным слоем.\nЗАКЛЮЧЕНИЕ: Образование правой молочной железы, BI-RADS 5.",
+    "conclusion": "Образование правой молочной железы, BI-RADS 5.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "BREAST_MASS",
+        "evidence": {
+          "text": "Образование правой молочной железы, BI-RADS 5",
+          "start": 269,
+          "end": 314
+        },
+        "attributes": {
+          "sizeMm": 21,
+          "side": "right",
+          "category": "BI-RADS 5",
+          "level": 5
+        },
+        "confidence": 0.96
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-q2",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-10-03T08:50:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2016",
+      "fullName": "Комарова Ирина Дмитриевна",
+      "birthDate": "1985-04-21",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6016",
+      "version": 1,
+      "studyType": "PELVIS_FEMALE",
+      "studyDate": "2026-10-03"
+    },
+    "text": "УЛЬТРАЗВУКОВОЕ ИССЛЕДОВАНИЕ ОРГАНОВ МАЛОГО ТАЗА (TV)\nМатка увеличена, контуры бугристые. По задней стенке узел 18 мм, деформирующий полость матки.\nЯичники без особенностей.\nЗАКЛЮЧЕНИЕ: Субмукозный миоматозный узел 18 мм (FIGO 1).",
+    "conclusion": "Субмукозный миоматозный узел 18 мм (FIGO 1).",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "SUBMUCOUS_FIBROID",
+        "evidence": {
+          "text": "Субмукозный миоматозный узел 18 мм (FIGO 1)",
+          "start": 185,
+          "end": 228
+        },
+        "attributes": {
+          "sizeMm": 18,
+          "figo": 1
+        },
+        "confidence": 0.94
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-q3",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-10-03T08:55:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2017",
+      "fullName": "Беляев Михаил Степанович",
+      "birthDate": "1954-08-03",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6017",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-10-03"
+    },
+    "text": "УЗИ БРЮШНОЙ АОРТЫ\nИнфраренальный отдел аорты расширен до 58 мм на протяжении 70 мм, пристеночный тромб толщиной 12 мм.\nЗАКЛЮЧЕНИЕ: Аневризма инфраренального отдела брюшной аорты 58 мм.",
+    "conclusion": "Аневризма инфраренального отдела брюшной аорты 58 мм.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "ABDOMINAL_AORTIC_ANEURYSM",
+        "evidence": {
+          "text": "Аневризма инфраренального отдела брюшной аорты 58 мм",
+          "start": 131,
+          "end": 183
+        },
+        "attributes": {
+          "sizeMm": 58
+        },
+        "confidence": 0.97
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  }
+]
