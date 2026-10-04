@@ -137,12 +137,12 @@ try {
       await until(async () => await page.getByRole('button', { name: '+ Добавить', exact: true }).isEnabled() === (key === 'independent'));
     }
   });
-  await test('settings and archive are inert stubs, dictionary still serves finding forms', async () => {
+  await test('settings and archive are absent from navigation, dictionary still serves finding forms', async () => {
     for (const route of ['settings', 'archive']) {
       await page.goto(`${base}/#/${route}`);
       await page.getByText('Раздел пока недоступен', { exact: true }).waitFor();
       assert.equal(await page.locator('.row-card, .dict-table').count(), 0);
-      for (const name of ['Картотека', 'Настройки']) assert.ok(await page.getByRole('button', { name, exact: true }).isDisabled());
+      assert.deepEqual(await page.locator('.nav .nav-item').allTextContents(), ['Дашборд', 'Входящие', 'Находки']);
     }
     assert.equal((await api('/api/dictionary/findings')).length, 48);
   });

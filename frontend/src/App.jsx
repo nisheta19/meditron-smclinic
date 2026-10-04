@@ -3,21 +3,21 @@ import { USE_MOCK, API_URL, capsReady, demo } from './api';
 import { DOCTOR_DISPLAY_NAME } from './config';
 import { fmtDateTime } from './lib/format';
 import { Revision, Toast, go, useMedia, useRoute } from './lib/hooks';
-import { Archive, ArrowLeft, Briefcase, Grid, Inbox, Logo, Tool } from './components/Icons';
+import { ArrowLeft, Briefcase, Grid, Inbox, Logo } from './components/Icons';
 import Findings from './pages/Findings';
 import Patients from './pages/Patients';
 import PatientCard from './pages/PatientCard';
+import Dashboard from './pages/Dashboard';
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
 const isDocsPath = () => /\/open-api\/?$/.test(location.pathname);
 
-// Пункты меню — как в макете
+// Только используемые разделы; настройки и картотека убраны по уточнению макета.
 const NAV = [
+  ['dashboard', 'Дашборд', Grid],
   ['inbox', 'Входящие', Inbox],
   ['findings', 'Находки', Briefcase],
-  ['archive', 'Картотека', Archive],
-  ['settings', 'Настройки', Tool],
 ];
 const STEPS = [[24, '+24 ч'], [72, '+72 ч'], [168, '+7 дн'], [720, '+30 дн']];
 
@@ -44,7 +44,8 @@ export default function App() {
     return <Suspense fallback={<p className="state">Загружаем документацию API…</p>}><ApiDocs /></Suspense>;
   }
 
-  const page = !ready ? <p className="state">Подключаемся к серверу…</p>
+  const page = section === 'dashboard' ? <Dashboard />
+    : !ready ? <p className="state">Подключаемся к серверу…</p>
     : section === 'patients' && id ? <PatientCard key={id} id={id} />
     : section === 'inbox' ? <Patients key="inbox" preset="inbox" />
     : ['archive', 'settings'].includes(section) ? <p className="state" role="status">Раздел пока недоступен</p> : <Findings />;
@@ -53,15 +54,12 @@ export default function App() {
   return (
     <Toast.Provider value={toast}>
       <Revision.Provider value={rev}>
-        <div className={`layout${isCollapsed ? ' collapsed' : ''}${section === 'patients' ? ' patient-view' : ''}`}>
+        <div className={`layout${isCollapsed ? ' collapsed' : ''}${section === 'patients' ? ' patient-view' : ''}${section === 'dashboard' ? ' dashboard-view' : ''}`}>
           <header className="mobile-top"><Logo height={22} /></header>
           <aside className="sidebar">
             <a className="brand" href="#/findings" aria-label="СМ-Клиника, на главную"><Logo /></a>
             <nav className="nav" aria-label="Разделы">
-              {section === 'patients' && <button className="nav-item dashboard-stub" disabled title="Дашборд — заглушка"><Grid size={16} /><span>Дашборд</span></button>}
-              {NAV.map(([key, label, Icon]) => ['archive', 'settings'].includes(key) ? (
-                <button key={key} className="nav-item" disabled title={`${label} — заглушка`}><Icon size={16} /><span>{label}</span></button>
-              ) : (
+              {NAV.map(([key, label, Icon]) => (
                 <a key={key} href={`#/${key}`} className="nav-item" aria-current={current === key ? 'page' : undefined} title={label}>
                   <Icon size={16} /><span>{label}</span>
                 </a>
@@ -79,7 +77,7 @@ export default function App() {
           </aside>
           <main className="main">{page}</main>
         </div>
-        {USE_MOCK && <DemoPanel onChange={() => setRev((r) => r + 1)} toast={toast} />}
+        {USE_MOCK && section !== 'dashboard' && <DemoPanel onChange={() => setRev((r) => r + 1)} toast={toast} />}
         <div className="toasts" role="status">{toasts.map((t) => <div key={t.key} className={`toast ${t.tone}`}>{t.text}</div>)}</div>
       </Revision.Provider>
     </Toast.Provider>

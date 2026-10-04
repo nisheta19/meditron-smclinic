@@ -833,5 +833,316 @@
       "No new corpus F1 measurement was needed: extraction and dictionary are unchanged.",
       "Required login was verified on the isolated test backend; the main UI remains accessible until its login form is added."
     ]
+  },
+  "staticDashboard": {
+    "checkedAt": "2026-10-04T19:31:18.094635+00:00",
+    "mlTests": 169,
+    "backendTests": 45,
+    "frontendUnitTests": 21,
+    "frontendBuild": "passed",
+    "integrationScenarios": 17,
+    "browserChecks": {
+      "e2e": 19,
+      "listAndCard": 7,
+      "filters": 11,
+      "sorting": 6,
+      "dashboard": 7
+    },
+    "totalChecks": 302,
+    "referenceFrame": {
+      "width": 1280,
+      "height": 1038,
+      "deviceScaleFactor": 2
+    },
+    "visualReview": "Two iterations; reference geometry, labels, colors, map and charts checked against supplied PNG, CSS and SVG.",
+    "dashboardScenarios": [
+      {
+        "name": "reference frame, card geometry and sidebar at 1280 × 1038",
+        "ok": true
+      },
+      {
+        "name": "reference figures, map and notification bars",
+        "ok": true
+      },
+      {
+        "name": "all dashboard controls are inert, without a popup or navigation",
+        "ok": true
+      },
+      {
+        "name": "dashboard renders and stays idle while every backend request is blocked",
+        "ok": true
+      },
+      {
+        "name": "sidebar navigation works and list polling stops on return",
+        "ok": true
+      },
+      {
+        "name": "mock mode shows the same static frame without demo buttons",
+        "ok": true
+      },
+      {
+        "name": "no horizontal overflow on phone, tablet or wide desktop",
+        "ok": true
+      }
+    ],
+    "dashboardApiRequests": 0,
+    "disabledDashboardButtons": 9,
+    "viewportWidths": [
+      390,
+      768,
+      1024,
+      1280,
+      1920
+    ],
+    "integrationApiCoverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/auth/csrf",
+          "GET /api/auth/me",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/auth/login",
+          "POST /api/auth/logout",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 19
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "workingPatientsBefore": 107,
+    "workingPatientsAfter": 107,
+    "healthyContainers": [
+      "backend",
+      "frontend",
+      "ml",
+      "postgres"
+    ],
+    "frontendOnlyDeployment": true,
+    "isolatedVerificationStackStopped": true,
+    "dictionaryUnchanged": true,
+    "dashboardDataIsStatic": true,
+    "notes": [
+      "Dashboard figures are design placeholders, not patient analytics.",
+      "No backend/ML code or working patient data was changed.",
+      "Working and verification dashboard screenshots match SHA-256.",
+      "No commit or push performed."
+    ]
+  },
+  "sidebarRefinement": {
+    "checkedAt": "2026-10-04T19:45:27.127184+00:00",
+    "removedNavigation": [
+      "settings",
+      "archive"
+    ],
+    "dashboardFooterShiftPx": 10,
+    "footerAlignedWithList": true,
+    "positions": [
+      {
+        "height": 832,
+        "section": "dashboard",
+        "avatar": {
+          "x": 19,
+          "y": 747,
+          "width": 32,
+          "height": 32
+        },
+        "collapse": {
+          "x": 8,
+          "y": 781,
+          "width": 190,
+          "height": 36
+        }
+      },
+      {
+        "height": 832,
+        "section": "findings",
+        "avatar": {
+          "x": 19,
+          "y": 747,
+          "width": 32,
+          "height": 32
+        },
+        "collapse": {
+          "x": 8,
+          "y": 781,
+          "width": 190,
+          "height": 36
+        }
+      },
+      {
+        "height": 832,
+        "section": "inbox",
+        "avatar": {
+          "x": 19,
+          "y": 747,
+          "width": 32,
+          "height": 32
+        },
+        "collapse": {
+          "x": 8,
+          "y": 781,
+          "width": 190,
+          "height": 36
+        }
+      },
+      {
+        "height": 1038,
+        "section": "dashboard",
+        "avatar": {
+          "x": 19,
+          "y": 953,
+          "width": 32,
+          "height": 32
+        },
+        "collapse": {
+          "x": 8,
+          "y": 987,
+          "width": 190,
+          "height": 36
+        }
+      },
+      {
+        "height": 1038,
+        "section": "findings",
+        "avatar": {
+          "x": 19,
+          "y": 953,
+          "width": 32,
+          "height": 32
+        },
+        "collapse": {
+          "x": 8,
+          "y": 987,
+          "width": 190,
+          "height": 36
+        }
+      },
+      {
+        "height": 1038,
+        "section": "inbox",
+        "avatar": {
+          "x": 19,
+          "y": 953,
+          "width": 32,
+          "height": 32
+        },
+        "collapse": {
+          "x": 8,
+          "y": 987,
+          "width": 190,
+          "height": 36
+        }
+      }
+    ],
+    "mlTests": 169,
+    "backendTests": 45,
+    "frontendUnitTests": 21,
+    "integrationScenarios": 17,
+    "browserChecks": {
+      "e2e": 19,
+      "listAndCard": 7,
+      "filters": 11,
+      "sorting": 6,
+      "dashboard": 7
+    },
+    "totalChecks": 302,
+    "healthyContainers": [
+      "backend",
+      "frontend",
+      "ml",
+      "postgres"
+    ],
+    "build": "passed using existing local dependencies with matching package-lock SHA-256 after npm ECONNRESET",
+    "lockfileSha256": "42c2f2fcfe8fce3d5ea1da20c22ceef297904d67832644e722c9ca57896067aa",
+    "frontendOnlyDeployment": true,
+    "commitOrPushPerformed": false
+  },
+  "mlGeneralizationV7": {
+    "modelVersion": "dict-v2.1-extractor-7",
+    "tests": {
+      "mlUnit": {
+        "tests": 312,
+        "failures": 0,
+        "errors": 0
+      },
+      "backendMaven": {
+        "tests": 45,
+        "failures": 0,
+        "errors": 0,
+        "passed": true
+      },
+      "integration": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "coverage": {
+          "backend": {
+            "covered": [
+              "DELETE /api/findings/{findingId}",
+              "GET /api/auth/csrf",
+              "GET /api/auth/me",
+              "GET /api/dictionary/findings",
+              "GET /api/integration/events/status",
+              "GET /api/patients",
+              "GET /api/patients/{patientId}",
+              "GET /api/patients/{patientId}/findings",
+              "GET /api/ping",
+              "GET /api/protocols/{protocolId}",
+              "PATCH /api/findings/{findingId}",
+              "POST /api/auth/login",
+              "POST /api/auth/logout",
+              "POST /api/integration/events",
+              "POST /api/integration/events/retry",
+              "POST /api/integration/ml/results",
+              "POST /api/integration/protocols",
+              "POST /api/patients/{patientId}/findings",
+              "POST /api/patients/{patientId}/findings/confirm"
+            ],
+            "uncovered": [],
+            "total": 19
+          },
+          "ml": {
+            "covered": [
+              "GET /api/mis/events/{event_id}",
+              "GET /health",
+              "POST /api/mis/events",
+              "POST /api/mis/events/{event_id}/retry"
+            ],
+            "uncovered": [],
+            "total": 4
+          }
+        }
+      }
+    },
+    "prospectiveSyntheticF1": 0.9824561403508771,
+    "realRegressionF1": 0.9079365079365079,
+    "syntheticRegressionF1": 0.9894736842105263,
+    "newUniqueSyntheticDocuments": 136,
+    "formatRuns": 1224,
+    "formatRunsF1": 1.0,
+    "clinicalValidation": false,
+    "report": "docs/ml-generalization-v7.md"
   }
 }

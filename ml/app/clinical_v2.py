@@ -33,6 +33,13 @@ def positive(pattern, text):
     return any(not negates(text, m.start(), m.end()) for m in re.finditer(pattern, text, re.I))
 
 
+def asserted_bool(pattern, blocks):
+    """An attribute's own negation, kept within its source clause."""
+    values = [not negates(b.text,m.start(),m.end()) for b in blocks
+              for m in re.finditer(pattern,b.text,re.I)]
+    return values[0] if values and len(set(values)) == 1 else None
+
+
 def inflected_pattern(phrase):
     """Inflection of dictionary literals, never executable YAML expressions."""
     tokens=[]
@@ -153,6 +160,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
         'PELVIC_VARICOSE_VEINS': r'вен\w*\s+(?:параметри|таза)[^.;]*(?:расширен|\d\s*мм)|параметральн\w*\s+вен\w*[^.;]*расширен',
         'BPH': r'гиперплази\w*[^.;]{0,50}предстательн|по\s+типу\s+хроническ\w*\s+простатит',
         'FREE_FLUID': r'(?:позадиматочн|дугласов|подпеч[её]ночн|боков\w*\s+канал)[^.;]*жидкост|гемоперитонеум',
+        'COLON_DIVERTICULA': r'дивертикул\w*\s+(?:ободочн|сигмовидн|толст)\w*\s+кишк\w*',
     }
     for code, pattern in patterns.items():
         for b in select(pattern):
@@ -356,7 +364,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if not side and has(r'с\s+обеих\s+сторон|обеих\s+молочн|справа\s+и\s+слева',clinical_text):a['side']='both'
             values=[]
             for b in related:
-                if b.organ=='study_organ' and positive(r'образовани\w*|кист[аы]|фиброаденом\w*',b.text):
+                if b.organ in {'study_organ',None} and positive(r'образовани\w*|кист[аы]|фиброаденом\w*',b.text):
                     m=re.search(r'образовани\w*|кист[аы]|фиброаденом\w*',b.text,re.I)
                     values += [v[0] for v in dimensions(b.text[m.end():])]
             if values and 'sizeMm' not in a:a['sizeMm']=max(values)
@@ -412,7 +420,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if has(r'сгустк', t) and not has(r'сгустк|гемоперитонеум', conclusion): f.setdefault('flags', []).append(flag('DISCREPANCY'))
         if code == 'OVARIAN_APOPLEXY':
             fluid_rows=[b for b in source if has(r'жидкост',b.text)]
-            vals=[float(m.replace(',','.')) for b in fluid_rows for m in re.findall(rf'({NUM})\s*мл',b.text)]
+            vals=[float(m.replace(',','.')) for b in fluid_rows for m in re.findall(rf'({NUM})\s*мл',b.text,re.I)]
             if vals:a['freeFluidMl']=max(vals);related+=fluid_rows
         if code in {'GALLSTONES','GALLBLADDER_POLYP','ACUTE_CHOLECYSTITIS','CHRONIC_CHOLECYSTITIS'}:
             if code == 'GALLSTONES':
@@ -432,9 +440,13 @@ def analyze(parsed, raw, study, dictionary, context=None):
                 if has(r'(?:перивезик|перипузыр)[^.;]*жидкост|жидкост[^.;]*перивезик', t): a['pericholecysticFluid'] = True
                 put(a, 'murphy', explicit_bool(t,r'Мерфи\s+положительн',r'Мерфи\s+отрицательн'))
         if code in {'HERNIA'}:
-            put(a, 'sizeMm', measured(t, r'грыжев\w*\s+ворот\w*|дефект\w*\s+апоневроз\w*'))
+            put(a, 'sizeMm', measured(t, r'грыжев\w*\s+ворот\w*|ворот\w*\s+грыж\w*|дефект\w*\s+апоневроз\w*'))
             put(a, 'reducible', explicit_bool(t,r'вправим|вправляется',r'невправим|не\s+вправляется'))
-            put(a, 'incarcerated', explicit_bool(t,r'ущемл[её]нн',r'без\s+(?:признаков\s+)?ущемления|признаков\s+ущемления\s+нет'))
+            incarceration = list(re.finditer(r'ущемл\w*',t,re.I))
+            if incarceration:
+                affirmed = [m for m in incarceration if not negates(t,m.start(),m.end())]
+                put(a, 'incarcerated', True if any(has(r'ущемл[её]нн',m[0]) for m in affirmed)
+                    else False if not affirmed else None)
             put(a,'obstruction',explicit_bool(t,r'непроходим|маятникообразн',r'без\s+(?:признаков\s+)?(?:кишечн\w*\s+)?непроходим|непроходим\w*[^.;]{0,20}(?:нет|не\s+выявлен)'))
             for pat,val in [(r'предбрюшинн\w*\s+(?:жиров\w*\s+)?клетчат','предбрюшинная клетчатка'),(r'петл\w*\s+тонк\w*\s+киш','петля тонкой кишки'),(r'сальник','сальник')]:
                 if positive(pat,t): a['content']=val;break
@@ -470,6 +482,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
             m=re.search(rf'({NUM})\s*(мм|см)\s*(?:от|до)\s*(?:СФС|СПС|сафено)',t,re.I)
             if m:a['distanceToJunctionMm']=float(m[1].replace(',','.'))*(10 if m[2].lower()=='см' else 1)
             put(a,'floating',explicit_bool(t,r'флотир',r'не\s+флотир|без\s+флотац'))
+            put(a,'floating',asserted_bool(r'флотаци\w*',related))
         if code == 'VENOUS_INSUFFICIENCY':
             if has(r'варикоз',original):a['varicose']=True
             elif has(r'рефлюкс|недостаточност',original):a['varicose']=False
@@ -491,11 +504,11 @@ def analyze(parsed, raw, study, dictionary, context=None):
         if code == 'BPH':
             volumes=[b for b in source if not has(r'остаточ|мочев\w*\s+пузыр|семенн',b.text)]
             clean=re.sub(r'\([^)]*(?:норм|N\s*объема)[^)]*\)','', ' '.join(b.text for b in volumes),flags=re.I)
-            put(a,'volumeCm3',number(rf'(?:об[ъь][её]м\w*(?:\s+железы)?|\bV(?:\s+предстательной\s+железы)?)\s*[:=—–-]?\s*({NUM})\s*(?:см|мл|куб)',clean))
+            put(a,'volumeCm3',number(rf'(?:об[ъь][её]м\w*(?:\s+(?:предстательн\w*\s+)?железы|\s+простаты)?|\bV(?:\s+предстательной\s+железы)?|\bпростата)\s*(?:составля\w*\s*)?[:=—–-]?\s*({NUM})\s*(?:см|мл|куб)',clean))
             put(a,'intravesicalMm',measured(t,r'внутрипузырн\w*\s+протрузи\w*'))
             if has(r'простатит',t):a['prostatitisPattern']=True
         if code == 'BPH_URINARY_RETENTION':
-            put(a,'residualUrineMl',number(rf'остаточн\w*\s+моч\w*\s*\(?\s*({NUM})\s*мл',t))
+            put(a,'residualUrineMl',number(rf'остаточн\w*\s+моч\w*\s*(?:в\s+об[ъь][её]ме\s*)?[:—–-]?\s*\(?\s*({NUM})\s*мл',t))
         if code == 'ENDOMETRIAL_HYPERPLASIA':
             explicit=measured(t,r'эндометрий\s*[:—–-]')
             put(a,'thicknessMm',explicit if explicit is not None else measured(t,r'эндометри\w*|м\s*[-–]\s*эхо'))

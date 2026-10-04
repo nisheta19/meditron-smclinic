@@ -67,7 +67,7 @@ try {
   await test('route controls are inert, history and close work', async () => {
     const buttons = page.locator('.route-placeholder button');
     for (let i = 0; i < await buttons.count(); i++) assert.ok(await buttons.nth(i).isDisabled());
-    assert.ok(await page.getByRole('button', { name: 'Дашборд', exact: true }).isDisabled());
+    assert.equal(await page.getByRole('link', { name: 'Дашборд', exact: true }).getAttribute('href'), '#/dashboard');
     await page.locator('.pc-history-more').click(); assert.equal(await page.locator('.pc-events > *').count(), 11);
     await page.getByRole('button', { name: 'Закрыть карточку' }).click(); await page.locator('.row-card').first().waitFor();
     assert.ok(page.url().endsWith('/findings'));

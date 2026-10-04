@@ -1,0 +1,46 @@
+"""Recover logical lines without changing the source or its output offsets.
+
+DOCX paragraphs and hard line breaks may split a sentence. Join continuations
+before entity/attribute extraction, retaining anatomy labels and new statements.
+"""
+import re
+
+FIELD = re.compile(r'^[\w\s()/—–-]{1,75}:', re.U)
+CONTINUATION = re.compile(
+    r'^(?:не\b|нет\b|без\b|размер\w*\b|диаметр\w*\b|составля\w*\b|'
+    r'мм\b|см\b|мл\b|%|на\s*\d|[×хx*—–-]\s*\d)', re.I)
+OPEN_END = re.compile(r'(?:[,(/—–-]|\b(?:в|во|на|из|для|от|до|по|с|со|и|или|не|за|без)|по\s+типу)\s*$', re.I)
+ANATOMY_HEADING = re.compile(
+    r'^(?:(?:ПРАВАЯ|ЛЕВАЯ|ПРАВЫЙ|ЛЕВЫЙ)\s+)?(?:МОЛОЧНАЯ\s+ЖЕЛЕЗА|ДОЛЯ|ПОЧКА|ЯИЧНИК|'
+    r'ЛИМФОУЗЛЫ|МАТКА|ШЕЙКА\s+МАТКИ|ЭНДОМЕТРИЙ|ПЕЧЕНЬ|ЖЕЛЧНЫЙ\s+ПУЗЫРЬ)\s*:?$')
+OPEN_ADJECTIVE = re.compile(r'\b[А-ЯЁ]+(?:АЯ|ЯЯ|ЫЙ|ИЙ|ОЙ|УЮ|ЮЮ|ОГО|ЕГО|ЫМИ|ИМИ|ЫХ|ИХ|ОЕ|ЕЕ|ЫЕ|ИЕ)\s*$')
+OPEN_NOUN = re.compile(r'\b(?:УЗЕЛ|КОНКРЕМЕНТ|КИСТА|ПОЛИП|ГИПЕРПЛАЗИЯ|ОБРАЗОВАНИЕ|ОЧАГ|ТРОМБОЗ)\s*$')
+GENITIVE_START = re.compile(r'^(?:[А-ЯЁ]+(?:ОЙ|ОГО|ЕГО|ЫХ|ИХ)|ЭНДОМЕТРИЯ|МИОМЕТРИЯ|ШЕЙКИ|ТЕЛА)\b')
+
+
+def logical_lines(text):
+    lines = []
+    for source in text.splitlines():
+        line = ' '.join(source.split())
+        if not line:
+            continue
+        previous = lines[-1] if lines else ''
+        # A labelled field starts a new unit even if its preceding field has no
+        # full stop. Headings/section boundaries are resolved before this call.
+        next_field = bool(FIELD.match(line)) and not re.match(
+            r'^(?:\w+\s+){0,3}контурами\s*:',line,re.I)
+        terminated = previous.endswith(('.', '!', '?', ';', ':'))
+        continuing = line[:1].islower() or line[:1].isdigit() or CONTINUATION.match(line)
+        # Uppercase templates carry no sentence-case cue. A terminal adjective
+        # needs its following noun; arbitrary uppercase fields must stay apart.
+        if previous.isupper() and line.isupper() and not ANATOMY_HEADING.fullmatch(line):
+            continuing = continuing or OPEN_ADJECTIVE.search(previous) or (
+                OPEN_NOUN.search(previous) and GENITIVE_START.match(line))
+        # Parentheses may contain a morphology, unit or differential diagnosis;
+        # their hard line break is not a new anatomical field.
+        continuing = continuing or line.startswith('(') or previous.count('(') > previous.count(')')
+        if previous and not next_field and not terminated and (continuing or OPEN_END.search(previous)):
+            lines[-1] += ' ' + line
+        else:
+            lines.append(line)
+    return lines

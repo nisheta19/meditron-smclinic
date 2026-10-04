@@ -5,12 +5,12 @@ import re
 # Longer alternatives come first so that a heading is not partially consumed.
 # New templates can extend this list without changing metadata extraction.
 HEADINGS = {
-    "description": r"Описание(?:[^\S\r\n]+исследования)?",
-    "conclusion": r"Заключение(?:[^\S\r\n]+исследования)?",
+    "description": r"Описание(?:[^\S\r\n]+(?:исследования|УЗИ))?|Результаты[^\S\r\n]+исследования",
+    "conclusion": r"(?:УЗ[ -]?)?Заключение(?:[^\S\r\n]+(?:исследования|врача|УЗИ))?",
     "recommendations": r"Рекомендации(?:[^\S\r\n]+врача)?|Рекомендовано|Рекомендована|Рек-но",
     "diagnosis": r"Диагноз",
     "complaints": r"Жалобы(?:[^\S\r\n]+со[^\S\r\n]+слов[^\S\r\n]+пациента)?",
-    "history": r"Анамнез(?:[^\S\r\n]+(?:заболевания|жизни))?",
+    "history": r"(?:(?:Клинический|Данные)[^\S\r\n]+)?Анамнез(?:а|[^\S\r\n]+(?:заболевания|жизни))?",
     "ordered_services": r"Назначенные[^\S\r\n]+услуги",
     "laboratory_tests": r"Лабораторная[^\S\r\n]+диагностика",
     "prescriptions": r"Назначения",

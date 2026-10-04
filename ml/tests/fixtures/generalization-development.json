@@ -1,0 +1,946 @@
+{
+  "annotationStatus": "synthetic",
+  "clinicalValidation": false,
+  "protocols": [
+    {
+      "file": "control-001.docx",
+      "studyType": "THYROID",
+      "text": "Описание исследования:\nВ толще левой доли обнаружено узловое образование,\nего размеры 13,5 × 8,2 мм.\nЗаключение врача: Узел слева, EU-TIRADS 4.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 13.5,
+              "tirads": 4
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-002.docx",
+      "studyType": "THYROID",
+      "text": "Описание:\nСправа визуализируется узел 2,3 на 1,6 см.\nЗаключение: Узловое образование правой доли, TI-RADS 3.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 23,
+              "tirads": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-003.docx",
+      "studyType": "THYROID",
+      "text": "Заключение УЗИ:\nУзел перешейка 8 × 6 ММ. EU-TIRADS 3.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "sizeMm": 8,
+              "tirads": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-004.docx",
+      "studyType": "THYROID",
+      "text": "Описание: Щитовидная железа. Узловых образований в правой и левой долях\nне определяется.\nЗаключение: Очаговых изменений нет.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-005.docx",
+      "studyType": "THYROID",
+      "text": "Данные анамнеза: Ранее выявляли узел левой доли 19 мм.\nОписание: Сейчас очаговых образований нет.\nЗаключение: Норма.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-006.docx",
+      "studyType": "THYROID",
+      "text": "Заключение: Вероятно, узел в правой доле, 6 мм.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 6,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-007.docx",
+      "studyType": "THYROID",
+      "text": "Заключение: Диффузные изменения по типу тиреоидита.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_DIFFUSE_AIT",
+            "attributes": {
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-008.docx",
+      "studyType": "THYROID",
+      "text": "Описание: Общий объем щитовидной железы 29 см³, железа увеличена.\nЗаключение: Увеличение щитовидной железы.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_ENLARGEMENT",
+            "attributes": {
+              "volumeCm3": 29
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-009.docx",
+      "studyType": "BREAST",
+      "text": "Описание исследования: В левой молочной железе определяется\nфиброаденома 21 на 12 мм.\nЗаключение врача: Фиброаденома слева. BI-RADS 3.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 21,
+              "birads": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-010.docx",
+      "studyType": "BREAST",
+      "text": "Заключение: Правая молочная железа: BI-RADS 4c.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "birads": 4,
+              "biradsSub": "c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-011.docx",
+      "studyType": "BREAST",
+      "text": "Описание: Слева анэхогенное образование 0,9 × 0,6 СМ.\nЗаключение: Киста левой молочной железы. BI-RADS 2.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 9,
+              "birads": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-012.docx",
+      "studyType": "BREAST",
+      "text": "Заключение врача: С обеих сторон BI-RADS 1.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-013.docx",
+      "studyType": "BREAST",
+      "text": "Описание: В обеих молочных железах очаговых образований\nне обнаружено.\nЗаключение: Патологии нет.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-014.docx",
+      "studyType": "BREAST",
+      "text": "Анамнез жизни: В 2017 году удалена фиброаденома.\nЗаключение: BI-RADS 1 справа и слева.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-015.docx",
+      "studyType": "BREAST",
+      "text": "Заключение: Нельзя исключить фиброаденому справа диаметром 15 мм.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 15,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-016.docx",
+      "studyType": "BREAST",
+      "text": "Заключение: BI RADS 2 обеих молочных желез.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "both",
+              "birads": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-017.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: Слева паховая грыжа. Ворота грыжи 24 мм. Грыжа вправляется.\nЗаключение: Паховая грыжа слева, убедительных признаков ущемления\nне выявлено.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 24,
+              "reducible": true,
+              "incarcerated": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-018.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Заключение: Паховая грыжа справа, грыжевые ворота 1,7 СМ. Невправимая.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 17,
+              "reducible": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-019.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: Грыжевого выпячивания в левой паховой области не обнаружено.\nЗаключение: Без патологии.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-020.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Анамнез заболевания: Паховая грыжа справа, операция в 2021 году.\nЗаключение: Признаков рецидива грыжи нет.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-021.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Заключение: Под подозрением паховая грыжа слева.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-022.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Заключение: Ущемленная паховая грыжа справа, невправимая.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "incarcerated": true,
+              "reducible": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-023.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Заключение: Левосторонняя паховая грыжа. Признаков кишечной непроходимости нет.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "obstruction": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-024.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Заключение: Паховая грыжа справа. Ущемление не обнаружено.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "incarcerated": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-025.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Предстательная железа. Объем железы\nсоставляет 53 мл.\nЗаключение: Доброкачественная гиперплазия предстательной железы.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 53
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-026.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Объем простаты 38,7 СМ³.\nЗаключение врача: ДГПЖ.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 38.7
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-027.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: После мочеиспускания определяется остаточная моча\nв объеме 64 мл.\nЗаключение: Остаточная моча.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 64
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-028.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Объем остаточной мочи: 91 МЛ.\nЗаключение: Остаточная моча 91 мл.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 91
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-029.docx",
+      "studyType": "PROSTATE",
+      "text": "Заключение: Признаков гиперплазии предстательной железы не обнаружено.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-030.docx",
+      "studyType": "PROSTATE",
+      "text": "Заключение: Остаточная моча после микции не определяется.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-031.docx",
+      "studyType": "PROSTATE",
+      "text": "Клинический анамнез: Аденома простаты, оперирована в 2020 году.\nЗаключение врача: Без патологии.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-032.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Простата 45 см³.\nЗаключение: ДГПЖ. Рекомендации врача: Контроль остаточной мочи.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 45
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-033.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: В желчном пузыре фиксированное образование\nразмером 9 на 6 мм, без акустической тени.\nЗаключение: Полип желчного пузыря.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLBLADDER_POLYP",
+            "attributes": {
+              "sizeMm": 9
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-034.docx",
+      "studyType": "ABDOMEN",
+      "text": "Заключение врача: Полип желчного пузыря, 0,65 см.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLBLADDER_POLYP",
+            "attributes": {
+              "sizeMm": 6.5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-035.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: В просвете желчного пузыря одиночный подвижный конкремент\n13 × 8 мм.\nЗаключение: Холецистолитиаз.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "sizeMm": 13,
+              "location": "gallbladder",
+              "mobile": true,
+              "count": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-036.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: В желчном пузыре эхогенная взвесь.\nЗаключение: Билиарный сладж, конкрементов нет.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "BILIARY_SLUDGE",
+            "attributes": {
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-037.docx",
+      "studyType": "ABDOMEN",
+      "text": "Заключение: Полипов в просвете желчного пузыря\nне выявлено.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-038.docx",
+      "studyType": "ABDOMEN",
+      "text": "Анамнез: Полип желчного пузыря 4 мм по прежнему УЗИ.\nЗаключение: Очаговых изменений не определяется.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-039.docx",
+      "studyType": "ABDOMEN",
+      "text": "Заключение: Вероятно, гемангиома печени 16 × 11 мм.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "LIVER_HEMANGIOMA",
+            "attributes": {
+              "sizeMm": 16,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-040.docx",
+      "studyType": "ABDOMEN",
+      "text": "Заключение: Дивертикулы ободочной кишки.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "COLON_DIVERTICULA",
+            "attributes": {}
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-041.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: В полости матки полип эндометрия\nразмером 18 на 7 мм.\nЗаключение врача: Полип эндометрия.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "ENDOMETRIAL_POLYP",
+            "attributes": {
+              "sizeMm": 18
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-042.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание исследования: Матка. Интрамуральный миоматозный узел\n3,1 × 2,2 см, FIGO 4.\nЗаключение: Миома матки.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "sizeMm": 31,
+              "figo": 4
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-043.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Заключение: Простая киста правого яичника 42 × 29 мм, O-RADS 2.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 42,
+              "orads": 2,
+              "lesionType": "simple"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-044.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Заключение врача: Гидросальпинкс слева, 27 мм.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDROSALPINX",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 27
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-045.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: Шейка матки: наботовы кисты до 7 мм.\nЗаключение: Наботовы кисты шейки матки.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "CERVICAL_RETENTION_CYSTS",
+            "attributes": {
+              "sizeMm": 7
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-046.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Заключение: Полип цервикального канала 9 × 5 мм.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "CERVICAL_POLYP",
+            "attributes": {
+              "sizeMm": 9
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-047.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Заключение: Эндоцервицит.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "ENDOCERVICITIS",
+            "attributes": {}
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-048.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: Узлов в миометрии\nне обнаружено. Полипов в полости матки нет.\nЗаключение: Без патологии.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-049.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Заключение: Нельзя исключить полип эндометрия диаметром 8 мм.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "ENDOMETRIAL_POLYP",
+            "attributes": {
+              "sizeMm": 8,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-050.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Заключение: Внутриматочные синехии.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "INTRAUTERINE_SYNECHIAE",
+            "attributes": {}
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-051.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Заключение: Тромбоз глубоких вен справа. Тромб не флотирует.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "attributes": {
+              "side": "right",
+              "floating": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-052.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Описание: Глубокие вены проходимы.\nЗаключение врача: Данных за тромбоз глубоких вен\nне получено.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-053.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Заключение: Тромбофлебит БПВ слева. Верхушка тромба в 4,1 СМ от СФС. Флотации нет.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+            "attributes": {
+              "side": "left",
+              "distanceToJunctionMm": 41,
+              "floating": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-054.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Заключение: Стеноз левой бедренной артерии\nна 58%.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "left",
+              "maxStenosisPct": 58
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-055.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Заключение: Посттромботические изменения справа, частичная реканализация.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "POST_THROMBOTIC_CHANGES",
+            "attributes": {
+              "side": "right",
+              "recanalization": "частичная"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-056.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Анамнез жизни: Тромбоз глубоких вен слева в 2014 году.\nЗаключение: Глубокие вены проходимы, свежих тромбов нет.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-057.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Заключение: Тромбоз глубоких вен слева. Тромб флотирующий.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "attributes": {
+              "side": "left",
+              "floating": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-058.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Заключение: Окклюзия правой поверхностной бедренной артерии.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "right",
+              "occlusion": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-059.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: В правой почке конкремент\nразмером 8 на 5 мм. ЧЛС не расширена.\nЗаключение: Конкремент правой почки.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 8,
+              "obstruction": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-060.docx",
+      "studyType": "KIDNEY",
+      "text": "Заключение: Камень левой почки 1,2 × 0,7 СМ.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 12
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-061.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: Левая почка: лоханка 22 мм, мочеточник не расширен.\nЗаключение: Гидронефроз слева.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "left",
+              "pelvisMm": 22,
+              "ureterDilated": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-062.docx",
+      "studyType": "KIDNEY",
+      "text": "Заключение врача: Конкрементов в правой почке не обнаружено.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-063.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: ЧЛС обеих почек не расширены.\nЗаключение: Гидронефроз\nне выявлен.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "control-064.docx",
+      "studyType": "KIDNEY",
+      "text": "Анамнез заболевания: Конкремент левой почки 11 мм.\nЗаключение: Признаков нефролитиаза не выявлено.",
+      "partition": "frozen_control",
+      "expected": {
+        "findings": []
+      }
+    }
+  ]
+}

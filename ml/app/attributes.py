@@ -4,7 +4,7 @@ import math
 
 BOUNDARY = re.compile(r"(?<!\d)\.(?!\d)|[;!?\n]|(?<=\d)\.(?!\d)")
 NUMBER = r"\d+(?:[.,]\d+)?"
-SIZE = re.compile(rf"(?<![\w.,+−–-])({NUMBER}(?:\s*[xх×*]\s*{NUMBER}){{0,2}})\s*(мм|см)(?![\w²³^])", re.I)
+SIZE = re.compile(rf"(?<![\w.,+−–-])({NUMBER}(?:\s*(?:[xх×*]|\bна\b)\s*{NUMBER}){{0,2}})\s*(мм|см)(?![\w²³^])", re.I)
 CATEGORY = re.compile(r"(?<!\w)(EU\s*[-–]?\s*TI|BI|TI|O)\s*[-–]?\s*RADS\s*[:=-]?\s*([0-6](?:[abcABCабвАБВ])?)(?!\w)", re.I)
 ORGAN = re.compile(r"\b(?:желез[аыу]|матк[аиу]|яичник\w*|пузыр[ья]\w*|дол[яию]|лимфоуз\w*)\b", re.I)
 OTHER_ENTITY = re.compile(r"\b(?:узел|узлы|кист\w*|образовани\w*|полип\w*|конкремент\w*|миом\w*)\b", re.I)

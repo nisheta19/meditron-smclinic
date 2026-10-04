@@ -6,12 +6,13 @@ from .dictionary import normalize_dictionary, uses_v2_contract
 from .findings import analyze as literal_analyze
 from .sections import split_sections
 from .extensions import extract_declared
+from .text_units import logical_lines
 
 NUM = r"\d+(?:[.,]\d+)?"
-MEASURE = re.compile(rf"(?<![\d−-])({NUM}(?:\s*[xх×*–-]\s*{NUM}){{0,2}})\s*(мм|см)(?![\w³²^])", re.I)
+MEASURE = re.compile(rf"(?<![\d−-])({NUM}(?:\s*(?:[xх×*–-]|\bна\b)\s*{NUM}){{0,2}})\s*(мм|см)(?![\w³²^])", re.I)
 CATEGORY = re.compile(r"(?<!\w)(EU\s*[-–]?\s*[TТ]I\s*[-–]?\s*RADS|[TТ]I\s*[-–]?\s*RADS|[BВ]I\s*[-–]?\s*RADS|BIRADS|BR|[OО]\s*[-–]?\s*RADS)\s*[-:=]?\s*([0-6]|IV|III|II|VI|V|I)([abcабв])?(?!\w)", re.I)
 NEG = re.compile(r"\b(?:не\s+(?:выяв\w*|определ\w*|в[уы]?изуализ\w*|лоцир\w*|обнаруж\w*|получ\w*)|без\s+признак\w*|отсутств\w*|нет)\b", re.I)
-UNCERTAIN = re.compile(r"\?|нельзя\s+исключить|не\s+исключается|вероятн\w*|возможно|под\s+вопросом|подозр\w*\s+на", re.I)
+UNCERTAIN = re.compile(r"\?|нельзя\s+исключить|не\s+исключается|вероятн\w*|возможно|предположительн\w*|под\s+(?:вопросом|подозрением)|подозр\w*\s+на", re.I)
 SURGERY = re.compile(r"после\s+(?:удаления|операции|резекции|холецистэктомии)|состояние\s+после|\bудал[её]н[аоы]?\b|\bудалени[ея]\b|миомэктомия|кистэктомия", re.I)
 EXCLUDED_SECTIONS = {"history", "recommendations", "prescriptions", "signature", "ordered_services", "laboratory_tests"}
 
@@ -30,8 +31,8 @@ def side_of(text):
     if re.search(r"с\s+обеих\s+сторон|обеих|билатерально", text, re.I):
         return "both"
     if re.search(r"\bдвусторонн",text,re.I): return "both"
-    left = bool(re.search(r"\b(?:слева|лев(?:ая|ой|ую|ое|ого|ом|ый|ые|ых)|s(?!\s*[-=]?\s*\d))\b", text, re.I))
-    right = bool(re.search(r"\b(?:справа|прав(?:ая|ой|ую|ое|ого|ом|ый|ые|ых)|d(?!\s*[-=]?\s*\d))\b", text, re.I))
+    left = bool(re.search(r"\b(?:слева|левосторонн\w*|лев(?:ая|ой|ую|ое|ого|ом|ый|ые|ых)|s(?!\s*[-=]?\s*\d))\b", text, re.I))
+    right = bool(re.search(r"\b(?:справа|правосторонн\w*|прав(?:ая|ой|ую|ое|ого|ом|ый|ые|ых)|d(?!\s*[-=]?\s*\d))\b", text, re.I))
     return "both" if left and right else "left" if left else "right" if right else None
 
 
@@ -43,14 +44,20 @@ def clause_boundaries(line):
         if m[0]==';' and re.match(r'\s*\d',line[m.end():]):continue
         boundaries.append(m)
     boundaries.extend(re.finditer(r'\b(?:но|однако)\b|,\s*(?=рядом\s+с\s+яичником)|,\s*(?=(?:узел|киста|полип)\s+\d)',line,re.I))
-    return sorted(boundaries,key=lambda m:m.start())
+    # Coordinated diagnoses keep separate anatomy and uncertainty scopes even
+    # when Word places the entire conclusion in one paragraph.
+    boundaries.extend(re.finditer(
+        r',\s*(?=(?:(?:\w+(?:ой|ого|ых|ые|ая)|форм[аы])\s+){0,4}'
+        r'(?:эндометриоз\w*|эндометри[йя]\b|кист[аы]\b|полип\w*|миом\w*|аденомиоз\w*))', line, re.I))
+    return sorted((m for m in boundaries if not (m[0].startswith(',') and
+        re.fullmatch(r'\s*(?:вероятн\w*|возможно|предположительн\w*)\s*',line[:m.start()],re.I))),key=lambda m:m.start())
 
 
 def blocks(raw, full_text):
     result, cursor = [], 0
     for section in split_sections(raw):
         inherited, organ = None, None
-        for raw_line in section["text"].splitlines():
+        for raw_line in logical_lines(section["text"]):
             line = " ".join(raw_line.split())
             if not line:
                 continue
@@ -83,7 +90,7 @@ def blocks(raw, full_text):
                 elif re.search(r"желчн\w*\s+пузыр",piece,re.I): organ="gallbladder"
                 elif re.search(r"яичник",piece,re.I): organ="ovary"
                 elif re.search(r"эндометри|м\s*[-–—]\s*эхо",piece,re.I): organ="endometrium"
-                elif re.search(r"почк[аиу]\b",piece,re.I): organ="kidney"
+                elif re.search(r"поч(?:к[аиуе]|ек|ках|ке)\b",piece,re.I): organ="kidney"
                 elif re.search(r"шейк\w*\s+матки|цервикальн\w*\s+канал|эндоцервикс",piece,re.I): organ="cervix"
                 elif re.search(r"матк[аи]\b|миометри",piece,re.I): organ="uterus"
                 elif re.search(r"переше[еий]к",piece,re.I): organ="isthmus"
@@ -337,9 +344,12 @@ EXTRA = {
 
 
 def negates(text, start, end):
+    # Lexical profiles may match a Russian stem. Scope starts after the whole
+    # word, otherwise its ending looks like unrelated text before the cue.
+    while end < len(text) and (text[end].isalnum() or text[end]=='_'):end += 1
     before,after=text[:start],text[end:]
     cue=NEG.search(after)
-    location_only = cue and re.fullmatch(r"[\s:—–,-]*(?:(?:достоверно|в|на|за|области|проекции|прав\w*|лев\w*|мал\w*|таз\w*|маткой|брюшн\w*|полости|доле|яичник\w*|молочной|железе|позадиматочн\w*|пространств\w*|забрюшинн\w*|момент|исследования)\b[\s:—–,-]*)*",after[:cue.start()],re.I)
+    location_only = cue and re.fullmatch(r"[\s:—–,-]*(?:(?:достоверно|в|на|за|и|с|со|обеих|обоих|обоим|област\w*|проекци\w*|прав\w*|лев\w*|мал\w*|таз\w*|маткой|брюшн\w*|пахов\w*|полост\w*|дол[еяхию]\w*|яичник\w*|молочн\w*|предстательн\w*|желез\w*|почк\w*|почек|желчн\w*|пузыр\w*|просвет\w*|после|микци\w*|мочеиспускани\w*|позадиматочн\w*|пространств\w*|забрюшинн\w*|момент|исследования)\b[\s:—–,-]*)*",after[:cue.start()],re.I)
     claim_negated=cue and re.search(r"(?:данных\s+за|признаков)\s*$",before,re.I)
     return bool(location_only or claim_negated or re.search(r"(?:без\s+(?:признаков\s+)?|нет\s+(?:признаков\s+)?)$",before,re.I)
                 or re.match(r"\s*[:—–,-]?\s*(?:(?:справа|слева)\s*)?(?:не\s+(?:выяв\w*|определ\w*|визуализ\w*|лоцир\w*|обнаруж\w*|получ\w*|расширен\w*)|нет\b|отсутств\w*)",after,re.I))
@@ -412,7 +422,9 @@ def candidates_for(item, source_blocks, study):
         # Separate coordinated diagnoses before assigning question/hedging cues.
         left=0;right=len(text)
         for comma in re.finditer(r",\s*(?=(?:полип\w*|миом\w*|кист\w*|образовани\w*|узел|свободн\w*\s+жидкост\w*|также)\b)",text,re.I):
-            if comma.end()<=match.start():left=comma.end()
+            if comma.end()<=match.start():
+                if UNCERTAIN.search(text[left:comma.start()]) and not regex.search(text[left:comma.start()]):continue
+                left=comma.end()
             elif comma.start()>=match.end():right=comma.start();break
         attrs['uncertain']=bool(UNCERTAIN.search(text[left:right]))
         attrs["uncertain"] |= any(p.search(text) for p in suspected)

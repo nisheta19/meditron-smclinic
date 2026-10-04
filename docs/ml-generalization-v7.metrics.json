@@ -1,0 +1,1141 @@
+{
+  "modelVersion": "dict-v2.1-extractor-7",
+  "createdAt": "2026-10-04T20:24:12.867325+00:00",
+  "clinicalValidation": false,
+  "sourceSha256": {
+    "app/__init__.py": "814ef1ca6acc2685e4648365b5a8d83fd2dde8fdb63b7b28edddc69ce692b127",
+    "app/__main__.py": "5e7672ea9596ee2a943c009ad934e23861f95a7fa818df234c8299c51e0e7850",
+    "app/annotation.py": "db715371d9a71c768daa5c2742cc2bcb37e144b53c221bb69626ea00dd658627",
+    "app/asgi.py": "7beb06c8b6276976aed47116eb9450c578bdb7af713cc0434ed584ec612d4bef",
+    "app/attributes.py": "1cd96ac230c75c596d2da134689c7a3cdb364e5ae7a38d1180f4269f0ab84273",
+    "app/backend.py": "341130094425857859f9486c36050da50248132f557fecb6fe9eabb6bfa07501",
+    "app/benchmark_v2.py": "4532497da82b9f1c828383db22d123a71436e0539c72bcc7ad49e66de586928b",
+    "app/check.py": "221b6e4f9e757ed94d961f04b2d33b9d9a034972993e9980899e27c0bea9c98c",
+    "app/clinical.py": "5a2ab88d5c536763fa5b7bd0b96189c320b72630180f4051c4dca2df47eb54e9",
+    "app/clinical_v2.py": "6cd7de4d85bd8a58703a485b5396ccf93758471b184fe9ec429ba16006b1d048",
+    "app/contracts.py": "5b06a53016d2ba86f3cfe47a170eae070c3579b24b26cbb8df10396a4cccb176",
+    "app/corpus.py": "32cbad3782238971124d90932292ba1d8a9f062f7ec0a70d2f599d13d3c33a9a",
+    "app/dataset.py": "4161a96ecdbbe0d81811c0c2de8473a5bbdbb45317583e68fa8a6fd8733d7231",
+    "app/demo.py": "5d435981956569900d462a325560933ea23cf1937babb5c7c9c9313eaa752a26",
+    "app/dictionary.py": "f5934e1bb95af653555bf1624c4cba0c60e3e79d6a5f3e558fdbdfd179383ab3",
+    "app/evaluate.py": "8acb973ea6846c8b5181977f9f0220f8de98a2d430daf95c300ce326e30b9217",
+    "app/extensions.py": "88351fb7e9b0448ec6dd95a5962988b0310da53b36ed03f0d67aa5202837f59d",
+    "app/findings.py": "ad89be8860b3f39f8186677c89d233a1d56e106e04d88f906038d9a6d69c5081",
+    "app/generalization.py": "5e2452742b86125c5dc1d102a33f2e58a649f4d7f7f6c0929c12279e0d2cbabe",
+    "app/mis.py": "dc00340e73708223e1f1e88c547ba7f191b9a4007f0002583f5666035198e4cb",
+    "app/parser.py": "6964bf662afb173f1ca6bbc98b8a5130eccc63d6e4759706e3a442dde81a1102",
+    "app/processing.py": "f89b1537b160841a98898663578dc9eac50839c54d76fc42cbad653cf261fe32",
+    "app/release.py": "dfe8e8840dadef8df937f2e315196ac5a35c3b9bb377de09d47d6db82a984dbc",
+    "app/sections.py": "d20b2ff43436240afe945089faa89d9f0a0ba9bdb6728d25c9126f81139821ae",
+    "app/server.py": "1c990ea4462552a104e8b4a3e46eb51c067c65c55b06ee744d59d3700e036918",
+    "app/service.py": "1ddf36f37bbcbe27f206c349e1d44b879a057e920c231ca38a66f720e8ea75fa",
+    "app/text_units.py": "5e50e4e56d3c3e15479710090af91597a4c2b3f38789184e88961aca0bfd9397",
+    "app/validation.py": "e9c5d18b52e8a625ae6458146210a3580363d46472d375729bfe44ecdd75f5b1",
+    "app/verify_corpus.py": "8f77f2c73868e29f638513ca2d680309f82752e0dd4c40fcc6366d6cc78e034d"
+  },
+  "dictionarySha256": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b",
+  "comparison": {
+    "fresh": {
+      "v6": {
+        "documents": 35,
+        "fullFacts": {
+          "tp": 20,
+          "fp": 3,
+          "fn": 2,
+          "precision": 0.8695652173913043,
+          "recall": 0.9090909090909091,
+          "f1": 0.8888888888888888
+        },
+        "entities": {
+          "tp": 22,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9565217391304348,
+          "recall": 1.0,
+          "f1": 0.9777777777777777
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 45,
+          "total": 47,
+          "accuracy": 0.9574468085106383
+        }
+      },
+      "v7": {
+        "documents": 35,
+        "fullFacts": {
+          "tp": 22,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "entities": {
+          "tp": 22,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 47,
+          "total": 47,
+          "accuracy": 1.0
+        }
+      }
+    },
+    "real": {
+      "v6": {
+        "documents": 89,
+        "fullFacts": {
+          "tp": 143,
+          "fp": 23,
+          "fn": 6,
+          "precision": 0.8614457831325302,
+          "recall": 0.959731543624161,
+          "f1": 0.9079365079365079
+        },
+        "entities": {
+          "tp": 149,
+          "fp": 17,
+          "fn": 0,
+          "precision": 0.8975903614457831,
+          "recall": 1.0,
+          "f1": 0.946031746031746
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 248,
+          "total": 254,
+          "accuracy": 0.9763779527559056
+        }
+      },
+      "v7": {
+        "documents": 89,
+        "fullFacts": {
+          "tp": 143,
+          "fp": 23,
+          "fn": 6,
+          "precision": 0.8614457831325302,
+          "recall": 0.959731543624161,
+          "f1": 0.9079365079365079
+        },
+        "entities": {
+          "tp": 149,
+          "fp": 17,
+          "fn": 0,
+          "precision": 0.8975903614457831,
+          "recall": 1.0,
+          "f1": 0.946031746031746
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 248,
+          "total": 254,
+          "accuracy": 0.9763779527559056
+        }
+      }
+    },
+    "synthetic": {
+      "v6": {
+        "documents": 33,
+        "fullFacts": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "entities": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 154,
+          "total": 154,
+          "accuracy": 1.0
+        }
+      },
+      "v7": {
+        "documents": 33,
+        "fullFacts": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "entities": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 154,
+          "total": 154,
+          "accuracy": 1.0
+        }
+      }
+    },
+    "real-line_wrap": {
+      "v6": {
+        "documents": 89,
+        "fullFacts": {
+          "tp": 96,
+          "fp": 67,
+          "fn": 53,
+          "precision": 0.588957055214724,
+          "recall": 0.6442953020134228,
+          "f1": 0.6153846153846154
+        },
+        "entities": {
+          "tp": 133,
+          "fp": 30,
+          "fn": 16,
+          "precision": 0.8159509202453987,
+          "recall": 0.8926174496644296,
+          "f1": 0.8525641025641025
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 179,
+          "total": 254,
+          "accuracy": 0.7047244094488189
+        }
+      },
+      "v7": {
+        "documents": 89,
+        "fullFacts": {
+          "tp": 143,
+          "fp": 23,
+          "fn": 6,
+          "precision": 0.8614457831325302,
+          "recall": 0.959731543624161,
+          "f1": 0.9079365079365079
+        },
+        "entities": {
+          "tp": 149,
+          "fp": 17,
+          "fn": 0,
+          "precision": 0.8975903614457831,
+          "recall": 1.0,
+          "f1": 0.946031746031746
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 248,
+          "total": 254,
+          "accuracy": 0.9763779527559056
+        }
+      }
+    },
+    "synthetic-line_wrap": {
+      "v6": {
+        "documents": 33,
+        "fullFacts": {
+          "tp": 29,
+          "fp": 19,
+          "fn": 18,
+          "precision": 0.6041666666666666,
+          "recall": 0.6170212765957447,
+          "f1": 0.6105263157894737
+        },
+        "entities": {
+          "tp": 39,
+          "fp": 9,
+          "fn": 8,
+          "precision": 0.8125,
+          "recall": 0.8297872340425532,
+          "f1": 0.8210526315789474
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 114,
+          "total": 154,
+          "accuracy": 0.7402597402597403
+        }
+      },
+      "v7": {
+        "documents": 33,
+        "fullFacts": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "entities": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 154,
+          "total": 154,
+          "accuracy": 1.0
+        }
+      }
+    },
+    "real-header_variants": {
+      "v6": {
+        "documents": 89,
+        "fullFacts": {
+          "tp": 137,
+          "fp": 33,
+          "fn": 12,
+          "precision": 0.8058823529411765,
+          "recall": 0.9194630872483222,
+          "f1": 0.8589341692789969
+        },
+        "entities": {
+          "tp": 146,
+          "fp": 24,
+          "fn": 3,
+          "precision": 0.8588235294117647,
+          "recall": 0.9798657718120806,
+          "f1": 0.9153605015673981
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 236,
+          "total": 254,
+          "accuracy": 0.9291338582677166
+        }
+      },
+      "v7": {
+        "documents": 89,
+        "fullFacts": {
+          "tp": 143,
+          "fp": 23,
+          "fn": 6,
+          "precision": 0.8614457831325302,
+          "recall": 0.959731543624161,
+          "f1": 0.9079365079365079
+        },
+        "entities": {
+          "tp": 149,
+          "fp": 17,
+          "fn": 0,
+          "precision": 0.8975903614457831,
+          "recall": 1.0,
+          "f1": 0.946031746031746
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 248,
+          "total": 254,
+          "accuracy": 0.9763779527559056
+        }
+      }
+    },
+    "synthetic-header_variants": {
+      "v6": {
+        "documents": 33,
+        "fullFacts": {
+          "tp": 43,
+          "fp": 11,
+          "fn": 4,
+          "precision": 0.7962962962962963,
+          "recall": 0.9148936170212766,
+          "f1": 0.8514851485148515
+        },
+        "entities": {
+          "tp": 45,
+          "fp": 9,
+          "fn": 2,
+          "precision": 0.8333333333333334,
+          "recall": 0.9574468085106383,
+          "f1": 0.8910891089108911
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 146,
+          "total": 154,
+          "accuracy": 0.948051948051948
+        }
+      },
+      "v7": {
+        "documents": 33,
+        "fullFacts": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "entities": {
+          "tp": 47,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9791666666666666,
+          "recall": 1.0,
+          "f1": 0.9894736842105263
+        },
+        "failedDocuments": [],
+        "attributes": {
+          "correct": 154,
+          "total": 154,
+          "accuracy": 1.0
+        }
+      }
+    }
+  },
+  "newDevelopment": {
+    "modelVersion": "dict-v2.1-extractor-7",
+    "goldSha256": "2d3d7599fa34c1f75b546a336544c4cb75ac948a676e8920fac3b2b2fc2f3e0d",
+    "clinicalValidation": false,
+    "variants": {
+      "original": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.0576513796877407,
+          "max": 0.11138969997409731
+        }
+      },
+      "wrap35": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05597904531532549,
+          "max": 0.11931300000287592
+        }
+      },
+      "wrap55": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.056065246872094576,
+          "max": 0.1149223999818787
+        }
+      },
+      "upper": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05707323593378533,
+          "max": 0.10253280005417764
+        }
+      },
+      "upper_wrap55": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.058160931252132286,
+          "max": 0.11348519998136908
+        }
+      },
+      "nbsp": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.060185462492881925,
+          "max": 0.12243719992693514
+        }
+      },
+      "decimal_dot": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05967569375388848,
+          "max": 0.10346229991409928
+        }
+      },
+      "multiplication": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05664131717821874,
+          "max": 0.11372320004738867
+        }
+      },
+      "headers": {
+        "documents": 64,
+        "entities": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 91,
+          "total": 91,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 18,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.050402095326717244,
+          "max": 0.09614210005383939
+        }
+      }
+    }
+  },
+  "newValidation": {
+    "modelVersion": "dict-v2.1-extractor-7",
+    "goldSha256": "bf897b1870cea8b24d519ac3aaa3ddd4e9ca9169cb096721c68ea3defc0e1fb9",
+    "clinicalValidation": false,
+    "variants": {
+      "original": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.057030470826753624,
+          "max": 0.11892489995807409
+        }
+      },
+      "wrap35": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.054781058331071913,
+          "max": 0.11108920001424849
+        }
+      },
+      "wrap55": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05598253750455721,
+          "max": 0.09894679998978972
+        }
+      },
+      "upper": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.056199236110033884,
+          "max": 0.11474420002195984
+        }
+      },
+      "upper_wrap55": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05879923888035895,
+          "max": 0.10478009993676096
+        }
+      },
+      "nbsp": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.06018967638697682,
+          "max": 0.1039257999509573
+        }
+      },
+      "decimal_dot": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.054777254177477315,
+          "max": 0.10090259998105466
+        }
+      },
+      "multiplication": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05407788889230384,
+          "max": 0.2226661000167951
+        }
+      },
+      "headers": {
+        "documents": 72,
+        "entities": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "fullFacts": {
+          "tp": 56,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "attributes": {
+          "correct": 125,
+          "total": 125,
+          "accuracy": 1.0
+        },
+        "failedDocuments": [],
+        "negativeCases": {
+          "total": 21,
+          "withFalseFindings": 0
+        },
+        "timingSeconds": {
+          "mean": 0.05715086388873816,
+          "max": 0.09037410002201796
+        }
+      }
+    }
+  },
+  "validationFirstProspectiveRun": {
+    "documents": 72,
+    "fullFacts": {
+      "tp": 56,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.9655172413793104,
+      "recall": 1.0,
+      "f1": 0.9824561403508771
+    },
+    "entities": {
+      "tp": 56,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.9655172413793104,
+      "recall": 1.0,
+      "f1": 0.9824561403508771
+    },
+    "attributes": {
+      "correct": 125,
+      "total": 125,
+      "accuracy": 1.0
+    },
+    "failedDocuments": []
+  },
+  "validationBaselineV6": {
+    "documents": 72,
+    "fullFacts": {
+      "tp": 38,
+      "fp": 25,
+      "fn": 18,
+      "precision": 0.6031746031746031,
+      "recall": 0.6785714285714286,
+      "f1": 0.6386554621848739
+    },
+    "entities": {
+      "tp": 54,
+      "fp": 9,
+      "fn": 2,
+      "precision": 0.8571428571428571,
+      "recall": 0.9642857142857143,
+      "f1": 0.907563025210084
+    },
+    "attributes": {
+      "correct": 104,
+      "total": 125,
+      "accuracy": 0.832
+    },
+    "failedDocuments": []
+  },
+  "developmentBaselineV6": {
+    "documents": 64,
+    "fullFacts": {
+      "tp": 26,
+      "fp": 27,
+      "fn": 20,
+      "precision": 0.49056603773584906,
+      "recall": 0.5652173913043478,
+      "f1": 0.5252525252525253
+    },
+    "entities": {
+      "tp": 44,
+      "fp": 9,
+      "fn": 2,
+      "precision": 0.8301886792452831,
+      "recall": 0.9565217391304348,
+      "f1": 0.8888888888888888
+    },
+    "attributes": {
+      "correct": 69,
+      "total": 91,
+      "accuracy": 0.7582417582417582
+    },
+    "failedDocuments": []
+  },
+  "checks": {
+    "mlUnit": {
+      "tests": 312,
+      "failures": 0,
+      "errors": 0
+    },
+    "backendMaven": {
+      "tests": 45,
+      "failures": 0,
+      "errors": 0,
+      "passed": true
+    },
+    "integration": {
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "coverage": {
+        "backend": {
+          "covered": [
+            "DELETE /api/findings/{findingId}",
+            "GET /api/auth/csrf",
+            "GET /api/auth/me",
+            "GET /api/dictionary/findings",
+            "GET /api/integration/events/status",
+            "GET /api/patients",
+            "GET /api/patients/{patientId}",
+            "GET /api/patients/{patientId}/findings",
+            "GET /api/ping",
+            "GET /api/protocols/{protocolId}",
+            "PATCH /api/findings/{findingId}",
+            "POST /api/auth/login",
+            "POST /api/auth/logout",
+            "POST /api/integration/events",
+            "POST /api/integration/events/retry",
+            "POST /api/integration/ml/results",
+            "POST /api/integration/protocols",
+            "POST /api/patients/{patientId}/findings",
+            "POST /api/patients/{patientId}/findings/confirm"
+          ],
+          "uncovered": [],
+          "total": 19
+        },
+        "ml": {
+          "covered": [
+            "GET /api/mis/events/{event_id}",
+            "GET /health",
+            "POST /api/mis/events",
+            "POST /api/mis/events/{event_id}/retry"
+          ],
+          "uncovered": [],
+          "total": 4
+        }
+      }
+    }
+  }
+}

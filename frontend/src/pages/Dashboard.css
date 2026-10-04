@@ -1,0 +1,62 @@
+/* Supplied Figma frame: 1280 × 1038, content x=222, y=25. Scoped to the dashboard. */
+.dashboard-view .main { padding-bottom: 25px; }
+.dashboard-view .brand { margin-bottom: 35px; }
+.dashboard button:disabled, .dashboard input:disabled { opacity: 1; cursor: default; }
+.dashboard .searchbar input:disabled { -webkit-text-fill-color: var(--placeholder); }
+.dash-controls { display: flex; justify-content: flex-end; gap: 8px; margin: 20px 0; }
+.dash-select { height: 38px; display: inline-flex; align-items: center; justify-content: space-between; padding: 0 10px 0 14px; gap: 4px; border: 0; border-radius: 16px; background: white; font-size: 14px; white-space: nowrap; }
+.dash-select svg { flex-shrink: 0; }
+.dash-select:first-child { width: 102px; }
+.dash-select:last-child { width: 124px; }
+.dash { display: grid; grid-template-columns: minmax(0, calc(50% - 3px)) repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, 278px); gap: 6px; }
+.dash-card { position: relative; overflow: hidden; background: white; border-radius: 26px; }
+.dash h2, .dash h3, .dash strong, .dash-hero p, .dash-delta, .funnel-bar span, .funnel-pct, .funnel-axis span, .dash-select span { text-box-trim: trim-both; text-box-edge: cap alphabetic; }
+.dash h2 { position: absolute; left: 30px; top: 30px; font: 400 26px/1 'Inter Variable', sans-serif; }
+.dash-go { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: #ededed; }
+.dash-go svg { display: block; }
+.dash-map { grid-column: 1; grid-row: 1 / span 2; }
+.dash-mapsvg { position: absolute; top: 97px; left: 50%; transform: translateX(-50%); width: 330px; max-width: calc(100% - 40px); height: auto; }
+.dash-hero { grid-column: 2 / span 2; grid-row: 1; background: var(--sm-main); color: white; }
+.dash-hero h2 { left: 28px; font-weight: 600; z-index: 1; }
+.dash-hero p { position: absolute; left: 27px; top: 66px; margin: 0; font-size: 20px; line-height: .9; color: rgb(255 255 255 / .7); z-index: 1; }
+.dash-hero strong { position: absolute; left: 27px; top: 120px; font: 600 64px/1 'Manrope Variable', sans-serif; z-index: 1; }
+.dash-wave { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dashboard .dash-icon { position: absolute; left: 22px; top: 28px; color: var(--black); }
+.dash-icon.link { transform: rotate(-45deg); }
+.dash-metric h3 { position: absolute; left: 22px; top: 66px; width: 152px; max-width: calc(100% - 38px); font: 400 20px/1 'Inter Variable', sans-serif; }
+.dash-metric strong { position: absolute; left: 17px; top: 168px; font: 700 64px/1 'Manrope Variable', sans-serif; }
+.dash-metric:last-child strong { left: 20px; }
+.dash-metric .orange { color: var(--accent); }
+.dash-metric .green { color: var(--sm-main); }
+.dash-delta { position: absolute; top: 229px; left: 22px; display: flex; align-items: center; height: 27px; padding: 0 10px; border: 1px solid var(--gray-light); border-radius: 14px; font-size: 12px; line-height: 15px; color: var(--gray-light); }
+.dash-funnel { grid-column: 1; grid-row: 3; }
+.dash-funnel h2 { top: 31px; font-size: 20px; }
+.funnel-bars { position: absolute; top: 70px; left: 31px; right: 31px; display: grid; gap: 12px; }
+.funnel-bar { position: relative; height: 42px; max-width: 100%; border-radius: 64px; background: var(--page); }
+.funnel-bar span { position: absolute; left: 18px; top: 16px; font-size: 12px; line-height: 15px; color: var(--gray-medium); white-space: nowrap; }
+.funnel-bar:nth-child(2) span { left: 19px; }
+.funnel-bar:nth-child(3) span { left: 20px; }
+.funnel-pct { position: absolute; right: 4px; top: 4px; display: flex; align-items: center; justify-content: center; width: 51px; height: 34px; border-radius: 100px; font-size: 12px; font-weight: 400; line-height: 15px; color: white; }
+.funnel-pct.c0 { background: var(--gray-dark); }
+.funnel-pct.c1 { background: var(--accent); }
+.funnel-pct.c2 { background: var(--sm-main); }
+.funnel-axis { position: absolute; left: 31px; right: 41px; top: 245px; display: flex; justify-content: space-between; font-size: 14px; line-height: 17px; color: var(--gray-medium); }
+@media (max-width: 1100px) {
+  .dash { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: 278px; }
+  .dash-map { grid-column: 1 / -1; grid-row: auto / span 2; }
+  .dash-hero, .dash-funnel { grid-column: 1 / -1; grid-row: auto; }
+}
+@media (max-width: 720px) {
+  .dashboard-view .main { padding-bottom: 100px; }
+  .dash-controls { margin: 12px 0; }
+  .dash h2 { left: 22px; font-size: 22px; }
+  .dash-funnel h2 { font-size: 18px; max-width: calc(100% - 40px); }
+  .dash-metric h3 { left: 16px; font-size: 16px; }
+  .dash-metric strong { font-size: 48px; left: 16px; }
+  .dash-delta { left: 12px; font-size: 10px; padding: 0 7px; }
+  .dash-go { width: 38px; height: 38px; top: 12px; right: 12px; }
+  .dash-go svg { width: 38px; height: 38px; }
+  .funnel-bars { left: 22px; right: 22px; }
+  .funnel-bar { min-width: 165px; }
+  .funnel-bar span { left: 12px !important; font-size: 10px; }
+}
