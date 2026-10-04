@@ -1,22 +1,22 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { USE_MOCK, API_URL, capsReady, demo } from './api';
 import { CURRENT_DOCTOR } from './config';
 import { fmtDateTime } from './lib/format';
 import { Revision, Toast, go, useMedia, useRoute } from './lib/hooks';
-import { Archive, ArrowLeft, Briefcase, GridIcon, Inbox, Logo } from './components/Icons';
+import { Archive, ArrowLeft, Briefcase, GridIcon, Inbox, LogOut, Logo } from './components/Icons';
 import Findings from './pages/Findings';
 import Patients from './pages/Patients';
 import PatientCard from './pages/PatientCard';
 import Dictionary from './pages/Dictionary';
 import Dashboard from './pages/Dashboard';
-import Login, { isAuthed } from './pages/Login';
+import Login, { isAuthed, logout } from './pages/Login';
 import PushCard from './pages/PushCard';
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
 const isDocsPath = () => /\/open-api\/?$/.test(location.pathname);
 
-// Пункты меню — как в макете (в последней версии «Настройки» убраны из меню: словарь открывается по блоку врача внизу)
+// Пункты меню — как в макете (без «Настроек»; словарь находок доступен по адресу #/settings)
 const NAV = [
   ['dashboard', 'Дашборд', GridIcon],
   ['inbox', 'Входящие', Inbox],
@@ -65,7 +65,7 @@ export default function App() {
     <Toast.Provider value={toast}>
       <Revision.Provider value={rev}>
         <div className={`layout${isCollapsed ? ' collapsed' : ''}`}>
-          <header className="mobile-top"><Logo height={22} /></header>
+          <header className="mobile-top"><Logo height={22} /><UserMenu mobile onLogout={() => { logout(); setAuthed(false); }} /></header>
           <aside className="sidebar">
             <a className="brand" href="#/findings" aria-label="СМ-Клиника, на главную"><Logo /></a>
             <nav className="nav" aria-label="Разделы">
@@ -76,11 +76,7 @@ export default function App() {
               ))}
             </nav>
             <div className="nav-bottom">
-              <a className="nav-user" href="#/settings" title={`${CURRENT_DOCTOR}: настройки и словарь находок`}
-                aria-current={section === 'settings' ? 'page' : undefined}>
-                <span className="nav-avatar" aria-hidden="true">{CURRENT_DOCTOR.split(/\s+/).slice(0, 2).map((w) => w[0]).join('')}</span>
-                <span className="nav-user-text"><span>{CURRENT_DOCTOR}</span><small>Врач</small></span>
-              </a>
+              <UserMenu onLogout={() => { logout(); setAuthed(false); }} />
               {!narrow && <button className="nav-item faint" onClick={() => setCollapsed((v) => !v)} aria-expanded={!collapsed} title={collapsed ? 'Развернуть' : 'Свернуть'}>
                 <ArrowLeft size={16} className={collapsed ? 'flip' : undefined} /><span>Свернуть</span>
               </button>}
@@ -93,6 +89,32 @@ export default function App() {
         <div className="toasts" role="status">{toasts.map((t) => <div key={t.key} className={`toast ${t.tone}`}>{t.text}</div>)}</div>
       </Revision.Provider>
     </Toast.Provider>
+  );
+}
+
+/** Профиль врача внизу меню: по клику открывается белая карточка с кнопкой «Выйти» (макет «Правило»). Выход ведёт на авторизацию */
+function UserMenu({ onLogout, mobile }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const away = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const esc = (e) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', away); addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', away); removeEventListener('keydown', esc); };
+  }, [open]);
+  const initials = CURRENT_DOCTOR.split(/\s+/).slice(0, 2).map((w) => w[0]).join('');
+  const who = <><span className="nav-avatar" aria-hidden="true">{initials}</span><span className="nav-user-text"><span>{CURRENT_DOCTOR}</span><small>Врач</small></span></>;
+  return (
+    <div className={`user-menu${open ? ' open' : ''}${mobile ? ' mobile' : ''}${mobile && USE_MOCK ? ' with-demo' : ''}`} ref={ref}>
+      <button className="nav-user" aria-haspopup="menu" aria-expanded={open} title={CURRENT_DOCTOR} onClick={() => setOpen((v) => !v)}>{who}</button>
+      {open && (
+        <div className="user-pop" role="menu">
+          <button className="nav-user" onClick={() => setOpen(false)} aria-label="Закрыть меню профиля">{who}</button>
+          <button role="menuitem" className="nav-item logout" onClick={onLogout}><LogOut size={16} /><span>Выйти</span></button>
+        </div>
+      )}
+    </div>
   );
 }
 

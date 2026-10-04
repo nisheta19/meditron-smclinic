@@ -1,5 +1,5 @@
 // Страница авторизации по макету Figma (auth.fig, кадр «Авторизация»).
-// Пока заглушка: вход при любом логине и пароле, выхода нет. Сессия хранится в localStorage.
+// Пока заглушка: вход при любом логине и пароле. Выход — в меню профиля внизу бокового меню. Сессия хранится в localStorage.
 import { useState } from 'react';
 import { Logo } from '../components/Icons';
 import background from '../assets/auth/background.webp';
@@ -9,6 +9,8 @@ const KEY = 'sm-route:auth';
 
 /** Вошёл ли пользователь (переживает перезагрузку страницы) */
 export const isAuthed = () => { try { return !!localStorage.getItem(KEY); } catch { return false; } };
+/** Выход: забыть сессию — App покажет страницу авторизации */
+export const logout = () => { try { localStorage.removeItem(KEY); } catch { /* нет хранилища — сессия и так не сохранялась */ } };
 const remember = (login) => { try { localStorage.setItem(KEY, JSON.stringify({ login, at: Date.now() })); } catch { /* приватный режим — вход до перезагрузки */ } };
 
 export default function Login({ onLogin }) {

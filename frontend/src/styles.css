@@ -554,7 +554,7 @@ mark.flash { animation: flash 1.2s ease-out; }
 
 
 /* ---------- Карточка пациента (макет «Сеч_Хакатон_Вёрстка») ---------- */
-.nav-user { text-decoration: none; border-radius: 12px; cursor: pointer;
+.nav-user { text-decoration: none; border-radius: 12px; cursor: pointer; border: 0; background: none; font: inherit; text-align: left;
   display: flex; align-items: center; gap: 8px; width: 190px; max-width: 100%; height: 36px; padding: 0 10px 0 11px; color: var(--gray-medium); overflow: hidden;
   transition: width 0.34s var(--ease), padding 0.34s var(--ease); }
 .nav-avatar { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #d9d9d9; color: var(--gray-dark); font-size: 12px; }
@@ -898,6 +898,31 @@ div.pc-event .pc-event-arrow { opacity: 0.35; }
   .pt-head { display: none; }
   .pt-route .pt-row, .pt-notes .pt-row, .pt-findings .pt-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 8px; padding: 12px 14px; }
   .pt-level, .pt-booked { padding-left: 0; }
+}
+
+
+/* ---------- Меню профиля: по клику — белая карточка с «Выйти» (макет «Правило») ---------- */
+.user-menu { position: relative; }
+.nav-user:focus-visible { outline: 2px solid var(--sm-main); outline-offset: -2px; }
+.user-pop {
+  position: absolute; left: 0; top: -8px; z-index: 12; display: grid; gap: 4px; width: 190px; padding: 8px 0 4px;
+  background: var(--white); border-radius: 16px; box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.18); animation: user-pop 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.user-pop .nav-user:hover { background: none; }
+.nav-item.logout { color: #ff3636; cursor: pointer; }
+.nav-item.logout:hover { background: rgb(255 54 54 / 0.08); }
+.nav-item.logout:active { background: rgb(255 54 54 / 0.16); }
+.collapsed .user-pop { width: 36px; }   /* свёрнутое меню: только аватар и иконка выхода */
+@keyframes user-pop { from { opacity: 0; transform: translateY(6px) scale(0.98); } }
+.user-menu.mobile { display: none; }
+@media (max-width: 720px) {
+  .user-menu.mobile { display: block; margin-left: auto; }
+  .user-menu.mobile.with-demo { margin-right: 72px; }   /* место под кнопку «Демо» */
+  .user-menu.mobile > .nav-user { width: 40px; padding: 0 4px; }
+  .user-menu.mobile > .nav-user .nav-user-text { display: none; }
+  .user-menu.mobile .user-pop { left: auto; right: -8px; top: -2px; width: 220px; }
+  .user-menu.mobile .user-pop .nav-user { width: 100%; }
+  .user-menu.mobile .nav-item.logout { flex: none; flex-direction: row; justify-content: flex-start; gap: 8px; width: 100%; height: 36px; padding: 0 10px; font-size: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
