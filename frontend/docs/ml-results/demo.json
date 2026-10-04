@@ -1,0 +1,657 @@
+[
+  {
+    "resultId": "ml-demo-01",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-26T11:05:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2001",
+      "fullName": "Соколова Марина Игоревна",
+      "birthDate": "1987-05-12",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6001",
+      "version": 1,
+      "studyType": "PELVIS_FEMALE",
+      "studyDate": "2026-09-26"
+    },
+    "text": "УЛЬТРАЗВУКОВОЕ ИССЛЕДОВАНИЕ ОРГАНОВ МАЛОГО ТАЗА (TV)\nМатка в положении anteflexio, размеры 51х44х48 мм. Миометрий однородный.\nЭндометрий 9 мм, в полости матки гиперэхогенное образование 7х5 мм с питающей ножкой, при ЦДК единичный сосуд.\nЯичники обычных размеров и структуры. Свободной жидкости нет.\nЗАКЛЮЧЕНИЕ: Эхографические признаки полипа эндометрия. Рекомендована консультация гинеколога.",
+    "conclusion": "Эхографические признаки полипа эндометрия. Рекомендована консультация гинеколога.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "ENDOMETRIAL_POLYP",
+        "evidence": {
+          "text": "Эхографические признаки полипа эндометрия",
+          "start": 311,
+          "end": 352
+        },
+        "attributes": {
+          "sizeMm": 7
+        },
+        "confidence": 0.95
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-02a",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-03-10T10:30:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2002",
+      "fullName": "Белова Татьяна Николаевна",
+      "birthDate": "1969-11-03",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6002",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-03-10"
+    },
+    "text": "УЗИ ОРГАНОВ БРЮШНОЙ ПОЛОСТИ\nПечень не увеличена. Желчный пузырь 70х28 мм, стенка 2 мм, в просвете единичный конкремент 5 мм.\nХоледох 4 мм. Поджелудочная железа без особенностей.\nЗАКЛЮЧЕНИЕ: Желчнокаменная болезнь, единичный конкремент.",
+    "conclusion": "Желчнокаменная болезнь, единичный конкремент.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "GALLSTONES",
+        "evidence": {
+          "text": "Желчнокаменная болезнь, единичный конкремент",
+          "start": 190,
+          "end": 234
+        },
+        "attributes": {
+          "sizeMm": 5,
+          "multiple": false
+        },
+        "confidence": 0.93
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-02b",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-02T09:50:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2002",
+      "fullName": "Белова Татьяна Николаевна",
+      "birthDate": "1969-11-03",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6022",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-09-02"
+    },
+    "text": "УЗИ ОРГАНОВ БРЮШНОЙ ПОЛОСТИ\nПечень не увеличена, структура однородная.\nЖелчный пузырь 78х30 мм, стенка 3 мм, в просвете множественные гиперэхогенные конкременты до 12 мм с акустической тенью.\nХоледох 4 мм. Поджелудочная железа и селезёнка без особенностей.\nЗАКЛЮЧЕНИЕ: Желчнокаменная болезнь. Хронический калькулёзный холецистит.",
+    "conclusion": "Желчнокаменная болезнь. Хронический калькулёзный холецистит.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "GALLSTONES",
+        "evidence": {
+          "text": "в просвете множественные гиперэхогенные конкременты до 12 мм с акустической тенью",
+          "start": 109,
+          "end": 190
+        },
+        "attributes": {
+          "sizeMm": 12,
+          "multiple": true
+        },
+        "confidence": 0.96
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-03",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-10-01T16:20:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2003",
+      "fullName": "Орлов Павел Андреевич",
+      "birthDate": "1982-02-17",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6003",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-10-01"
+    },
+    "text": "УЗИ ОРГАНОВ БРЮШНОЙ ПОЛОСТИ\nПечень и поджелудочная железа без особенностей.\nЖелчный пузырь обычной формы, стенка 2 мм. По задней стенке пристеночное неподвижное образование 12 мм без акустической тени.\nЗАКЛЮЧЕНИЕ: Полип желчного пузыря 12 мм.",
+    "conclusion": "Полип желчного пузыря 12 мм.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "GALLBLADDER_POLYP",
+        "evidence": {
+          "text": "Полип желчного пузыря 12 мм",
+          "start": 214,
+          "end": 241
+        },
+        "attributes": {
+          "sizeMm": 12
+        },
+        "confidence": 0.92
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-04",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-30T12:10:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2004",
+      "fullName": "Ершов Игорь Валентинович",
+      "birthDate": "1934-07-22",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6004",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-09-30"
+    },
+    "text": "УЗИ ОРГАНОВ БРЮШНОЙ ПОЛОСТИ\nЖелчный пузырь обычной формы, по передней стенке пристеночное образование 5 мм.\nКонкременты не выявлены. Холедох не расширен.\nЗАКЛЮЧЕНИЕ: Полип желчного пузыря 5 мм. Рекомендован УЗ-контроль через 6 месяцев.",
+    "conclusion": "Полип желчного пузыря 5 мм. Рекомендован УЗ-контроль через 6 месяцев.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "GALLBLADDER_POLYP",
+        "evidence": {
+          "text": "Полип желчного пузыря 5 мм",
+          "start": 166,
+          "end": 192
+        },
+        "attributes": {
+          "sizeMm": 5
+        },
+        "confidence": 0.9
+      }
+    ],
+    "notTriggered": [
+      {
+        "code": "GALLSTONES",
+        "evidence": {
+          "text": "Конкременты не выявлены",
+          "start": 108,
+          "end": 131
+        },
+        "reason": "NEGATION"
+      }
+    ],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-05",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-29T10:40:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2005",
+      "fullName": "Захарова Елена Петровна",
+      "birthDate": "1977-01-30",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6005",
+      "version": 1,
+      "studyType": "BREAST",
+      "studyDate": "2026-09-29"
+    },
+    "text": "УЗИ МОЛОЧНЫХ ЖЕЛЁЗ\nВ левой молочной железе на 2 часах гипоэхогенное образование 14х9 мм с неровными контурами, ориентировано вертикально, периферический кровоток.\nПравая молочная железа без очаговых изменений. Регионарные лимфоузлы не увеличены.\nЗАКЛЮЧЕНИЕ: Образование левой молочной железы, BI-RADS 4.",
+    "conclusion": "Образование левой молочной железы, BI-RADS 4.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "BREAST_MASS",
+        "evidence": {
+          "text": "Образование левой молочной железы, BI-RADS 4",
+          "start": 258,
+          "end": 302
+        },
+        "attributes": {
+          "sizeMm": 14,
+          "side": "left",
+          "category": "BI-RADS 4",
+          "level": 4
+        },
+        "confidence": 0.93
+      }
+    ],
+    "notTriggered": [
+      {
+        "code": "BREAST_MASS",
+        "evidence": {
+          "text": "Правая молочная железа без очаговых изменений",
+          "start": 163,
+          "end": 208
+        },
+        "reason": "NEGATION"
+      }
+    ],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-06",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-24T15:00:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2006",
+      "fullName": "Миронова Ольга Сергеевна",
+      "birthDate": "2009-08-08",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6006",
+      "version": 1,
+      "studyType": "BREAST",
+      "studyDate": "2026-09-24"
+    },
+    "text": "УЗИ МОЛОЧНЫХ ЖЕЛЁЗ\nВ правой молочной железе на 10 часах анэхогенное образование 6 мм с ровными контурами.\nЗАКЛЮЧЕНИЕ: Киста правой молочной железы, BI-RADS 2.",
+    "conclusion": "Киста правой молочной железы, BI-RADS 2.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "BREAST_MASS",
+        "evidence": {
+          "text": "Киста правой молочной железы, BI-RADS 2",
+          "start": 118,
+          "end": 157
+        },
+        "attributes": {
+          "sizeMm": 6,
+          "side": "right",
+          "category": "BI-RADS 2",
+          "level": 2
+        },
+        "confidence": 0.94
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-07",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-08-20T09:15:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2007",
+      "fullName": "Кудрявцев Сергей Михайлович",
+      "birthDate": "1948-04-14",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6007",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-08-20"
+    },
+    "text": "УЗИ ПАХОВЫХ ОБЛАСТЕЙ\nСправа при натуживании определяется выход петли кишки через паховый канал, грыжевые ворота 18 мм.\nСлева паховый канал без особенностей.\nЗАКЛЮЧЕНИЕ: Правосторонняя паховая грыжа.",
+    "conclusion": "Правосторонняя паховая грыжа.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "HERNIA",
+        "evidence": {
+          "text": "Правосторонняя паховая грыжа",
+          "start": 169,
+          "end": 197
+        },
+        "attributes": {
+          "side": "right",
+          "defectMm": 18
+        },
+        "confidence": 0.95
+      }
+    ],
+    "notTriggered": [
+      {
+        "code": "HERNIA",
+        "evidence": {
+          "text": "Слева паховый канал без особенностей",
+          "start": 119,
+          "end": 155
+        },
+        "reason": "NORMAL"
+      }
+    ],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-08",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-30T17:30:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2008",
+      "fullName": "Никитин Артём Олегович",
+      "birthDate": "1991-12-01",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6008",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-09-30"
+    },
+    "text": "УЗИ ПОЧЕК\nЛевая почка 118х52 мм, расширение ЧЛС: лоханка 28 мм, чашки до 12 мм. В нижней трети мочеточника конкремент 7 мм.\nПравая почка без особенностей.\nЗАКЛЮЧЕНИЕ: Гидронефроз слева. Конкремент левого мочеточника.",
+    "conclusion": "Гидронефроз слева. Конкремент левого мочеточника.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "HYDRONEPHROSIS",
+        "evidence": {
+          "text": "Гидронефроз слева",
+          "start": 167,
+          "end": 184
+        },
+        "attributes": {
+          "side": "left",
+          "pelvisMm": 28
+        },
+        "confidence": 0.92
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-09",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-15T13:00:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2009",
+      "fullName": "Фёдоров Виктор Иванович",
+      "birthDate": "1960-03-09",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6009",
+      "version": 1,
+      "studyType": "PROSTATE",
+      "studyDate": "2026-09-15"
+    },
+    "text": "ТРУЗИ ПРЕДСТАТЕЛЬНОЙ ЖЕЛЕЗЫ\nПредстательная железа 52х48х46 мм, объём 62 см3, структура неоднородная за счёт узловой гиперплазии центральной зоны.\nОстаточная моча 90 мл.\nЗАКЛЮЧЕНИЕ: Эхо-признаки доброкачественной гиперплазии предстательной железы, объём 62 см3.",
+    "conclusion": "Эхо-признаки доброкачественной гиперплазии предстательной железы, объём 62 см3.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "PROSTATE_ENLARGEMENT",
+        "evidence": {
+          "text": "Эхо-признаки доброкачественной гиперплазии предстательной железы",
+          "start": 181,
+          "end": 245
+        },
+        "attributes": {
+          "volumeMl": 62,
+          "residualMl": 90
+        },
+        "confidence": 0.91
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-10",
+    "status": "FAILED",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-10-02T15:45:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2010",
+      "fullName": "Ковалёва Дарья Андреевна",
+      "birthDate": "1985-09-19",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6010",
+      "version": 1,
+      "studyType": "THYROID",
+      "studyDate": "2026-10-02"
+    },
+    "text": null,
+    "conclusion": "",
+    "conclusionFound": false,
+    "findings": [],
+    "notTriggered": [],
+    "error": {
+      "code": "UNREADABLE_FILE",
+      "message": "Скан протокола не распознан: низкое качество изображения"
+    }
+  },
+  {
+    "resultId": "ml-demo-11",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-10-02T16:10:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2011",
+      "fullName": "Тихонова Вера Павловна",
+      "birthDate": "1958-05-27",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6011",
+      "version": 1,
+      "studyType": "BREAST",
+      "studyDate": "2026-10-02"
+    },
+    "text": "УЗИ МОЛОЧНЫХ ЖЕЛЁЗ\nМолочные железы с преобладанием фиброзного компонента. Очаговых образований не выявлено.\nРегионарные лимфоузлы не увеличены.",
+    "conclusion": "",
+    "conclusionFound": false,
+    "findings": [],
+    "notTriggered": [
+      {
+        "code": "BREAST_MASS",
+        "evidence": {
+          "text": "Очаговых образований не выявлено",
+          "start": 74,
+          "end": 106
+        },
+        "reason": "NEGATION"
+      }
+    ],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-12",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-10-02T18:05:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2012",
+      "fullName": "Голованов Николай Петрович",
+      "birthDate": "1968-02-11",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6012",
+      "version": 1,
+      "studyType": "LOWER_LIMB_VESSELS",
+      "studyDate": "2026-10-02"
+    },
+    "text": "УЗДС ВЕН НИЖНИХ КОНЕЧНОСТЕЙ\nСлева в подколенной вене и нижней трети ПБВ гипоэхогенные тромботические массы, окклюзирующие просвет, компрессия неполная, верхушка тромба флотирует на протяжении 15 мм.\nСправа глубокие вены проходимы.\nЗАКЛЮЧЕНИЕ: Окклюзивный тромбоз подколенной и поверхностной бедренной вены слева с флотирующей верхушкой.",
+    "conclusion": "Окклюзивный тромбоз подколенной и поверхностной бедренной вены слева с флотирующей верхушкой.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "DEEP_VEIN_THROMBOSIS",
+        "evidence": {
+          "text": "Окклюзивный тромбоз подколенной и поверхностной бедренной вены слева с флотирующей верхушкой",
+          "start": 243,
+          "end": 335
+        },
+        "attributes": {
+          "side": "left",
+          "floatingMm": 15
+        },
+        "confidence": 0.97
+      }
+    ],
+    "notTriggered": [
+      {
+        "code": "DEEP_VEIN_THROMBOSIS",
+        "evidence": {
+          "text": "Справа глубокие вены проходимы",
+          "start": 199,
+          "end": 229
+        },
+        "reason": "NEGATION"
+      }
+    ],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-13v1",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-28T11:00:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2013",
+      "fullName": "Лебедев Константин Юрьевич",
+      "birthDate": "2003-10-05",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6013",
+      "version": 1,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-09-28"
+    },
+    "text": "УЗИ ОРГАНОВ БРЮШНОЙ ПОЛОСТИ\nЖелчный пузырь обычной формы, пристеночное неподвижное образование 8 мм.\nЗАКЛЮЧЕНИЕ: Полип желчного пузыря 8 мм.",
+    "conclusion": "Полип желчного пузыря 8 мм.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "GALLBLADDER_POLYP",
+        "evidence": {
+          "text": "Полип желчного пузыря 8 мм",
+          "start": 113,
+          "end": 139
+        },
+        "attributes": {
+          "sizeMm": 8
+        },
+        "confidence": 0.9
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-13v2",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-28T15:30:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2013",
+      "fullName": "Лебедев Константин Юрьевич",
+      "birthDate": "2003-10-05",
+      "sex": "M"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6013",
+      "version": 2,
+      "studyType": "ABDOMEN",
+      "studyDate": "2026-09-28"
+    },
+    "text": "УЗИ ОРГАНОВ БРЮШНОЙ ПОЛОСТИ\nЖелчный пузырь обычной формы, пристеночное неподвижное образование 11 мм (исправлено врачом, в первой версии указано 8 мм).\nЗАКЛЮЧЕНИЕ: Полип желчного пузыря 11 мм.",
+    "conclusion": "Полип желчного пузыря 11 мм.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "GALLBLADDER_POLYP",
+        "evidence": {
+          "text": "Полип желчного пузыря 11 мм",
+          "start": 164,
+          "end": 191
+        },
+        "attributes": {
+          "sizeMm": 11
+        },
+        "confidence": 0.9
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-14v1",
+    "status": "DONE",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-18T10:00:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2014",
+      "fullName": "Савельева Анна Викторовна",
+      "birthDate": "1983-06-30",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6014",
+      "version": 1,
+      "studyType": "PELVIS_FEMALE",
+      "studyDate": "2026-09-18"
+    },
+    "text": "УЛЬТРАЗВУКОВОЕ ИССЛЕДОВАНИЕ ОРГАНОВ МАЛОГО ТАЗА\nЭндометрий 11 мм, в полости гиперэхогенное образование 6 мм.\nЗАКЛЮЧЕНИЕ: Эхографические признаки полипа эндометрия.",
+    "conclusion": "Эхографические признаки полипа эндометрия.",
+    "conclusionFound": true,
+    "findings": [
+      {
+        "code": "ENDOMETRIAL_POLYP",
+        "evidence": {
+          "text": "Эхографические признаки полипа эндометрия",
+          "start": 121,
+          "end": 162
+        },
+        "attributes": {
+          "sizeMm": 6
+        },
+        "confidence": 0.9
+      }
+    ],
+    "notTriggered": [],
+    "error": null
+  },
+  {
+    "resultId": "ml-demo-14v2",
+    "status": "ANNULLED",
+    "modelVersion": "ml-0.3",
+    "processedAt": "2026-09-19T12:00:00+03:00",
+    "patient": {
+      "externalId": "MIS-P-2014",
+      "fullName": "Савельева Анна Викторовна",
+      "birthDate": "1983-06-30",
+      "sex": "F"
+    },
+    "protocol": {
+      "externalId": "MIS-US-6014",
+      "version": 2,
+      "studyType": "PELVIS_FEMALE",
+      "studyDate": "2026-09-18"
+    },
+    "text": "УЛЬТРАЗВУКОВОЕ ИССЛЕДОВАНИЕ ОРГАНОВ МАЛОГО ТАЗА\nЭндометрий 11 мм, в полости гиперэхогенное образование 6 мм.\nЗАКЛЮЧЕНИЕ: Эхографические признаки полипа эндометрия.",
+    "conclusion": "Эхографические признаки полипа эндометрия.",
+    "conclusionFound": true,
+    "findings": [],
+    "notTriggered": [],
+    "error": null
+  }
+]

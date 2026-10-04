@@ -166,5 +166,276 @@
     },
     "backendJarSha256": "1c38679c16a9488ee8f80bd1fdeda7b4292bd97f858b6e10a2a5a6df437d127d",
     "dictionarySha256": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b"
+  },
+  "frontendIntegration": {
+    "checkedAt": "2026-10-04T14:09:36.142523+00:00",
+    "frontendUnitTests": 16,
+    "browserScenarios": 16,
+    "browserPassed": true,
+    "mlTests": 165,
+    "backendTests": 18,
+    "integrationScenarios": 12,
+    "backendApiCoverage": {
+      "covered": [
+        "DELETE /api/findings/{findingId}",
+        "GET /api/dictionary/findings",
+        "GET /api/integration/events/status",
+        "GET /api/patients",
+        "GET /api/patients/{patientId}",
+        "GET /api/patients/{patientId}/findings",
+        "GET /api/ping",
+        "GET /api/protocols/{protocolId}",
+        "PATCH /api/findings/{findingId}",
+        "POST /api/integration/events",
+        "POST /api/integration/events/retry",
+        "POST /api/integration/ml/results",
+        "POST /api/integration/protocols",
+        "POST /api/patients/{patientId}/findings",
+        "POST /api/patients/{patientId}/findings/confirm"
+      ],
+      "uncovered": [],
+      "total": 15
+    },
+    "mlApiCoverage": {
+      "covered": [
+        "GET /api/mis/events/{event_id}",
+        "GET /health",
+        "POST /api/mis/events",
+        "POST /api/mis/events/{event_id}/retry"
+      ],
+      "uncovered": [],
+      "total": 4
+    },
+    "dockerResilience": {
+      "checkedAt": "2026-10-04T14:05:03.480441+00:00",
+      "passed": true,
+      "checks": [
+        "gateway_502_without_ml",
+        "same_event_succeeds_after_ml_recovery",
+        "frontend_proxy_reports_backend_outage",
+        "callback_retained_when_backend_down",
+        "sqlite_queue_and_result_id_survive_container_recreation",
+        "frontend_proxy_recovers_without_frontend_restart",
+        "automatic_delivery_after_backend_recovery",
+        "one_patient_one_protocol_no_duplicates",
+        "postgres_and_sqlite_survive_recreation_of_all_containers"
+      ],
+      "attempts": 3,
+      "mlRecoveryRetries": 18
+    },
+    "services": {
+      "backend": "healthy",
+      "frontend": "healthy",
+      "ml": "healthy",
+      "postgres": "healthy"
+    },
+    "staticOfflineCheck": {
+      "passed": true,
+      "externalRequests": [],
+      "errors": []
+    },
+    "releaseAudit": {
+      "passed": true,
+      "archiveUnchanged": true,
+      "backendMlSourcesUnchanged": true,
+      "dictionaryCopiesIdentical": true,
+      "openApiCopiesIdentical": true,
+      "removedOriginalProtocolTexts": 7,
+      "newTrackableFiles": 49
+    },
+    "automaticListRefreshSeconds": 5,
+    "originalArchiveSha256": "eecf2f9ed561a2a1a8da0b6b969a376b5a0894ef00141c96551095063326d968",
+    "limitations": [
+      "No authentication, appointments or notification APIs",
+      "Standalone mock is synthetic and uses separate presentation rules"
+    ]
+  },
+  "frontendDesign": {
+    "checkedAt": "2026-10-04T15:38:21.448565+00:00",
+    "passed": true,
+    "referenceViewportWidth": 1280,
+    "geometryTolerancePx": 2,
+    "responsiveWidths": [
+      390,
+      768,
+      1024,
+      1280,
+      1920
+    ],
+    "frontendUnitTests": 16,
+    "frontendRealApiScenarios": 16,
+    "designScenarios": 7,
+    "designFixtures": "fictional API responses; no database writes",
+    "mlTests": 165,
+    "backendTests": 18,
+    "integrationScenarios": 12,
+    "apiCoverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 15
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "buildPassed": true,
+    "offlineHtml": {
+      "passed": true,
+      "synthetic": true,
+      "errors": [],
+      "externalRequests": []
+    },
+    "unhandledBrowserErrors": [],
+    "unexpectedHttpErrors": [],
+    "unsupportedDesignRequests": [],
+    "services": {
+      "frontend": "healthy",
+      "backend": "healthy",
+      "ml": "healthy",
+      "postgres": "healthy"
+    },
+    "backendMlSourcesUnchanged": true,
+    "dictionaryCopiesIdentical": true,
+    "newTrackableFiles": 53,
+    "strictMockupReview": {
+      "urgencySideStripesRemoved": true,
+      "urgencyAndStatusBadgesRemoved": true,
+      "extraFindingCounterAndBulkButtonRemoved": true,
+      "plainProtocolDate": true,
+      "protocolSelectionViaHistory": true,
+      "serviceMetadataInMoreDialog": true,
+      "avatarUsesSuppliedListMockup": true,
+      "allFourListRowsGeometryChecked": true,
+      "urgentAndFlaggedStatesChecked": true
+    },
+    "limitations": [
+      "Live content and sheet height depend on patient data.",
+      "Appointments, route editing, notifications and dashboard are disabled placeholders.",
+      "Geometry tests are not a whole-image pixel equality test."
+    ]
+  },
+  "dateFields": {
+    "checkedAt": "2026-10-04T16:21:16.215203+00:00",
+    "passed": true,
+    "browser": "Edge",
+    "implementation": "Local calendar popover and editable dd.mm.yyyy text input; no new dependencies",
+    "filterScenarios": [
+      {
+        "name": "unsupported booking counters show zero and remain disabled",
+        "passed": true
+      },
+      {
+        "name": "every part of both date fields opens the calendar without an icon",
+        "passed": true
+      },
+      {
+        "name": "calendar stays visible during manual entry and day selection",
+        "passed": true
+      },
+      {
+        "name": "date survives outside click, Escape, and closing the filter panel",
+        "passed": true
+      },
+      {
+        "name": "partial and invalid drafts survive closing without reaching the API",
+        "passed": true
+      },
+      {
+        "name": "month navigation and keyboard selection keep the calendar active",
+        "passed": true
+      },
+      {
+        "name": "switching fields leaves one calendar and sends ISO date bounds",
+        "passed": true
+      },
+      {
+        "name": "all date and dropdown filters use gray borders without green glow",
+        "passed": true
+      },
+      {
+        "name": "reset clears applied values and incomplete drafts together",
+        "passed": true
+      },
+      {
+        "name": "calendar stays inside the viewport on mobile and desktop",
+        "passed": true
+      },
+      {
+        "name": "no browser errors or malformed dates in filter requests",
+        "passed": true
+      }
+    ],
+    "styles": {
+      "border": "1px solid #d7d7d7",
+      "boxShadow": "none",
+      "outline": "none",
+      "calendarIcon": "absent",
+      "dropdownSelection": "gray"
+    },
+    "bookingPlaceholderCounters": 0,
+    "frontendUnitTests": 20,
+    "frontendE2e": 16,
+    "designScenarios": 7,
+    "mlTests": 165,
+    "backendTests": 18,
+    "integrationScenarios": 12,
+    "apiCoverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 15
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "allContainersHealthy": true
   }
 }

@@ -35,6 +35,8 @@ def main():
     args = cli.parse_args()
     backend = 'http://' + compose('port', 'backend', '8080')
     ml = 'http://' + compose('port', 'ml', '8000')
+    frontend = 'http://' + compose('port', 'frontend', '80')
+    frontend_id = compose('ps', '-q', 'frontend')
     identity = 'docker-recovery-' + uuid4().hex[:12]
     work = ROOT / '.local' / identity
     work.mkdir(parents=True)
@@ -92,14 +94,28 @@ def main():
             passed('gateway_502_without_ml')
             compose('up', '-d', '--no-deps', 'ml')
             healthy(ml + '/health')
-            request('POST', backend + '/api/integration/events', 202, json=event)
+            # The host health URL may recover before the backend's Docker DNS
+            # cache/connection does. Retry the identical idempotent event only
+            # on the documented temporary 502, with a bounded deadline.
+            deadline = time.monotonic() + 35
+            recovery_retries = 0
+            while True:
+                response = client.post(backend + '/api/integration/events', json=event)
+                if response.status_code == 202:
+                    break
+                assert response.status_code == 502 and time.monotonic() < deadline, response.text[:300]
+                recovery_retries += 1
+                time.sleep(.5)
             signed = wait_status(meta['eventId'], lambda s: s['delivery'] == 'delivered')
             assert signed['status'] == 'DONE'
             initial_card = card()
             assert initial_card['currentFindings']
             passed('same_event_succeeds_after_ml_recovery')
 
+            assert request('GET', frontend + '/api/ping')['status'] == 'ok'
             compose('stop', 'backend')
+            assert client.get(frontend + '/api/ping').status_code in (502, 504)
+            passed('frontend_proxy_reports_backend_outage')
             annul = dict(meta, eventId=identity + '-annul', eventType='PROTOCOL_ANNULLED')
             request('POST', ml + '/api/mis/events', 202, json=annul)
             pending = wait_status(annul['eventId'], lambda s: s['attempts'] >= 1, timeout=20)
@@ -113,8 +129,12 @@ def main():
             assert restored['attempts'] >= pending['attempts']
             passed('sqlite_queue_and_result_id_survive_container_recreation')
 
-            compose('up', '-d', '--no-deps', 'backend')
+            compose('up', '-d', '--no-deps', '--force-recreate', 'backend')
             healthy(backend + '/actuator/health')
+            healthy(frontend + '/api/ping')
+            assert compose('ps', '-q', 'frontend') == frontend_id
+            assert request('GET', frontend + '/api/ping')['status'] == 'ok'
+            passed('frontend_proxy_recovers_without_frontend_restart')
             done = wait_status(annul['eventId'], lambda s: s['delivery'] == 'delivered')
             assert done['resultId'] == pending['resultId'] and done['status'] == 'ANNULLED'
             passed('automatic_delivery_after_backend_recovery')
@@ -129,7 +149,7 @@ def main():
             assert request('GET', ml + '/api/mis/events/' + annul['eventId']) == done
             passed('postgres_and_sqlite_survive_recreation_of_all_containers')
             report = {'checkedAt': datetime.now(timezone.utc).isoformat(), 'passed': True,
-                      'checks': checks, 'attempts': done['attempts']}
+                      'checks': checks, 'attempts': done['attempts'], 'mlRecoveryRetries': recovery_retries}
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(json.dumps(report, indent=2), encoding='utf-8')
         finally:
