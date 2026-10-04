@@ -83,7 +83,7 @@ export default function Findings() {
           onChange={() => sel.setAll(ids, !all)} />} />
       {list.error ? <ErrorBox error={list.error} onRetry={list.reload} /> : (
         <RowList cols={COLS} rows={sorted} rowKey={(r) => r.routeId} sort={sort} onSort={toggle} selection={sel}
-          onRow={(r) => go(`patients/${r.patientId}`)} loading={list.loading || cards.loading}
+          onRow={(r) => go(`push/${r.patientId}/${r.routeId}`)} loading={list.loading || cards.loading}   /* макет: из «Находок» — карточка отправки уведомлений */
           empty={byRoutes ? 'Под выбранные условия маршрутов нет.' : 'Под выбранные условия находок нет.'} />
       )}
 

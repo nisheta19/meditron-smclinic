@@ -10,6 +10,7 @@ import PatientCard from './pages/PatientCard';
 import Dictionary from './pages/Dictionary';
 import Dashboard from './pages/Dashboard';
 import Login, { isAuthed } from './pages/Login';
+import PushCard from './pages/PushCard';
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
@@ -26,7 +27,7 @@ const STEPS = [[24, '+24 ч'], [72, '+72 ч'], [168, '+7 дн'], [720, '+30 дн
 const BACK = [[-24, '−24 ч'], [-72, '−72 ч'], [-168, '−7 дн'], [-720, '−30 дн']];
 
 export default function App() {
-  const [section = 'findings', id] = useRoute();
+  const [section = 'findings', id, sub] = useRoute();
   const [rev, setRev] = useState(0);
   const [toasts, setToasts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
@@ -54,10 +55,11 @@ export default function App() {
 
   const page = !ready ? <p className="state">Подключаемся к серверу…</p>
     : section === 'patients' && id ? <PatientCard id={id} />
+    : section === 'push' && id ? <PushCard id={id} routeId={sub} />
     : section === 'inbox' ? <Patients key="inbox" preset="inbox" />
     : section === 'archive' ? <Patients key="archive" preset="archive" />
     : section === 'settings' ? <Dictionary /> : section === 'dashboard' ? <Dashboard /> : <Findings />;
-  const current = section === 'patients' ? 'findings' : section;   // карточка открывается из «Находок»
+  const current = ['patients', 'push'].includes(section) ? 'findings' : section;   // карточка открывается из «Находок»
 
   return (
     <Toast.Provider value={toast}>

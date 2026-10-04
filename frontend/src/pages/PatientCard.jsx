@@ -14,12 +14,12 @@ import AddFindingDialog from '../components/AddFindingDialog';
 import NotifyDialog from '../components/NotifyDialog';
 import Dropdown from '../components/Dropdown';
 
-const ORGAN = {
+export const ORGAN = {
   PELVIS_FEMALE: 'Органы малого таза', ABDOMEN: 'Брюшная полость', BREAST: 'Молочные железы',
   THYROID: 'Щитовидная железа', PROSTATE: 'Предстательная железа', LOWER_LIMB_VESSELS: 'Сосуды нижних конечностей',
   KIDNEY: 'Почки', SOFT_TISSUE: 'Мягкие ткани',
 };
-const longDate = (v) => (v ? new Date(v).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).replace(/\s?г\.$/, '') : '');
+export const longDate = (v) => (v ? new Date(v).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).replace(/\s?г\.$/, '') : '');
 const stamp = fmtStamp;   // «13.07.2026 · 13:14»
 const list = (v) => (Array.isArray(v) ? v.join(', ') : v);
 
@@ -148,7 +148,7 @@ function Flags({ flags, className = '' }) {
 }
 
 /* ---------- Данные пациента ---------- */
-function PatientInfo({ c, onMore }) {
+export function PatientInfo({ c, onMore }) {
   const toast = useToast();
   const none = <span className="pc-none">нет данных</span>;
   const val = (v, unit = '') => (v == null || v === '' || (Array.isArray(v) && !v.length) ? none : `${list(v)}${unit}`);
@@ -187,7 +187,7 @@ function PatientInfo({ c, onMore }) {
   );
 }
 
-function MoreDialog({ c, onClose }) {
+export function MoreDialog({ c, onClose }) {
   const rows = [
     ['ФИО', c.fullName], ['Дата рождения', `${fmtDate(c.birthDate)}, ${c.age} лет`], ['Пол', c.sex === 'F' ? 'Женский' : 'Мужской'],
     ['Номер карты', c.cardNumber], ['ID в МИС', c.externalId], ['Статус проверки', REVIEW[c.reviewState]?.[0]],
@@ -349,7 +349,7 @@ function NotificationLog({ routeId }) {
 /* ---------- История приёмов ---------- */
 const HISTORY_LIMIT = 8;
 
-function History({ c, protocols, findings, onOpenProtocol }) {
+export function History({ c, protocols, findings, onOpenProtocol }) {
   const [all, setAll] = useState(false);
   const routes = [...c.routes, ...c.history.routes];
   const events = [

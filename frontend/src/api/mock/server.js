@@ -136,7 +136,9 @@ function defaultText(rt, st, channel) {
 }
 
 const pushNote = (rt, st, channel, text, at, sentBy) => {
-  const n = { id: nextId('ntf'), routeId: rt.id, stepId: st.id, channel, text, sentAt: iso(at), sentBy };
+  // readAt — только в демо (в контракте нет): примерно 2 из 3 сообщений прочитаны через 1–20 ч после отправки
+  const k = seq % 3, readAt = k === 2 ? null : iso(at + (1 + ((seq * 7) % 20)) * H);
+  const n = { id: nextId('ntf'), routeId: rt.id, stepId: st.id, channel, text, sentAt: iso(at), sentBy, readAt };
   db.notifications.push(n);
   return n;
 };

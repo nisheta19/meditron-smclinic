@@ -204,8 +204,17 @@ small { display: block; color: var(--gray-medium); font-size: 12px; }
 .field input:focus, .field textarea:focus, .dd-btn:focus-visible, .dd-btn.open { border-color: var(--sm-main); box-shadow: 0 0 0 3px rgb(19 171 123 / 0.12); }
 /* В панели фильтров поля «сливаются» с поиском: мягкая серая подложка без рамки */
 .filter-panel .field input, .filter-panel .dd-btn { background: var(--page); border-color: transparent; }
-.filter-panel .field input:hover, .filter-panel .dd-btn:hover { border-color: var(--gray-accent); }
-.filter-panel .field input:focus, .filter-panel .dd-btn.open, .filter-panel .dd-btn:focus-visible { background: var(--white); border-color: var(--sm-main); }
+/* Подпись ровно над значением: отступ = внутренний отступ поля (14 px) + рамка (1 px) */
+.filter-panel .field > span { padding-left: 15px; }
+/* Фильтры: без зелёной подсветки — наведение и фокус/открытие лишь чуть темнее фона, рамка не выделяется */
+.filter-panel .field input:hover, .filter-panel .dd-btn:hover { background: #efefef; border-color: transparent; }
+.filter-panel .field input:focus, .filter-panel .dd-btn.open, .filter-panel .dd-btn:focus-visible {
+  background: #ececec; border-color: transparent; box-shadow: none;
+}
+.filter-panel .dd-btn:focus-visible { box-shadow: inset 0 0 0 1px var(--gray-accent); }   /* клавиатурный фокус — едва заметная рамка */
+.filter-panel .dd-btn.open svg { color: var(--gray-dark); }
+.filter-panel :is(.dd-btn, input):focus-visible, .dash-controls .dd-btn:focus-visible { outline: none; }
+.dash-controls .dd-btn:focus-visible { box-shadow: inset 0 0 0 1px var(--gray-accent); }
 .field input[type="date"] { font-variant-numeric: tabular-nums; color: var(--black); }
 .field input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: pointer; }
 
@@ -730,8 +739,12 @@ div.pc-event .pc-event-arrow { opacity: 0.35; }
 /* ---------- Дашборд ---------- */
 .dash-controls { display: flex; justify-content: flex-end; gap: 8px; margin: 20px 0; }
 .dash-controls .dd { width: auto; }
-.dash-controls .dd-btn { min-height: 38px; height: 38px; padding: 0 10px 0 14px; gap: 6px; border-color: transparent; border-radius: 16px; background: var(--white); }
-.dash-controls .dd-btn svg { color: var(--black); width: 20px; height: 20px; }
+/* Стрелка как в фильтрах: 12 px, те же отступы */
+.dash-controls .dd-btn { min-height: 38px; height: 38px; padding: 0 14px; gap: 10px; border-color: transparent; border-radius: 16px; background: var(--white); }
+.dash-controls .dd-btn svg { color: var(--black); width: 12px; height: 12px; }
+.dash-controls .dd-btn:hover { background: #fafafa; border-color: transparent; }
+.dash-controls .dd-btn.open, .dash-controls .dd-btn:focus-visible { background: #f0f0f0; border-color: transparent; box-shadow: none; }
+.dash-controls .dd-btn.open svg { color: var(--black); }
 .dash-note { margin: -8px 0 14px 4px; }
 /* Одна сетка: слева карта (2 ряда) и «Результативность уведомлений», справа зелёная карточка и 2×2 показателя.
    Ряды общие, поэтому нижние карточки обеих половин всегда на одном уровне. */
@@ -851,6 +864,40 @@ div.pc-event .pc-event-arrow { opacity: 0.35; }
   .auth-art svg { height: 40px; width: auto; }
   .auth-doctor { display: none; }
   .auth-card { width: min(456px, 100%); padding: 36px 20px 32px; border-radius: 28px; }
+}
+
+
+/* ---------- Карточка отправки уведомлений из «Находок» (Untitled.fig, «Отправка пушей ИЗ НАХОДОК») ---------- */
+.pc-main.push .pc-info { margin-bottom: 32px; }
+.pc-main.push .pc-info + .pc-subtitle { margin-top: 0; }
+.pc-main.push .pc-subtitle { margin-top: 28px; }
+.pt { margin-top: 21px; }
+.pt-head, .pt-row { display: grid; align-items: center; }
+.pt-head { margin-bottom: 12px; }
+.pt-head .col-head { justify-self: start; }
+.pt-row { min-height: 52px; margin-bottom: 6px; padding: 8px 14px 8px 0; background: var(--page); border-radius: 20px; font-size: 14px; color: var(--black); }
+.pt-row > span { min-width: 0; padding-right: 12px; }
+.pt em { font-style: normal; }
+.pt em.alarm { color: #ff3636; }
+.pt em.muted { color: var(--gray-medium); }
+.pt-route .pt-head, .pt-route .pt-row { grid-template-columns: 41px 203px 245px minmax(0, 1fr); padding-left: 21px; }
+.pt-route i { font-style: normal; color: var(--gray-dark); margin-right: 2px; }
+.pt-n { color: var(--gray-dark); }
+.pt-notes .pt-head, .pt-notes .pt-row { grid-template-columns: 235px 218px 184px minmax(0, 1fr); padding-left: 20px; }
+.pt-msg { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-booked { display: flex; padding-left: 16px; }
+.pt-yes, .pt-no { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pt-yes { stroke: var(--sm-main); }
+.pt-no { stroke: var(--accent); }
+.pt-findings .pt-head, .pt-findings .pt-row { grid-template-columns: 255px 240px minmax(0, 1fr); padding-left: 25px; }
+.pt-organ { color: var(--gray-dark); }
+.pt-level { padding-left: 14px; }
+.pt-findings .pt-head .col-head:last-child { padding-left: 16px; }
+.push-send { height: 48px; margin: 6px 0 0 2px; padding: 0 16px; border-radius: 18px; font-size: 14px; }
+@media (max-width: 720px) {
+  .pt-head { display: none; }
+  .pt-route .pt-row, .pt-notes .pt-row, .pt-findings .pt-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 8px; padding: 12px 14px; }
+  .pt-level, .pt-booked { padding-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
