@@ -43,7 +43,7 @@ export default function Findings() {
 
   // С маршрутами строка = маршрут (TrackingItem). Если backend маршрутов ещё не умеет — строка = находка пациента
   const byRoutes = caps.routes;
-  const list = useAsync(() => (byRoutes ? api.routes({ size: 500 }) : api.patients({ size: 500 })), [byRoutes]);
+  const list = useAsync(() => (byRoutes ? api.routes({ size: 200 }) : api.patients({ size: 200 })), [byRoutes]);
   const dictionary = useAsync(() => api.dictionary(), []);
   const dict = useMemo(() => Object.fromEntries((dictionary.data ?? []).map((d) => [d.code, d])), [dictionary.data]);
   const items = list.data?.items ?? [];

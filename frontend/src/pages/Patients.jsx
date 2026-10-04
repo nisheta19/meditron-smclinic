@@ -36,7 +36,7 @@ export default function Patients({ preset }) {
   const [search, setSearch] = useState('');
   const [chip, setChip] = useState('all');
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-  const list = useAsync(() => api.patients({ search, size: 500 }), [search]);
+  const list = useAsync(() => api.patients({ search, size: 200 }), [search]);
   const dictionary = useAsync(() => api.dictionary(), []);
   const dict = useMemo(() => Object.fromEntries((dictionary.data ?? []).map((d) => [d.code, d])), [dictionary.data]);
   const cards = useCards((list.data?.items ?? []).map((p) => p.id));
