@@ -1,0 +1,61 @@
+{
+  "checkedAt": "2026-10-04T12:34:25.945007+00:00",
+  "mlTests": 165,
+  "backendTests": 18,
+  "integrationScenarios": 12,
+  "httpRequests": 740,
+  "backendApiCoverage": {
+    "covered": [
+      "DELETE /api/findings/{findingId}",
+      "GET /api/dictionary/findings",
+      "GET /api/integration/events/status",
+      "GET /api/patients",
+      "GET /api/patients/{patientId}",
+      "GET /api/patients/{patientId}/findings",
+      "GET /api/ping",
+      "GET /api/protocols/{protocolId}",
+      "PATCH /api/findings/{findingId}",
+      "POST /api/integration/events",
+      "POST /api/integration/events/retry",
+      "POST /api/integration/ml/results",
+      "POST /api/integration/protocols",
+      "POST /api/patients/{patientId}/findings",
+      "POST /api/patients/{patientId}/findings/confirm"
+    ],
+    "uncovered": [],
+    "total": 15
+  },
+  "mlApiCoverage": {
+    "covered": [
+      "GET /api/mis/events/{event_id}",
+      "GET /health",
+      "POST /api/mis/events",
+      "POST /api/mis/events/{event_id}/retry"
+    ],
+    "uncovered": [],
+    "total": 4
+  },
+  "corpusDocuments": 89,
+  "corpusDelivered": 89,
+  "findingsStoredAfterBackendRules": 137,
+  "corpusMedianSeconds": 0.617,
+  "corpusMaxSeconds": 0.747,
+  "outageChecks": {
+    "passed": true,
+    "checks": [
+      "gateway_502_without_ml",
+      "callback_retries_when_backend_down",
+      "sqlite_queue_survives_ml_restart",
+      "same_result_id_after_restart",
+      "delivered_after_backend_restart",
+      "one_patient_one_protocol_no_duplicates"
+    ],
+    "attempts": 3
+  },
+  "dockerComposeConfigValid": true,
+  "dockerContainersExecuted": false,
+  "backendJarSha256": "764ce132e7d5facbe83c34ade3afee7abf985b49354ba56550940f23b0835256",
+  "mlPythonSha256": "244f137d811e9ddb98c6deea78b13dd5c63e67fa15e5078429f95579a19135d7",
+  "dictionarySha256": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b",
+  "sourceArchiveSha256": "58eb8c1f4539c71286291f874203bc00b34b1df8e87a32620618f105594f903c"
+}

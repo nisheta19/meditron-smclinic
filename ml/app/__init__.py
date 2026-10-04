@@ -1,0 +1,1 @@
+"""Local DOCX metadata extraction."""

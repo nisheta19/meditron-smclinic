@@ -1,0 +1,28 @@
+{
+  "resultId": "demo-06",
+  "status": "FAILED",
+  "modelVersion": "demo-0.1",
+  "processedAt": "2026-09-09T10:06:00+03:00",
+  "patient": {
+    "externalId": "mis-0006",
+    "fullName": "Пациент 006",
+    "birthDate": "1990-01-09",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-omt-x",
+    "version": 1,
+    "studyType": "PELVIS_FEMALE",
+    "studyDate": "2026-09-09"
+  },
+  "conclusion": null,
+  "conclusionFound": false,
+  "findings": [],
+  "notTriggered": [],
+  "error": {
+    "code": "UNREADABLE_FILE",
+    "message": "Файл повреждён, текст не извлечён"
+  },
+  "dictionaryVersion": "dict-v2.1",
+  "flags": []
+}

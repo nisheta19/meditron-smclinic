@@ -1,0 +1,38 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 22MB
+  application:
+    name: meditron-routing
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/meditron}
+    username: ${DB_USER:meditron}
+    password: ${DB_PASSWORD:meditron}
+  jpa:
+    hibernate:
+      ddl-auto: update   # для хакатона ок; в проде — миграции (Flyway/Liquibase)
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+ml:
+  service-url: ${ML_SERVICE_URL:http://localhost:8000}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# Демо-данные: при пустой базе загружаются результаты ML из resources/demo
+demo:
+  seed: ${DEMO_SEED:false}

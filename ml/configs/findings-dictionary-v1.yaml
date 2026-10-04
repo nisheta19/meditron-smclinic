@@ -1,0 +1,822 @@
+# Словарь находок — ЧЕРНОВИК на проверку медэксперту
+# Один файл читают и ML (что искать и как извлекать), и бэкенд (куда направлять).
+#
+# Кто что использует:
+#   ML      -> code, studyTypes, synonyms, attributes, notThis, + общий блок ml
+#   Бэкенд  -> rules, targetSpecialty, targetDays, routeTemplateCode, urgent, ifMissing
+#
+# Как бэкенд применяет rules: правила проверяются сверху вниз, срабатывает первое,
+# у которого выполнены ВСЕ условия (all). Правило может переопределить специалиста,
+# срок и срочность. Ни одно не сработало -> находка уходит в notTriggered с
+# причиной BELOW_THRESHOLD. Если нужного атрибута нет -> решает ifMissing
+# (TRIGGER — запускаем маршрут, врач на подтверждении разберётся; SKIP — не запускаем).
+# Правило с result: NO_ROUTE останавливает проверку и маршрут не запускает (BELOW_THRESHOLD).
+#
+# Пометка VITA: — клиническое решение, которое нужно подтвердить или поправить.
+# mlApproved: true — часть для ML (synonyms, attributes, extraction, notThis) утверждена медэкспертом.
+# approved: true — утверждена и часть для бэкенда (rules, сроки, специалисты).
+# Принцип: ML возвращает факты (в т.ч. функциональные кисты, BI-RADS 1–2), а «маршрут / не маршрут» решает бэкенд по rules.
+
+version: dict-v1-ml
+
+# ----------------------------------------------------------------------------
+# Общие правила для ML
+# ----------------------------------------------------------------------------
+ml:
+  urgentPolicy:
+    - "Находки с urgent: true (и правила с urgent) — приоритет полноты: при сомнении возвращать находку с uncertain=true, а не пропускать."
+    - "Отрицание («тромбоза не выявлено», «кровоток сохранён») проверять строго по той же фразе, к которой относится находка."
+  whereToLook:
+    - Сначала раздел «Заключение» — по нему решается, есть ли находка.
+    - Атрибуты (размер, FIGO, категория) — из описательной части, если в заключении их нет.
+    - Нет заключения -> искать по описанию и ставить conclusionFound=false.
+
+  # Находка рядом с этими словами -> notTriggered, reason=NEGATION
+  negationCues:
+    - не выявлен
+    - не выявлено
+    - не определяется
+    - не определяются
+    - не визуализируется
+    - не лоцируется
+    - не обнаружен
+    - отсутствует
+    - отсутствуют
+    - без признаков
+    - данных за .* не получено
+    - признаков .* не выявлено
+    - достоверно .* не определяется
+
+  # Атрибут uncertain=true (находку всё равно возвращать)
+  uncertaintyCues:
+    - "?"
+    - нельзя исключить
+    - не исключается
+    - вероятно
+    - более вероятно
+    - возможно
+    - под вопросом
+    - подозрение на
+
+  # Орган удалён или находка уже прооперирована -> notTriggered, reason=POST_SURGERY
+  postSurgeryCues:
+    - состояние после
+    - после холецистэктомии
+    - удалён
+    - удалена
+    - резекция
+
+  # Атрибут growth
+  growthCues: [с динамикой роста, увеличение размеров, в динамике увеличение, рост]
+  stableCues: [без динамики, без отрицательной динамики, стабильн]   # growth=false
+
+  sizeParsing:
+    - "Размеры вида 12х11 мм, 1.4*1.1*1.5 см, 3,6*3,5 мм -> sizeMm = наибольший размер в мм."
+    - "Сантиметры переводить в мм (0,8 см -> 8)."
+    - "Диапазон «до 6-8 мм» -> верхняя граница (8)."
+    - "Несколько образований -> sizeMm наибольшего, count = количество."
+
+  sideCues:
+    left: [слева, левой, левого, левая, s]
+    right: [справа, правой, правого, правая, d]
+    both: [с обеих сторон, обеих, билатерально]
+
+  categoryParsing:
+    - "BI-RADS / Birads / Br -> birads (число 0–6), подкатегория 4a/4b/4c -> biradsSub."
+    - "O-RADS / ORADS, римские цифры (O-RADS I) -> orads (число)."
+    - "EU-TIRADS -> tirads + tiradsSystem=EU; TI-RADS без уточнения -> tiradsSystem=UNKNOWN."
+    - "Категория указана по сторонам -> отдельная находка на каждую сторону с side."
+
+# ----------------------------------------------------------------------------
+# Шаблоны маршрутов (ссылка из routeTemplateCode)
+# ----------------------------------------------------------------------------
+routeTemplates:
+  SURGICAL_STANDARD: консультация -> решение врача -> направление -> госпитализация -> операция -> контроль через 7±2 дня
+  DIAGNOSTIC_FIRST: консультация -> диагностическая процедура (гистероскопия с раздельным диагностическим выскабливанием) -> гистология -> решение врача о тактике по результату -> контроль
+  OBSERVATION_FOLLOWUP: плановый контроль у профильного врача через targetDays -> напоминание пациенту заранее -> визит состоялся
+  CONSULT_OBSERVATION: консультация -> решение врача (наблюдение / обследование) -> контрольный визит
+  URGENT_ESCALATION: задача дежурному персоналу немедленно, без сообщения пациенту от системы
+
+# ----------------------------------------------------------------------------
+# Находки
+# ----------------------------------------------------------------------------
+findings:
+
+  # ================= ГИНЕКОЛОГИЯ (ОМТ) =================
+
+  - code: ENDOMETRIAL_POLYP
+    name: Полип эндометрия
+    active: true
+    approved: true
+    mlApproved: true
+    studyTypes: [PELVIS_FEMALE]
+    clinicalNote: Ненаблюдаемая патология — при выявлении всегда показано удаление оперирующим гинекологом.
+    synonyms:
+      certain:              # uncertain=false
+        - полип эндометрия
+        - полипы эндометрия
+        - множественные полипы эндометрия
+        - полипоз эндометрия
+        - патология эндометрия, соответствует полипу
+        - "патология эндометрия (полип)"
+      suspected:            # uncertain=true
+        - изменения эндометрия по типу полипа
+        - эндометриальное образование, подозрительное на полип
+        - очаговое образование эндометрия
+        - диффузные / множественные очаговые образования эндометрия
+        - локальное утолщение эндометрия
+        - фокальное разрастание эндометрия
+    attributes: [sizeMm, count, recurrent, menopause, uncertain]
+    extraction:
+      - "menopause=true: «менопауза», «постменопауза», «постменопаузальный период», «менопауза N лет»."
+    notThis:
+      - "Полип шейки матки / цервикального канала -> CERVICAL_POLYP (отдельная находка)."
+      - "Гистологическое заключение («железисто-фиброзный полип», морфология) — не протокол УЗИ, тип документа не тот."
+    targetSpecialty: Оперирующий гинеколог
+    routeTemplateCode: SURGICAL_STANDARD
+    procedures:
+      main: Раздельное диагностическое выскабливание под контролем гистероскопии (отдельно полость матки и цервикальный канал)
+      additional:
+        name: Гистерорезектоскопия
+        indications: [рецидивирующие полипы, образования больших размеров, нестандартное расположение]
+    targetDays: 7
+    rules:
+      - all: [{ attr: uncertain, eq: false }]
+        targetDays: 7       # полип описан точно — срочно
+      - all: [{ attr: menopause, eq: true }]
+        targetDays: 7       # постменопауза — срочно даже при подозрении (выше онкориск)
+      - all: [{ attr: patient.age, gte: 50 }]
+        targetDays: 7       # менопауза не указана, но возраст 50+
+      - all: [{ attr: uncertain, eq: true }]
+        targetDays: 14      # подозрение — уточнение, возможно повторное УЗИ на 5–7 день цикла
+    ifMissing: TRIGGER
+    examples: ["Ж ОМТ (17)", "Ж ОМТ (23)", "Ж ОМТ (8)"]
+
+  - code: ENDOMETRIAL_HYPERPLASIA
+    name: Гиперплазия эндометрия
+    active: true
+    approved: true
+    mlApproved: true
+    studyTypes: [PELVIS_FEMALE]
+    clinicalNote: Тактика определяется только после гистологии; система направляет на консультацию, не на операцию.
+    synonyms:
+      certain:
+        - гиперплазия эндометрия
+        - гиперпластический процесс эндометрия
+      suspected:
+        - диффузное утолщение эндометрия
+        - утолщённый эндометрий
+        - увеличение М-эхо
+        - неоднородная структура эндометрия
+        - неоднородный эндометрий
+        - толщина эндометрия не соответствует дню цикла
+        - несоответствие толщины эндометрия дню цикла
+    attributes: [thicknessMm, menopause, fromMeasurement, uncertain]
+    extraction:
+      - "menopause=true: «менопауза», «постменопауза», «постменопаузальный период»."
+      - "thicknessMm: толщина М-эхо / эндометрия в мм."
+      - "Если в тексте есть менопауза и указана толщина эндометрия, а слов из synonyms нет — всё равно вернуть эту находку с fromMeasurement=true, uncertain=true и thicknessMm. Решение по порогу принимает бэкенд."
+    notThis:
+      - "«Локальное утолщение», «фокальное разрастание», «очаговое образование» эндометрия -> ENDOMETRIAL_POLYP (подозрение)."
+    targetSpecialty: Оперирующий гинеколог
+    routeTemplateCode: DIAGNOSTIC_FIRST
+    procedures:
+      diagnostic: Гистероскопия с раздельным диагностическим выскабливанием, гистологическое исследование
+      afterHistology: Тактику (наблюдение, терапия, хирургическое лечение) определяет врач по результату гистологии
+    targetDays: 7
+    rules:
+      - all: [{ attr: uncertain, eq: false }]
+        targetDays: 7       # гиперплазия описана прямо
+      - all: [{ attr: fromMeasurement, eq: true }, { attr: thicknessMm, gt: 4 }]
+        targetDays: 7       # постменопауза, М-эхо > 4 мм
+      - all: [{ attr: fromMeasurement, eq: true }]
+        result: NO_ROUTE    # постменопауза, М-эхо <= 4 мм — норма
+      - all: [{ attr: menopause, eq: true }]
+        targetDays: 7
+      - all: [{ attr: patient.age, gte: 50 }]
+        targetDays: 7
+      - all: [{ attr: uncertain, eq: true }]
+        targetDays: 14      # подозрение у женщин репродуктивного возраста
+    ifMissing: TRIGGER
+    examples: ["Ж ОМТ (17) — гиперплазия прямо", "Ж ОМТ (25) — несоответствие дню цикла, неоднородный", "Ж ОМТ (14) — менопауза, проверить М-эхо"]
+
+  - code: UTERINE_FIBROID
+    name: Миома матки (триггер — субмукозный узел)
+    active: true
+    approved: true
+    mlApproved: true
+    studyTypes: [PELVIS_FEMALE]
+    clinicalNote: Субмукозные узлы (FIGO 0–3) и деформация полости — к оперирующему гинекологу; остальные миомы — плановый контроль у гинеколога через 6 месяцев.
+    synonyms:
+      - миома матки
+      - миоматозный узел
+      - лейомиома
+      - фибромиома
+      - многоузловая миома
+      - субмукозная миома
+      - подслизистая миома
+      - субмукозный узел
+      - подслизистый узел
+      - субмукозный узел на ножке
+      - интрамурально-субмукозный узел
+      - миома с центрипетальным ростом
+      - узел деформирует полость матки
+      - рождающийся миоматозный узел
+    attributes: [figo, deformsCavity, prolapsing, sizeMm, count, growth, menopause, uncertain]
+    extraction:
+      - "figo: «тип N по FIGO», «FIGO N» -> число."
+      - "Без типа: «субмукозный узел на ножке» -> 0; «интрамурально-субмукозный» -> 2; «субмукозный / подслизистый» -> 1; «интрамуральный» -> 4; «субсерозный» -> 6."
+      - "deformsCavity=true: «деформирует полость матки», «деформация полости матки»."
+      - "prolapsing=true: «рождающийся узел», «рождающаяся миома», «узел в цервикальном канале»."
+      - "menopause=true: «менопауза», «постменопауза»."
+    notThis:
+      - "Аденомиоз, диффузные изменения миометрия — не миома."
+      - "Миома в стадии кальциноза — возвращать как миому, figo по описанию."
+    targetSpecialty: Оперирующий гинеколог
+    routeTemplateCode: SURGICAL_STANDARD
+    procedures:
+      main: Гистерорезектоскопия
+    targetDays: 7
+    rules:
+      - all: [{ attr: prolapsing, eq: true }]
+        urgent: true
+        targetSpecialty: Дежурный гинеколог
+        routeTemplateCode: URGENT_ESCALATION
+        targetDays: 0           # рождающийся узел — риск кровотечения
+      - all: [{ attr: menopause, eq: true }, { attr: growth, eq: true }]
+        targetDays: 7           # рост миомы в постменопаузе — любой тип узла
+      - all: [{ attr: figo, lte: 3 }, { attr: uncertain, eq: false }]
+        targetDays: 7
+      - all: [{ attr: deformsCavity, eq: true }, { attr: uncertain, eq: false }]
+        targetDays: 7
+      - all: [{ attr: figo, lte: 3 }]
+        targetDays: 14          # подозрение
+      - all: [{ attr: deformsCavity, eq: true }]
+        targetDays: 14
+      - all: []                 # все остальные миомы (FIGO 4–8 или тип не указан)
+        targetSpecialty: Гинеколог
+        routeTemplateCode: OBSERVATION_FOLLOWUP
+        targetDays: 180         # контроль через 6 месяцев
+    ifMissing: TRIGGER
+    examples: ["Ж ОМТ (11) — деформация полости", "Ж ОМТ (22) — FIGO 4, контроль 6 мес", "Ж ОМТ (21) — FIGO 5/6, контроль 6 мес", "Ж ОМТ (2), (10), (13), (16), (19), (20) — тип не указан, контроль 6 мес"]
+
+  - code: OVARIAN_LESION
+    name: Образование яичника
+    active: true
+    mlApproved: true
+    studyTypes: [PELVIS_FEMALE]
+    synonyms:
+      - киста яичника
+      - образование яичника
+      - объёмное образование яичника
+      - эндометриоидная киста
+      - эндометриома
+      - дермоидная киста
+      - тератома
+      - кистома
+      - цистаденома
+      - параовариальная киста
+      - жидкостное образование яичника
+      - солидное образование яичника
+      - кистозно-солидное образование
+      - многокамерное образование яичника
+      - фолликулярная киста        # функциональная -> functional=true
+      - киста жёлтого тела         # функциональная -> functional=true
+      - геморрагическая киста      # функциональная -> functional=true
+    attributes: [orads, sizeMm, volumeMl, side, growth, solid, papillary, vascularized, septated, functional, menopause, uncertain]
+    extraction:
+      - "orads: «O-RADS 2», «ORADS 2», «O-RADS II» -> число; по сторонам — отдельная находка на каждую сторону."
+      - "solid=true: солидный / кистозно-солидный компонент; papillary=true: папиллярные разрастания, пристеночные включения; vascularized=true: кровоток в образовании при ЦДК."
+      - "septated=true: перегородки, многокамерное."
+      - "functional=true: фолликулярная киста, киста жёлтого тела, геморрагическая киста."
+      - "growth=true: «с динамикой роста», «увеличение по сравнению с»."
+    notThis:
+      - "Жёлтое тело и доминантный фолликул без слова киста — норма, не находка."
+      - "Мультифолликулярные / афолликулярные яичники, снижение овариального резерва — не образование."
+      - "Гидросальпингс — маточная труба, не яичник."
+      - "Свободная жидкость в малом тазу — не образование яичника."
+    targetSpecialty: Оперирующий гинеколог
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 14
+    rules:       # ЧЕРНОВИК для бэкенда, утвердить позже
+      - all: [{ attr: functional, eq: true }]
+        result: NO_ROUTE
+      - all: [{ attr: orads, gte: 4 }]
+        targetSpecialty: Онкогинеколог
+        targetDays: 7
+      - all: [{ attr: menopause, eq: true }]
+        targetDays: 7
+      - all: [{ attr: orads, eq: 3 }]
+      - all: [{ attr: growth, eq: true }]
+      - all: [{ attr: solid, eq: true }]
+      - all: [{ attr: papillary, eq: true }]
+      - all: []
+        targetSpecialty: Гинеколог
+        routeTemplateCode: OBSERVATION_FOLLOWUP
+        targetDays: 180
+    ifMissing: TRIGGER
+    examples: ["Ж ОМТ (7) — O-RADS 2 с ростом", "Ж ОМТ (1) — параовариальная O-RADS 2", "Ж ОМТ (15) — O-RADS 2 с перегородкой", "Ж ОМТ (9) — киста без категории", "Ж ОМТ (6) — фолликулярная, functional"]
+
+  - code: ECTOPIC_PREGNANCY
+    name: Внематочная беременность (экстренно)
+    active: true
+    urgent: true
+    mlApproved: true
+    studyTypes: [PELVIS_FEMALE]
+    synonyms:
+      - внематочная беременность
+      - эктопическая беременность
+      - трубная беременность
+      - шеечная беременность
+      - беременность в рубце
+      - плодное яйцо вне полости матки
+      - образование в проекции маточной трубы
+      - плодное яйцо в полости матки не визуализируется    # при положительном ХГЧ — uncertain=true
+    attributes: [side, location, freeFluid, hcgPositive, uncertain]
+    extraction:
+      - "hcgPositive=true: в протоколе указан положительный ХГЧ / тест на беременность."
+      - "«Плодное яйцо в полости матки не визуализируется» -> находка только при hcgPositive=true, с uncertain=true."
+    notThis:
+      - "Маточная беременность, плодное яйцо в полости матки — не находка."
+    targetSpecialty: Дежурный гинеколог
+    routeTemplateCode: URGENT_ESCALATION
+    targetDays: 0
+    rules: [ { all: [] } ]
+    ifMissing: TRIGGER
+    examples: []   # синтетика
+
+  - code: OVARIAN_TORSION
+    name: Перекрут яичника (экстренно)
+    active: true
+    urgent: true
+    mlApproved: true
+    studyTypes: [PELVIS_FEMALE]
+    synonyms:
+      - перекрут яичника
+      - перекрут придатков
+      - перекрут ножки кисты
+      - отсутствие кровотока в яичнике
+      - резкое снижение кровотока в яичнике
+      - симптом водоворота
+      - увеличенный отёчный яичник с периферическим расположением фолликулов
+    attributes: [side, sizeMm, uncertain]
+    notThis:
+      - "«Кровоток в яичнике сохранён», «васкуляризация соответствует норме» -> NEGATION."
+    targetSpecialty: Дежурный гинеколог
+    routeTemplateCode: URGENT_ESCALATION
+    targetDays: 0
+    rules: [ { all: [] } ]
+    ifMissing: TRIGGER
+    examples: []   # синтетика
+
+  - code: OVARIAN_APOPLEXY
+    name: Апоплексия яичника / гемоперитонеум (экстренно)
+    active: true
+    urgent: true
+    mlApproved: true
+    studyTypes: [PELVIS_FEMALE]
+    synonyms:
+      - апоплексия яичника
+      - разрыв кисты яичника
+      - разрыв жёлтого тела
+      - гемоперитонеум
+      - сгустки крови в малом тазу
+    attributes: [side, freeFluidMl, uncertain]
+    notThis:
+      - "Свободная жидкость без признаков крови / разрыва -> FREE_FLUID."
+    targetSpecialty: Дежурный гинеколог
+    routeTemplateCode: URGENT_ESCALATION
+    targetDays: 0
+    rules: [ { all: [] } ]
+    ifMissing: TRIGGER
+    examples: []   # синтетика
+
+  - code: CERVICAL_POLYP
+    name: Полип шейки матки
+    active: false
+    studyTypes: [PELVIS_FEMALE]
+    synonyms: [полип шейки матки, полип цервикального канала, эндоцервикальный полип]
+    attributes: [sizeMm, uncertain]
+    notThis: ["Наботовы / ретенционные кисты шейки матки — не полип."]
+    targetSpecialty: Оперирующий гинеколог
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 14
+    rules: [ { all: [] } ]
+    ifMissing: TRIGGER
+    examples: ["Ж ОМТ (23) — с «?», uncertain"]
+
+  # ================= ЖЕЛЧНЫЙ ПУЗЫРЬ (ОБП) =================
+
+  - code: GALLSTONES
+    name: Желчнокаменная болезнь
+    active: true
+    mlApproved: true
+    studyTypes: [ABDOMEN]
+    synonyms:
+      - конкременты желчного пузыря
+      - конкремент в желчном пузыре
+      - камни желчного пузыря
+      - холецистолитиаз
+      - желчнокаменная болезнь
+      - ЖКБ
+      - калькулёзный холецистит
+      - калькулезный холецистит
+      - гиперэхогенное образование с акустической тенью     # в желчном пузыре
+      - конкремент холедоха                                 # location=choledoch
+      - холедохолитиаз                                      # location=choledoch
+      - микролиты желчного пузыря                           # uncertain=true
+    attributes: [sizeMm, count, location, mobile, choledochMm, ductsDilated, uncertain]
+    extraction:
+      - "location: gallbladder (по умолчанию) | choledoch (холедох, общий желчный проток)."
+      - "choledochMm: диаметр холедоха в мм («Холедох 3,2 мм»)."
+      - "ductsDilated=true: «холедох расширен», «расширение внутрипечёночных протоков», «билиарная гипертензия»."
+      - "mobile=true: «смещаемый», «подвижный при перемене положения тела»."
+    notThis:
+      - "Сладж, взвесь, замазкообразная желчь, холестероз, холестаз — не камни."
+      - "Образование без акустической тени, неподвижное -> GALLBLADDER_POLYP."
+      - "Конкременты почек / мочевого пузыря / мочеточника -> KIDNEY_STONES."
+      - "Состояние после холецистэктомии -> notTriggered, reason=POST_SURGERY."
+    targetSpecialty: Хирург
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 7
+    rules:       # ЧЕРНОВИК для бэкенда
+      - all: [{ attr: location, eq: choledoch }, { attr: ductsDilated, eq: true }]
+        urgent: true            # холедохолитиаз с расширением протоков — риск желтухи, холангита
+        targetSpecialty: Дежурный хирург
+        routeTemplateCode: URGENT_ESCALATION
+        targetDays: 0
+      - all: []
+    ifMissing: TRIGGER
+    examples: ["ЖП (13)", "ЖП (14)", "ЖП (23) — множественные до 6–8 мм", "ЖП (24) — калькулёзный холецистит", "ЖП (10) — после холецистэктомии, POST_SURGERY", "ЖП (7), (8) — сладж, не камни"]
+
+  - code: GALLBLADDER_POLYP
+    name: Полип желчного пузыря
+    active: true
+    mlApproved: true
+    studyTypes: [ABDOMEN]
+    synonyms:
+      - полип желчного пузыря
+      - полип в желчном пузыре
+      - полипы желчного пузыря
+      - полипоз желчного пузыря
+      - пристеночное образование желчного пузыря без акустической тени
+      - неподвижное гиперэхогенное образование без акустической тени
+    attributes: [sizeMm, count, sessile, vascularized, growth, uncertain]
+    extraction:
+      - "sessile=true: «на широком основании», «широкое основание»; на ножке -> false."
+      - "vascularized=true: кровоток в образовании при ЦДК."
+      - "growth: «без динамики» -> false; «увеличение» -> true."
+      - "«Небольших размеров» без числа — sizeMm не заполнять."
+    notThis:
+      - "Холестероз желчного пузыря — не полип."
+      - "Образование с акустической тенью, смещаемое -> GALLSTONES."
+      - "Сладж, взвесь — не полип."
+    targetSpecialty: Хирург
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 7
+    rules:       # ЧЕРНОВИК для бэкенда
+      - all: [{ attr: sizeMm, gte: 10 }]
+      - all: [{ attr: growth, eq: true }]
+      - all: [{ attr: sizeMm, gte: 6 }, { attr: patient.age, gte: 50 }]
+        targetDays: 14
+      - all: [{ attr: sizeMm, gte: 6 }, { attr: sessile, eq: true }]
+        targetDays: 14
+    ifMissing: TRIGGER
+    examples: ["ЖП (16) — 3,6 мм без динамики", "ЖП (18)", "ЖП (20)", "ЖП (21) — «небольших размеров»", "ЖП (22)", "ЖП (25) — полипоз"]
+
+  - code: ACUTE_CHOLECYSTITIS
+    name: Острый холецистит (экстренно)
+    active: true
+    urgent: true
+    mlApproved: true
+    studyTypes: [ABDOMEN]
+    synonyms:
+      - острый холецистит
+      - признаки острого холецистита
+      - деструктивный холецистит
+      - флегмонозный холецистит
+      - гангренозный холецистит
+      - эмпиема желчного пузыря
+      - утолщение стенки желчного пузыря с двойным контуром
+      - слоистость стенки желчного пузыря
+      - перипузырная жидкость
+      - паравезикальный инфильтрат
+    attributes: [wallThicknessMm, pericholecysticFluid, withStones, uncertain]
+    extraction:
+      - "wallThicknessMm: толщина стенки желчного пузыря (норма до 3 мм)."
+      - "withStones=true: в том же протоколе описаны конкременты желчного пузыря."
+    notThis:
+      - "Хронический холецистит, «вне обострения» — не экстренно."
+      - "Утолщение стенки без признаков воспаления при асците / гепатите — с uncertain=true."
+    targetSpecialty: Дежурный хирург
+    routeTemplateCode: URGENT_ESCALATION
+    targetDays: 0
+    rules: [ { all: [] } ]
+    ifMissing: TRIGGER
+    examples: ["ЖП (3) — хронический холецистит вне обострения, не экстренно"]   # положительных в архиве нет — синтетика
+
+  - code: FREE_FLUID
+    name: Свободная жидкость в брюшной полости / малом тазу
+    active: true
+    mlApproved: true
+    studyTypes: [ABDOMEN, PELVIS_FEMALE]
+    synonyms:
+      - свободная жидкость
+      - выпот
+      - асцит
+      - гемоперитонеум
+      - жидкость в позадиматочном пространстве
+      - жидкость в дугласовом пространстве
+      - межпетельная жидкость
+    attributes: [location, volumeMl, amount, echogenic, uncertain]
+    extraction:
+      - "location: брюшная полость | малый таз | межпетельно | подпечёночно | поддиафрагмально."
+      - "volumeMl: объём в мл, если указан («в объёме 40 мл»)."
+      - "amount: небольшое | умеренное | значительное | большое — как написал врач."
+      - "echogenic: анэхогенная | со взвесью | со сгустками."
+    notThis:
+      - "«Свободной жидкости не выявлено / не определяется» -> NEGATION."
+      - "Жидкость в грыжевом мешке -> HERNIA (incarcerated)."
+    targetSpecialty: Дежурный хирург / дежурный гинеколог
+    routeTemplateCode: URGENT_ESCALATION
+    targetDays: 0
+    rules:       # ЧЕРНОВИК для бэкенда — порог объёма не утверждён
+      - all: [{ attr: echogenic, eq: со сгустками }]
+        urgent: true
+      - all: [{ attr: amount, in: [значительное, большое] }]
+        urgent: true
+      - all: [{ attr: volumeMl, gte: 200 }]
+        urgent: true
+      - all: []
+        result: NO_ROUTE
+    ifMissing: SKIP
+    examples: ["Ж ОМТ (6) — 40 мл со взвесью, врач не счёл экстренным", "Ж ОМТ (12) — небольшой выпот"]
+    # VITA: порог объёма / описания для экстренности (сейчас черновик: сгустки, «значительное», ≥ 200 мл).
+
+  # ================= МОЛОЧНАЯ ЖЕЛЕЗА =================
+
+  - code: BREAST_LESION
+    name: Образование молочной железы (по BI-RADS)
+    active: true
+    mlApproved: true
+    studyTypes: [BREAST]
+    synonyms:
+      - образование молочной железы
+      - очаговое образование
+      - узловое образование молочной железы
+      - объёмное образование
+      - солидное образование
+      - фиброаденома
+      - киста молочной железы
+      - участок неоднородной структуры
+      - BI-RADS
+      - Birads
+      - Br
+    attributes: [birads, biradsSub, side, sizeMm, count, suspiciousLymphNodes, inflammation, uncertain]
+    extraction:
+      - "Если категория BI-RADS указана по сторонам — вернуть находку на каждую сторону с birads и side, даже BI-RADS 1–2 (порог решает бэкенд)."
+      - "birads: «BI-RADS 4», «Birads 4», «Br4», «категория 4» -> 4; «4a/4b/4c» -> biradsSub."
+      - "suspiciousLymphNodes=true: изменённые, увеличенные регионарные / аксиллярные лимфоузлы с нарушенной дифференцировкой."
+      - "inflammation=true: «нельзя исключить мастит», признаки воспаления."
+    notThis:
+      - "Импланты, состояние после маммопластики / мастопексии — не образование."
+      - "Мастопатия, фиброзно-кистозные изменения, жировая инволюция без образования и без категории — не образование."
+    targetSpecialty: Маммолог
+    routeTemplateCode: CONSULT_OBSERVATION
+    targetDays: 30
+    rules:       # ЧЕРНОВИК для бэкенда
+      - all: [{ attr: birads, gte: 5 }]
+        targetSpecialty: Маммолог-онколог
+        routeTemplateCode: SURGICAL_STANDARD
+        targetDays: 3
+      - all: [{ attr: birads, eq: 4 }]
+        targetSpecialty: Маммолог-онколог
+        routeTemplateCode: SURGICAL_STANDARD
+        targetDays: 7
+      - all: [{ attr: birads, eq: 0 }]
+        targetDays: 14
+      - all: [{ attr: birads, eq: 3 }]
+      - all: [{ attr: birads, lte: 2 }]
+        result: NO_ROUTE
+    ifMissing: TRIGGER
+    examples: ["молочн железа (3) — BI-RADS 4 слева, «нельзя исключить мастит»", "молочн железа (2) — BI-RADS 3 с двух сторон", "молочн железа (1) — фиброаденома без категории", "молочн железа (10) — импланты Br2", "молочн железа (6), (8), (9) — BI-RADS 2"]
+
+  # ================= ЩИТОВИДНАЯ ЖЕЛЕЗА =================
+
+  - code: THYROID_NODULE
+    name: Узловое образование щитовидной железы
+    active: true
+    mlApproved: true
+    studyTypes: [THYROID]
+    synonyms:
+      - узел щитовидной железы
+      - узлы щитовидной железы
+      - узловое образование щитовидной железы
+      - узловой зоб
+      - многоузловой зоб
+      - коллоидный узел
+      - губчатый узел
+      - EU-TIRADS
+      - TI-RADS
+    attributes: [tirads, tiradsSystem, sizeMm, count, side, growth, suspiciousFeatures, suspiciousLymphNodes, uncertain]
+    extraction:
+      - "tirads: «EU-TIRADS 3» -> 3, tiradsSystem=EU; «TI-RADS 2» без уточнения -> tiradsSystem=UNKNOWN; «Ti-rads-2» -> 2."
+      - "Категория по долям — отдельная находка на каждую долю (side)."
+      - "suspiciousFeatures — список из: микрокальцинаты, выраженно гипоэхогенный, неровный / нечёткий контур, вертикальная ориентация (выше, чем шире), экстратиреоидное распространение."
+      - "suspiciousLymphNodes=true: шейные лимфоузлы с утолщённым корковым слоем, без дифференцировки, с кальцинатами или кистозными изменениями."
+    notThis:
+      - "Диффузные изменения, АИТ, диффузный зоб — не узел."
+      - "Расширенные фолликулы, микро- / макрофолликулы без слова узел — не узел."
+    targetSpecialty: Эндокринолог
+    routeTemplateCode: CONSULT_OBSERVATION
+    targetDays: 14
+    rules:       # ЧЕРНОВИК для бэкенда
+      - all: [{ attr: tirads, eq: 5 }, { attr: sizeMm, gte: 10 }]
+      - all: [{ attr: tirads, eq: 4 }, { attr: sizeMm, gte: 15 }]
+      - all: [{ attr: tirads, eq: 3 }, { attr: sizeMm, gte: 20 }]
+      - all: [{ attr: growth, eq: true }]
+    ifMissing: TRIGGER
+    examples: ["щитовидка (6), (3) — EU-TIRADS 3", "щитовидка (1), (2), (7), (8) — TI-RADS 2", "щитовидка (8) — губчатый узел", "щитовидка (4), (5) — узлы без категории", "щитовидка (9) — АИТ, лимфоузлы с утолщённым корковым слоем, узлов нет"]
+
+  # ================= СОСУДЫ НИЖНИХ КОНЕЧНОСТЕЙ =================
+
+  - code: DEEP_VEIN_THROMBOSIS
+    name: Тромбоз вен (экстренно)
+    active: true
+    urgent: true
+    mlApproved: true
+    studyTypes: [LOWER_LIMB_VESSELS]
+    synonyms:
+      - тромбоз
+      - тромбоз глубоких вен
+      - флеботромбоз
+      - тромбофлебит
+      - тромботические массы
+      - окклюзивный тромб
+      - неокклюзивный тромб
+      - флотирующий тромб
+      - вена не сжимается датчиком
+      - несжимаемая вена
+    attributes: [side, vein, floating, occlusive, uncertain]
+    extraction:
+      - "vein: название сегмента (ОБВ, ПБВ, подколенная, БПВ, МПВ, суральные)."
+      - "floating=true: флотирующий тромб / верхушка."
+    notThis:
+      - "«Признаков тромбоза не выявлено», «данных за тромбоз не получено», «без признаков тромбоза», «сжимаема до конца» -> NEGATION."
+      - "Посттромботические изменения без свежего тромба — с uncertain=true."
+    targetSpecialty: Дежурный сосудистый хирург
+    routeTemplateCode: URGENT_ESCALATION
+    targetDays: 0
+    rules: [ { all: [] } ]
+    ifMissing: TRIGGER
+    examples: ["нижние конечности (5), (7), (8) — отрицание тромбоза, NEGATION"]
+
+  - code: VENOUS_INSUFFICIENCY
+    name: Варикозная болезнь / клапанная недостаточность вен
+    active: false
+    studyTypes: [LOWER_LIMB_VESSELS]
+    synonyms: [несостоятельность БПВ, несостоятельность МПВ, несостоятельность сафено-феморального соустья, несостоятельность сафено-подколенного соустья, варикозная трансформация, варикозная деформация, рефлюкс, клапанная недостаточность]
+    attributes: [side]
+    notThis: ["«Клапанная недостаточность не выявлена» -> NEGATION."]
+    targetSpecialty: Флеболог
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 30
+    rules: [ { all: [] } ]
+    ifMissing: TRIGGER
+    examples: ["нижние конечности (4)", "нижние конечности (5)", "нижние конечности (7)"]
+
+  - code: ARTERIAL_STENOSIS
+    name: Стеноз / окклюзия артерий нижних конечностей
+    active: false
+    studyTypes: [LOWER_LIMB_VESSELS]
+    synonyms: [стеноз, стенозирующий атеросклероз, окклюзия, атеросклеротическая бляшка, гемодинамически значимый стеноз]
+    attributes: [stenosisPct, occlusion, side]
+    notThis: ["Нестенозирующий атеросклероз — ниже порога."]
+    targetSpecialty: Сосудистый хирург
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 14
+    rules:
+      - all: [{ attr: occlusion, eq: true }]
+      - all: [{ attr: stenosisPct, gte: 50 }]
+    ifMissing: SKIP
+    examples: ["нижние конечности (6) — окклюзия ЗББА", "нижние конечности (3) — ОБА 50–55%", "нижние конечности (2) — нестенозирующий, не триггер"]
+    # VITA: порог 50% или 70%? Учитывать ли клинику (ишемия) — её в протоколе нет.
+
+  # ================= ПРОЧЕЕ (в архиве примеров нет) =================
+
+  - code: HERNIA
+    name: Грыжа передней брюшной стенки / паховая
+    active: true
+    mlApproved: true
+    studyTypes: [ABDOMEN, SOFT_TISSUE]
+    synonyms:
+      - грыжа передней брюшной стенки
+      - паховая грыжа
+      - бедренная грыжа
+      - пупочная грыжа
+      - грыжа белой линии живота
+      - послеоперационная вентральная грыжа
+      - грыжевой дефект
+      - грыжевые ворота
+      - грыжевой мешок
+    attributes: [sizeMm, side, reducible, incarcerated, uncertain]
+    extraction:
+      - "sizeMm: размер грыжевых ворот / дефекта апоневроза."
+      - "reducible=false: «невправимая»; incarcerated=true: «ущемлённая», признаки ущемления (нарушение кровотока в содержимом, жидкость в грыжевом мешке)."
+    notThis:
+      - "Грыжа диска, грыжа пищеводного отверстия диафрагмы — не эта находка."
+      - "Диастаз прямых мышц живота без грыжевого дефекта — не грыжа."
+    targetSpecialty: Хирург
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 14
+    rules:       # ЧЕРНОВИК для бэкенда
+      - all: [{ attr: incarcerated, eq: true }]
+        urgent: true
+        targetSpecialty: Дежурный хирург
+        routeTemplateCode: URGENT_ESCALATION
+        targetDays: 0
+      - all: []
+    ifMissing: TRIGGER
+    examples: []   # в архиве нет — нужна синтетика
+
+  - code: HYDRONEPHROSIS
+    name: Гидронефроз / расширение ЧЛС
+    active: true
+    mlApproved: true
+    studyTypes: [KIDNEY]
+    synonyms:
+      - гидронефроз
+      - уретерогидронефроз
+      - расширение чашечно-лоханочной системы
+      - расширение ЧЛС
+      - пиелоэктазия
+      - каликоэктазия
+      - пиелокаликоэктазия
+    attributes: [side, grade, pelvisMm, ureterDilated, uncertain]
+    extraction:
+      - "grade: степень гидронефроза, если указана (1–4)."
+      - "pelvisMm: переднезадний размер лоханки в мм."
+      - "ureterDilated=true: расширение мочеточника."
+    notThis:
+      - "«ЧЛС не расширена» -> NEGATION."
+      - "Ампулярная (внепочечная) лоханка — вариант строения, не гидронефроз."
+    targetSpecialty: Уролог
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 7
+    rules:       # ЧЕРНОВИК для бэкенда
+      - all: []
+    ifMissing: TRIGGER
+    examples: []   # в архиве нет — нужна синтетика
+
+  - code: KIDNEY_STONES
+    name: Конкременты почек / мочеточника
+    active: true
+    mlApproved: true
+    studyTypes: [KIDNEY]
+    synonyms:
+      - конкременты почек
+      - конкремент почки
+      - нефролитиаз
+      - уролитиаз
+      - мочекаменная болезнь
+      - камень мочеточника
+      - конкремент в лоханке
+      - гиперэхогенное включение с акустической тенью     # в почке
+    attributes: [sizeMm, count, side, location, obstruction, uncertain]
+    extraction:
+      - "location: kidney (по умолчанию) | ureter (мочеточник) | bladder (мочевой пузырь)."
+      - "obstruction=true: камень с расширением ЧЛС / мочеточника выше него на той же стороне, «признаки обструкции», «уретерогидронефроз»."
+    notThis:
+      - "Аббревиатура «МКБ» рядом с кодом (например, «Код МКБ: N80.0») — классификатор болезней, не мочекаменная болезнь."
+      - "Гиперэхогенные включения без акустической тени, кальцинаты паренхимы, фиброз синуса — не конкременты."
+      - "Конкременты желчного пузыря -> GALLSTONES."
+    targetSpecialty: Уролог
+    routeTemplateCode: SURGICAL_STANDARD
+    targetDays: 14
+    rules:       # ЧЕРНОВИК для бэкенда
+      - all: [{ attr: obstruction, eq: true }]
+        urgent: true            # камень с обструкцией — риск обструктивного пиелонефрита
+        targetSpecialty: Дежурный уролог
+        routeTemplateCode: URGENT_ESCALATION
+        targetDays: 0
+      - all: [{ attr: location, eq: ureter }]
+        targetDays: 3
+      - all: []
+    ifMissing: TRIGGER
+    examples: []   # в архиве нет — нужна синтетика
+
+  - code: BPH_URINARY_RETENTION
+    name: ДГПЖ с нарушением оттока мочи
+    active: false
+    studyTypes: [PROSTATE]
+    synonyms: [ДГПЖ, аденома простаты, гиперплазия предстательной железы, остаточная моча, нарушение пассажа мочи]
+    attributes: [residualUrineMl, volumeMl, growth]
+    notThis: ["ДГПЖ без остаточной мочи и без роста — плановый уролог, не маршрут."]
+    targetSpecialty: Уролог
+    routeTemplateCode: CONSULT_OBSERVATION
+    targetDays: 14
+    rules:
+      - all: [{ attr: residualUrineMl, gte: 100 }]
+      - all: [{ attr: growth, eq: true }]
+    ifMissing: SKIP
+    examples: ["простата (9) — остаточная моча 100 мл", "простата (8) — нарушение пассажа мочи", "простата (10) — рост узловой ДГПЖ"]

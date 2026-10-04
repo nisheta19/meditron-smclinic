@@ -1,0 +1,39 @@
+{
+  "resultId": "demo-02",
+  "status": "DONE",
+  "modelVersion": "demo-0.1",
+  "processedAt": "2026-09-07T10:02:00+03:00",
+  "patient": {
+    "externalId": "mis-0002",
+    "fullName": "Пациент 002",
+    "birthDate": "1968-02-03",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-gb-23",
+    "version": 1,
+    "studyType": "ABDOMEN",
+    "studyDate": "2026-09-07"
+  },
+  "conclusion": "Эхо-признаки диффузных изменений печени по типу жирового гепатоза, хронического калькулезного холецистита, диффузных изменений поджелудочной железы.",
+  "conclusionFound": true,
+  "findings": [
+    {
+      "code": "GALLSTONES",
+      "evidence": {
+        "text": "конкременты множественные до 6-8мм"
+      },
+      "attributes": {
+        "sizeMm": 8,
+        "count": "множественные",
+        "location": "gallbladder"
+      },
+      "confidence": 0.96,
+      "flags": []
+    }
+  ],
+  "notTriggered": [],
+  "error": null,
+  "dictionaryVersion": "dict-v2.1",
+  "flags": []
+}

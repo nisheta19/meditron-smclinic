@@ -1,0 +1,46 @@
+{
+  "resultId": "demo-09",
+  "status": "DONE",
+  "modelVersion": "demo-0.2",
+  "dictionaryVersion": "dict-v2.1",
+  "processedAt": "2026-10-03T10:00:00+03:00",
+  "patient": {
+    "externalId": "mis-0009",
+    "fullName": "Пациент 009",
+    "birthDate": "1999-02-07",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-omt-synth-13",
+    "version": 1,
+    "studyType": "PELVIS_FEMALE",
+    "studyDate": "2026-10-03"
+  },
+  "conclusion": "Свободная жидкость в малом тазу.",
+  "conclusionFound": true,
+  "flags": [],
+  "findings": [
+    {
+      "code": "FREE_FLUID",
+      "evidence": {
+        "text": "неоднородная жидкость с эхогенными сгустками, общим объёмом около 200 мл"
+      },
+      "attributes": {
+        "echogenic": "со сгустками",
+        "volumeMl": 200,
+        "beyondPelvis": true,
+        "location": "боковой канал",
+        "uncertain": false
+      },
+      "confidence": 0.88,
+      "flags": [
+        {
+          "code": "DISCREPANCY",
+          "note": "в заключении только «свободная жидкость», в описании — сгустки и жидкость в правом боковом канале"
+        }
+      ]
+    }
+  ],
+  "notTriggered": [],
+  "error": null
+}

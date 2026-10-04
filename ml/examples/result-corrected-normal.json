@@ -1,0 +1,24 @@
+{
+  "resultId": "manual-demo-002",
+  "status": "DONE",
+  "modelVersion": "manual-demo-1",
+  "processedAt": "2026-10-03T13:15:02+03:00",
+  "patient": {
+    "externalId": "demo-patient-001",
+    "fullName": "Пациент 001",
+    "birthDate": "1999-03-15",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "demo-protocol-001",
+    "version": 2,
+    "studyType": "PELVIS_FEMALE",
+    "studyDate": "2026-09-07"
+  },
+  "text": "Заключение: Очаговых изменений не выявлено.",
+  "conclusion": "Очаговых изменений не выявлено.",
+  "conclusionFound": true,
+  "findings": [],
+  "notTriggered": [],
+  "error": null
+}

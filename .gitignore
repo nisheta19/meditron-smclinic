@@ -1,0 +1,93 @@
+# Local agent instructions (including the alternate spelling)
+AGENTS.md
+AGNENTS.md
+.codex/
+.agents/
+
+# Local state and environment; keep the shareable example
+.local/
+.state/
+.env
+.env.*
+!.env.example
+*.env
+*.env.local
+.envrc
+
+# Local credentials and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+credentials.json
+credentials.*.json
+service-account*.json
+
+# Private source documents and archives
+*.doc
+*.docx
+*.docm
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+
+# Databases, dumps and logs (SQL migrations remain trackable)
+*.sqlite
+*.sqlite3*
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.dump
+*.backup
+pgdata/
+logs/
+
+# Local runtimes and downloaded packages
+*.exe
+*.dll
+*.whl
+
+# Java / Maven
+target/
+*.class
+*.jar
+!**/.mvn/wrapper/maven-wrapper.jar
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Python / ML
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+.ipynb_checkpoints/
+*.pt
+*.pkl
+*.onnx
+data/raw/
+
+# Frontend
+node_modules/
+dist/
+build/

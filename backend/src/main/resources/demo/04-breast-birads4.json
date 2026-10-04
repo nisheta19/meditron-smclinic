@@ -1,0 +1,48 @@
+{
+  "resultId": "demo-04",
+  "status": "DONE",
+  "modelVersion": "demo-0.1",
+  "processedAt": "2026-09-08T10:04:00+03:00",
+  "patient": {
+    "externalId": "mis-0004",
+    "fullName": "Пациент 004",
+    "birthDate": "1975-07-30",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-breast-3",
+    "version": 1,
+    "studyType": "BREAST",
+    "studyDate": "2026-09-08"
+  },
+  "conclusion": "Участок неоднородной структуры 18.9х14.1 мм (нельзя исключить мастит). BI-RADS 1 справа, BI-RADS 4 слева.",
+  "conclusionFound": true,
+  "findings": [
+    {
+      "code": "BREAST_LESION",
+      "evidence": {
+        "text": "Категория BI-RADS 4 (левая молочная железа)"
+      },
+      "attributes": {
+        "birads": 4,
+        "side": "left",
+        "sizeMm": 18.9,
+        "inflammation": true
+      },
+      "confidence": 0.9,
+      "flags": []
+    }
+  ],
+  "notTriggered": [
+    {
+      "code": "BREAST_LESION",
+      "evidence": {
+        "text": "Категория BI-RADS 1 (правая молочная железа)"
+      },
+      "reason": "NORMAL"
+    }
+  ],
+  "error": null,
+  "dictionaryVersion": "dict-v2.1",
+  "flags": []
+}

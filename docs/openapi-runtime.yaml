@@ -1,0 +1,1265 @@
+openapi: 3.1.0
+info:
+  title: MEDITRON · СМ-Клиника API
+  description: Выявление клинически значимых находок и маршрутизация пациента
+  version: 0.0.1
+servers:
+- url: http://127.0.0.1:18080
+  description: Generated server url
+tags:
+- name: Dictionary
+  description: Словарь находок (findings-dictionary.yaml)
+- name: Integration
+  description: Вход от ML (не для фронта)
+- name: Patients
+  description: Инбокс, карточка пациента, находки пациента
+- name: MIS
+  description: Бэкенд отправляет протоколы в ML и получает результат асинхронно
+paths:
+  /api/patients/{patientId}/findings:
+    get:
+      tags:
+      - Patients
+      operationId: findings
+      parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - SUGGESTED
+          - CONFIRMED
+          - REJECTED
+          - REMOVED
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FindingDto'
+    post:
+      tags:
+      - Patients
+      summary: Врач добавляет находку вручную (сразу CONFIRMED, source=MANUAL)
+      operationId: addFinding
+      parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindingCreateRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FindingDto'
+  /api/patients/{patientId}/findings/confirm:
+    post:
+      tags:
+      - Patients
+      summary: «Всё ок» — подтвердить пачку находок
+      operationId: confirm
+      parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmFindingsRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FindingDto'
+  /api/integration/protocols:
+    post:
+      tags:
+      - MIS
+      summary: 'Передать DOCX в ML: metadata (application/json) и file (DOCX)'
+      operationId: upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  $ref: '#/components/schemas/JsonNode'
+                file:
+                  type: string
+                  format: binary
+              required:
+              - metadata
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/integration/ml/results:
+    post:
+      tags:
+      - Integration
+      summary: Результат ML по одному протоколу. Повтор того же resultId — 202 без
+        изменений
+      operationId: mlResult
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MlResultRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+  /api/integration/events:
+    post:
+      tags:
+      - MIS
+      summary: Передать JSON МИС в ML, включая аннулирование без файла
+      operationId: event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonNode'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/integration/events/retry:
+    post:
+      tags:
+      - MIS
+      summary: Повторить доставку результата после устранения ошибки бэкенда
+      operationId: retry
+      parameters:
+      - name: eventId
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/findings/{findingId}:
+    delete:
+      tags:
+      - Findings
+      summary: Удалить находку (мягко — статус REMOVED, остаётся в истории)
+      operationId: delete
+      parameters:
+      - name: findingId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: reason
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: No Content
+    patch:
+      tags:
+      - Findings
+      summary: Подтвердить / отклонить / поправить находку
+      operationId: update
+      parameters:
+      - name: findingId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindingUpdateRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FindingDto'
+  /api/protocols/{protocolId}:
+    get:
+      tags:
+      - Protocols
+      summary: Протокол с находками и списком «почему не сработало»
+      operationId: protocol
+      parameters:
+      - name: protocolId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProtocolDto'
+  /api/ping:
+    get:
+      tags:
+      - ping-controller
+      operationId: ping
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /api/patients:
+    get:
+      tags:
+      - Patients
+      summary: 'Инбокс: «Новые» = reviewState=PENDING, ATTENTION — протокол не прочитан
+        или без заключения'
+      operationId: list
+      parameters:
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: reviewState
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - OK
+          - PENDING
+          - ATTENTION
+      - name: studyType
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - PELVIS_FEMALE
+          - ABDOMEN
+          - BREAST
+          - THYROID
+          - PROSTATE
+          - LOWER_LIMB_VESSELS
+          - KIDNEY
+          - SOFT_TISSUE
+      - name: maxLevel
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - EMERGENCY
+          - URGENT
+          - PLANNED
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PatientPageDto'
+  /api/patients/{patientId}:
+    get:
+      tags:
+      - Patients
+      summary: 'Карточка пациента: находки по последнему протоколу, маршруты, история'
+      operationId: card
+      parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PatientCardDto'
+  /api/integration/events/status:
+    get:
+      tags:
+      - MIS
+      summary: Статус обработки и доставки callback; успех доставки — delivery=delivered
+      operationId: status
+      parameters:
+      - name: eventId
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/dictionary/findings:
+    get:
+      tags:
+      - Dictionary
+      summary: 'Словарь: краткий вид для фронта; full=true — полные записи для ML
+        (атрибуты, правила извлечения, ловушки)'
+      operationId: findings_1
+      parameters:
+      - name: studyType
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: full
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    FindingCreateRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        protocolId:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: {}
+        comment:
+          type: string
+        doctor:
+          type: string
+      required:
+      - code
+    EvidenceDto:
+      type: object
+      properties:
+        text:
+          type: string
+          minLength: 1
+        start:
+          type: integer
+          format: int32
+        end:
+          type: integer
+          format: int32
+      required:
+      - text
+    FindingDto:
+      type: object
+      properties:
+        id:
+          type: string
+        patientId:
+          type: string
+        protocolId:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - SUGGESTED
+          - CONFIRMED
+          - REJECTED
+          - REMOVED
+        source:
+          type: string
+          enum:
+          - ML
+          - MANUAL
+        evidence:
+          $ref: '#/components/schemas/EvidenceDto'
+        attributes:
+          type: object
+          additionalProperties: {}
+        confidence:
+          type: number
+          format: double
+        modelVersion:
+          type: string
+        ruleVersion:
+          type: string
+        matchedRule:
+          type: string
+        targetSpecialty:
+          type: string
+        targetDays:
+          type: integer
+          format: int32
+        level:
+          type: string
+          enum:
+          - EMERGENCY
+          - URGENT
+          - PLANNED
+        urgent:
+          type: boolean
+        flags:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        routeId:
+          type: string
+        reviewedBy:
+          type: string
+        reviewedAt:
+          type: string
+          format: date-time
+        comment:
+          type: string
+    ConfirmFindingsRequest:
+      type: object
+      properties:
+        findingIds:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          minItems: 1
+        doctor:
+          type: string
+      required:
+      - findingIds
+    JsonNode: {}
+    MlError:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+      required:
+      - code
+      - message
+    MlFinding:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        evidence:
+          $ref: '#/components/schemas/EvidenceDto'
+        attributes:
+          type: object
+          additionalProperties: {}
+        confidence:
+          type: number
+          format: double
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/MlFlag'
+      required:
+      - code
+      - evidence
+    MlFlag:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        note:
+          type: string
+      required:
+      - code
+    MlNotTriggered:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        evidence:
+          $ref: '#/components/schemas/EvidenceDto'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - code
+      - evidence
+      - reason
+    MlResultRequest:
+      type: object
+      properties:
+        resultId:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          enum:
+          - DONE
+          - FAILED
+          - ANNULLED
+        modelVersion:
+          type: string
+          minLength: 1
+        dictionaryVersion:
+          type: string
+        processedAt:
+          type: string
+          format: date-time
+        patient:
+          $ref: '#/components/schemas/PatientPart'
+        protocol:
+          $ref: '#/components/schemas/ProtocolPart'
+        text:
+          type: string
+        conclusion:
+          type: string
+        conclusionFound:
+          type: boolean
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/MlFlag'
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/MlFinding'
+        notTriggered:
+          type: array
+          items:
+            $ref: '#/components/schemas/MlNotTriggered'
+        error:
+          $ref: '#/components/schemas/MlError'
+      required:
+      - modelVersion
+      - patient
+      - processedAt
+      - protocol
+      - resultId
+      - status
+    PatientPart:
+      type: object
+      properties:
+        externalId:
+          type: string
+          minLength: 1
+        fullName:
+          type: string
+          minLength: 1
+        birthDate:
+          type: string
+          format: date
+        sex:
+          type: string
+          enum:
+          - F
+          - M
+      required:
+      - birthDate
+      - externalId
+      - fullName
+      - sex
+    ProtocolPart:
+      type: object
+      properties:
+        externalId:
+          type: string
+          minLength: 1
+        version:
+          type: integer
+          format: int32
+          minimum: 1
+        studyType:
+          type: string
+          enum:
+          - PELVIS_FEMALE
+          - ABDOMEN
+          - BREAST
+          - THYROID
+          - PROSTATE
+          - LOWER_LIMB_VESSELS
+          - KIDNEY
+          - SOFT_TISSUE
+        studyDate:
+          type: string
+          format: date
+      required:
+      - externalId
+      - studyDate
+      - studyType
+    FindingUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - SUGGESTED
+          - CONFIRMED
+          - REJECTED
+          - REMOVED
+        code:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: {}
+        comment:
+          type: string
+        doctor:
+          type: string
+    ProtocolDto:
+      type: object
+      properties:
+        protocol:
+          $ref: '#/components/schemas/ProtocolShortDto'
+        patientId:
+          type: string
+        text:
+          type: string
+        modelVersion:
+          type: string
+        error:
+          $ref: '#/components/schemas/ErrorResponse'
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindingDto'
+        notTriggered:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+    ProtocolShortDto:
+      type: object
+      properties:
+        id:
+          type: string
+        externalId:
+          type: string
+        version:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - DONE
+          - FAILED
+          - ANNULLED
+        studyType:
+          type: string
+          enum:
+          - PELVIS_FEMALE
+          - ABDOMEN
+          - BREAST
+          - THYROID
+          - PROSTATE
+          - LOWER_LIMB_VESSELS
+          - KIDNEY
+          - SOFT_TISSUE
+        studyDate:
+          type: string
+          format: date
+        conclusion:
+          type: string
+        conclusionFound:
+          type: boolean
+        findingsCount:
+          type: integer
+          format: int32
+        receivedAt:
+          type: string
+          format: date-time
+        flags:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+    PatientPageDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatientShortDto'
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+    PatientShortDto:
+      type: object
+      properties:
+        id:
+          type: string
+        externalId:
+          type: string
+        fullName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        age:
+          type: integer
+          format: int32
+        sex:
+          type: string
+          enum:
+          - F
+          - M
+        cardNumber:
+          type: string
+        reviewState:
+          type: string
+          enum:
+          - OK
+          - PENDING
+          - ATTENTION
+        maxLevel:
+          type: string
+          enum:
+          - EMERGENCY
+          - URGENT
+          - PLANNED
+        receivedAt:
+          type: string
+          format: date-time
+        pendingFindings:
+          type: integer
+          format: int32
+        activeRoutes:
+          type: integer
+          format: int32
+        lastStudyDate:
+          type: string
+          format: date
+        studyType:
+          type: string
+          enum:
+          - PELVIS_FEMALE
+          - ABDOMEN
+          - BREAST
+          - THYROID
+          - PROSTATE
+          - LOWER_LIMB_VESSELS
+          - KIDNEY
+          - SOFT_TISSUE
+        activeFindings:
+          type: integer
+          format: int32
+        topFindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopFindingDto'
+    TopFindingDto:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - SUGGESTED
+          - CONFIRMED
+          - REJECTED
+          - REMOVED
+        level:
+          type: string
+          enum:
+          - EMERGENCY
+          - URGENT
+          - PLANNED
+        targetSpecialty:
+          type: string
+        targetDays:
+          type: integer
+          format: int32
+    History:
+      type: object
+      properties:
+        protocols:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProtocolShortDto'
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindingDto'
+        routes:
+          type: array
+          items: {}
+    PatientCardDto:
+      type: object
+      properties:
+        patient:
+          $ref: '#/components/schemas/PatientShortDto'
+        currentProtocol:
+          $ref: '#/components/schemas/ProtocolShortDto'
+        currentFindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindingDto'
+        routes:
+          type: array
+          items: {}
+        history:
+          $ref: '#/components/schemas/History'

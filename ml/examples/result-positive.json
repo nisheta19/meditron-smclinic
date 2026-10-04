@@ -1,0 +1,36 @@
+{
+  "resultId": "manual-demo-001",
+  "status": "DONE",
+  "modelVersion": "manual-demo-1",
+  "processedAt": "2026-10-03T13:15:02+03:00",
+  "patient": {
+    "externalId": "demo-patient-001",
+    "fullName": "Пациент 001",
+    "birthDate": "1999-03-15",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "demo-protocol-001",
+    "version": 1,
+    "studyType": "PELVIS_FEMALE",
+    "studyDate": "2026-09-07"
+  },
+  "text": "Описание: Полип эндометрия. Заключение: Полип эндометрия.",
+  "conclusion": "Полип эндометрия.",
+  "conclusionFound": true,
+  "findings": [
+    {
+      "code": "ENDOMETRIAL_POLYP",
+      "evidence": {
+        "text": "Полип эндометрия",
+        "start": 10,
+        "end": 26
+      },
+      "attributes": {
+        "uncertain": false
+      }
+    }
+  ],
+  "notTriggered": [],
+  "error": null
+}

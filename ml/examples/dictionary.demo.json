@@ -1,0 +1,14 @@
+[
+  {
+    "code": "ENDOMETRIAL_POLYP",
+    "name": "Полип эндометрия",
+    "synonyms": ["полипа эндометрия", "полип эндометрия", "полипоз эндометрия"],
+    "studyTypes": ["PELVIS_FEMALE"]
+  },
+  {
+    "code": "UTERINE_FIBROID",
+    "name": "Миома матки",
+    "synonyms": ["миомы матки"],
+    "studyTypes": ["PELVIS_FEMALE"]
+  }
+]

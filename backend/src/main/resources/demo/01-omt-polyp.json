@@ -1,0 +1,56 @@
+{
+  "resultId": "demo-01",
+  "status": "DONE",
+  "modelVersion": "demo-0.1",
+  "processedAt": "2026-09-07T10:01:00+03:00",
+  "patient": {
+    "externalId": "mis-0001",
+    "fullName": "Пациент 001",
+    "birthDate": "1981-05-12",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-omt-23",
+    "version": 1,
+    "studyType": "PELVIS_FEMALE",
+    "studyDate": "2026-09-07"
+  },
+  "conclusion": "УЗ-признаки полипа эндометрия, полипа шейки матки? Категория O-RADS I справа, O-RADS I слева.",
+  "conclusionFound": true,
+  "findings": [
+    {
+      "code": "ENDOMETRIAL_POLYP",
+      "evidence": {
+        "text": "УЗ-признаки полипа эндометрия"
+      },
+      "attributes": {
+        "uncertain": false
+      },
+      "confidence": 0.94,
+      "flags": []
+    },
+    {
+      "code": "CERVICAL_POLYP",
+      "evidence": {
+        "text": "полипа шейки матки?"
+      },
+      "attributes": {
+        "uncertain": true
+      },
+      "confidence": 0.71,
+      "flags": []
+    }
+  ],
+  "notTriggered": [
+    {
+      "code": "OVARIAN_LESION",
+      "evidence": {
+        "text": "O-RADS I справа, O-RADS I слева"
+      },
+      "reason": "NORMAL"
+    }
+  ],
+  "error": null,
+  "dictionaryVersion": "dict-v2.1",
+  "flags": []
+}

@@ -1,0 +1,50 @@
+{
+  "resultId": "demo-08",
+  "status": "DONE",
+  "modelVersion": "demo-0.2",
+  "dictionaryVersion": "dict-v2.1",
+  "processedAt": "2026-10-03T10:00:00+03:00",
+  "patient": {
+    "externalId": "mis-0008",
+    "fullName": "Пациент 008",
+    "birthDate": "1979-06-03",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-veins-synth-02",
+    "version": 1,
+    "studyType": "LOWER_LIMB_VESSELS",
+    "studyDate": "2026-10-03"
+  },
+  "conclusion": "УЗ-признаки варикотромбофлебита ствола БПВ слева с проксимальной границей тромба в 2 см от СФС. Глубокие вены проходимы.",
+  "conclusionFound": true,
+  "flags": [],
+  "findings": [
+    {
+      "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+      "evidence": {
+        "text": "варикотромбофлебита ствола БПВ слева с проксимальной границей тромба в 2 см от СФС"
+      },
+      "attributes": {
+        "side": "left",
+        "vein": "БПВ",
+        "location": "trunk",
+        "distanceToJunctionMm": 20,
+        "floating": false,
+        "uncertain": false
+      },
+      "confidence": 0.95,
+      "flags": []
+    }
+  ],
+  "notTriggered": [
+    {
+      "code": "DEEP_VEIN_THROMBOSIS",
+      "evidence": {
+        "text": "Глубокие вены проходимы"
+      },
+      "reason": "NEGATION"
+    }
+  ],
+  "error": null
+}

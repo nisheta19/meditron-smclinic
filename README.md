@@ -1,0 +1,147 @@
+# MEDITRON — итоговая связка backend + ML
+
+Проект собран из `meditron-smclinic-feature-dict-v2.zip` и текущего ML
+`dict-v2.1-extractor-6`. Все исходники для запуска находятся здесь.
+Оригинальный проект, архив и исходные протоколы не изменены.
+
+```mermaid
+flowchart LR
+  A[DOCX + метаданные МИС] --> B[Backend: приём файла]
+  B --> C[ML: текст, факты, атрибуты, цитаты]
+  B --> D[(PostgreSQL)]
+  C --> E[(SQLite: очередь результатов)]
+  E -->|JSON callback| B
+  B --> F[Правила справочника: специалист и срок]
+  F --> D
+  D --> G[API инбокса и карточки пациента]
+```
+
+ML получает справочник от бэкенда. Файл обрабатывается локально, без облачной модели,
+изображений и OCR. Метаданные пациента передаёт МИС; демонстрационный скрипт создаёт
+вымышленные данные. JSON callback содержит факты, а бэкенд применяет правила маршрутизации.
+
+## Быстрый запуск на этом компьютере
+
+Подготовлены Java JAR, Python-окружение и отдельная PostgreSQL в `.local/`.
+Из PowerShell:
+
+```powershell
+cd C:\hackaton\final
+.\scripts\Start-Local.ps1
+```
+
+- Backend / Swagger: http://127.0.0.1:18080/swagger-ui/index.html
+- ML / Swagger: http://127.0.0.1:18000/docs
+- Проверка backend: http://127.0.0.1:18080/actuator/health
+- Проверка ML: http://127.0.0.1:18000/health
+- PostgreSQL: `127.0.0.1:15432`, база `meditron_final_test`.
+
+Подготовленная база содержит результаты тестов, включая 89 локальных протоколов.
+Она находится в игнорируемой `.local/`; передавать эту папку вместе с исходниками не нужно.
+По умолчанию локальные сервисы слушают только localhost.
+
+Остановка:
+
+```powershell
+.\scripts\Stop-Local.ps1
+```
+
+## Отправить свой DOCX через бэкенд
+
+```powershell
+cd C:\hackaton\final
+.\ml\.venv\Scripts\python.exe scripts/submit_protocol.py --file "C:\hackaton\src\протоколы\протоколы молочная железа\молочн железа (4).docx" --study-type BREAST
+```
+
+Скрипт создаёт нового вымышленного пациента и идентификаторы, отправляет файл именно
+в backend, ждёт callback и печатает JSON из backend. `studyDate` в этом демо — текущая
+дата, возраст условный. Для реальных метаданных и исправлений используйте `--metadata`:
+
+```powershell
+.\ml\.venv\Scripts\python.exe scripts/submit_protocol.py --file "C:\путь\протокол.docx" --metadata "C:\путь\metadata.json"
+```
+
+Формат JSON, версии и аннулирование: [инструкция интеграции](docs/integration.md).
+
+## Запуск на другой машине
+
+Вариант с Docker (PostgreSQL + backend + ML):
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build -d
+docker compose ps
+```
+
+Порты Docker по умолчанию: backend `8080`, ML `8000`, PostgreSQL `5432`.
+При использовании скриптов передайте `--backend http://127.0.0.1:8080`.
+Данные PostgreSQL и очередь ML сохраняются в разных именованных томах.
+Конфигурация Compose проверена; сборка и запуск контейнеров на этом компьютере
+не выполнены из-за ошибки запуска Docker Desktop. Сквозные испытания проведены
+на настоящих процессах Java/Python и PostgreSQL, без подмены бэкенда.
+
+Вариант без Docker: Java 21+, Maven, Python 3.12 и PostgreSQL 16.
+
+```powershell
+# Остановить работающий backend перед пересборкой JAR на Windows.
+cd backend
+mvn package
+cd ..
+py -3.12 -m venv ml/.venv
+.\ml\.venv\Scripts\python.exe -m pip install -r ml/requirements-lock.txt
+# Создать отдельную БД в своей PostgreSQL, затем:
+.\scripts\Start-Local.ps1 -SkipPostgres -PostgresPort 5432 -Database meditron -DbUser meditron -DbPassword "ваш пароль"
+```
+
+Для этого компьютера portable PostgreSQL скачана из
+[официального каталога EDB](https://www.enterprisedb.com/download-postgresql-binaries)
+и инициализирована отдельно; системная служба не устанавливалась.
+
+## Проверки
+
+Используйте отдельную демонстрационную базу: интеграционные тесты создают пациентов.
+
+```powershell
+cd C:\hackaton\final
+Push-Location ml
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+Pop-Location
+Push-Location backend
+mvn test
+Pop-Location
+.\ml\.venv\Scripts\python.exe -X utf8 tests/integration.py
+# Дополнительно прогнать все локальные DOCX через backend → ML → backend:
+.\ml\.venv\Scripts\python.exe -X utf8 tests/integration.py --corpus "C:\hackaton\src\протоколы"
+```
+
+Проверка отключения и перезапуска сервисов на отдельных портах:
+
+```powershell
+$env:DB_URL="jdbc:postgresql://127.0.0.1:15432/meditron_final_test"
+$env:DB_USER="meditron"
+$env:DB_PASSWORD="meditron-local-test"
+.\ml\.venv\Scripts\python.exe tests/resilience.py --java "C:\Program Files\Java\jdk-25\bin\java.exe"
+```
+
+[Отчёт проверки](docs/verification.md) перечисляет результаты и покрытие эндпоинтов.
+Машинные отчёты и логи находятся в `.local/`.
+
+## Состав и границы реализации
+
+| Папка | Содержимое |
+|---|---|
+| `backend/` | Приём DOCX, HTTP-клиент ML, callback, PostgreSQL, правила, инбокс, действия врача |
+| `ml/` | DOCX-парсер, извлечение фактов по справочнику, проверка контракта, SQLite, HTTP API, 165 тестов |
+| `scripts/` | Локальный запуск/остановка и отправка DOCX через backend |
+| `tests/` | Сквозные HTTP-проверки, все реализованные API, восстановление после сбоев |
+| `docs/` | Контракты, инструкция, отчёт; `imported-backend/` — исходные README архива |
+| `frontend/` | Только README из архива; готового приложения в архиве нет |
+
+Бэкенд рассчитывает направление, уровень и срок для находок, сохраняет подтверждения
+врача. Исполнение маршрутов, шаги, уведомления, таймеры эскалации и frontend ещё
+не реализованы в полученном проекте; `routes` возвращается пустым. API авторизации
+также нет. Это проверенная локальная связка для хакатона, а не законченная система МИС.
+
+Медицинский YAML сохранён без изменения порогов. В нём, например, BI-RADS ≥ 5 даёт
+срок 3 дня, но наследует `level: PLANNED`; интерфейс получит именно эти значения.
+Это особенность исходного справочника, которую следует согласовать в следующей версии.

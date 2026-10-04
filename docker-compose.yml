@@ -1,0 +1,59 @@
+name: meditron-final
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-meditron}
+      POSTGRES_USER: ${POSTGRES_USER:-meditron}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-meditron}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-meditron} -d ${POSTGRES_DB:-meditron}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-meditron}
+      DB_USER: ${POSTGRES_USER:-meditron}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-meditron}
+      ML_SERVICE_URL: http://ml:8000
+      DEMO_SEED: "false"
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      start_period: 45s
+      retries: 15
+
+  ml:
+    build: ./ml
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_URL: http://backend:8080
+      ML_DATABASE: /state/events.sqlite3
+    volumes:
+      - mlstate:/state
+    ports:
+      - "127.0.0.1:${ML_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  pgdata:
+  mlstate:

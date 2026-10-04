@@ -1,0 +1,1487 @@
+{
+  "dictionaryVersion": "dict-v2.1",
+  "format": "Ожидаемый ответ ML в формате контракта POST /api/integration/ml/results (только смысловые поля)",
+  "scoring": {
+    "findings": "Совпадение = тот же code + та же attributes.side (если есть в эталоне) + тот же attributes.location (если есть). Остальные атрибуты сравниваются по ключам эталона; лишние атрибуты в ответе ML не штрафуются.",
+    "notTriggered": "Обязательные элементы — проверяются (code + reason). Элементы из optional не обязательны и не штрафуются.",
+    "optional.findings": "Допустимы в findings, не считаются ни TP, ни FP.",
+    "mustNotFind": "Если код из списка попал в findings — это FP ловушки.",
+    "protocolFlags / flags": "Флаги, которые ML должен поставить; recall DISCREPANCY считается отдельно."
+  },
+  "protocols": [
+    {
+      "file": "синт_01_тромбоз_глубоких_вен.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "patient": {
+        "sex": "M",
+        "age": 58
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "attributes": {
+              "side": "left",
+              "floating": true,
+              "occlusive": true,
+              "vein": "бедренная, подколенная, задние большеберцовые"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный хирург / сосудистый хирург, немедленно"
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "reason": "NEGATION",
+            "side": "right"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_02_тромбофлебит_у_соустья.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "patient": {
+        "sex": "F",
+        "age": 47
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+            "attributes": {
+              "side": "left",
+              "vein": "БПВ",
+              "location": "trunk",
+              "distanceToJunctionMm": 20,
+              "floating": false
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный хирург / флеболог, немедленно"
+            }
+          },
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "attributes": {
+              "side": "left",
+              "varicose": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Флеболог / сердечно-сосудистый хирург, 30 дн."
+            }
+          },
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "attributes": {
+              "side": "right",
+              "varicose": true
+            },
+            "flags": [
+              "DISCREPANCY"
+            ],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Флеболог / сердечно-сосудистый хирург, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "reason": "NEGATION"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": "Варикоз справа есть только в описании -> DISCREPANCY"
+    },
+    {
+      "file": "синт_03_тромбофлебит_далее_3см.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "patient": {
+        "sex": "F",
+        "age": 52
+      },
+      "checks": "Экстренная (СРОЧНО)",
+      "expected": {
+        "findings": [
+          {
+            "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+            "attributes": {
+              "side": "right",
+              "vein": "БПВ",
+              "location": "trunk",
+              "distanceToJunctionMm": 180
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "СРОЧНО",
+              "route": "Флеболог / хирург, 1 дн."
+            }
+          },
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "attributes": {
+              "side": "right",
+              "varicose": true,
+              "refluxSource": "СФС",
+              "refluxSec": 2
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Флеболог / сердечно-сосудистый хирург, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "reason": "NEGATION"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_04_острый_холецистит.docx",
+      "studyType": "ABDOMEN",
+      "patient": {
+        "sex": "F",
+        "age": 63
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "ACUTE_CHOLECYSTITIS",
+            "attributes": {
+              "wallThicknessMm": 6,
+              "doubleContour": true,
+              "pericholecysticFluid": true,
+              "murphy": true,
+              "withStones": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный хирург, немедленно"
+            }
+          },
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "location": "gallbladder",
+              "sizeMm": 18,
+              "mobile": false,
+              "sludge": true,
+              "choledochMm": 5
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [
+        "FREE_FLUID"
+      ],
+      "note": "Полоска жидкости у ЖП — атрибут pericholecysticFluid, не FREE_FLUID"
+    },
+    {
+      "file": "синт_05_холедохолитиаз.docx",
+      "studyType": "ABDOMEN",
+      "patient": {
+        "sex": "M",
+        "age": 71
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "location": "choledoch",
+              "sizeMm": 9,
+              "ductsDilated": true,
+              "choledochMm": 12
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный хирург, немедленно"
+            }
+          },
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "location": "gallbladder",
+              "sizeMm": 10,
+              "count": "множественные",
+              "mobile": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 30 дн."
+            }
+          },
+          {
+            "code": "HEPATIC_STEATOSIS",
+            "attributes": {
+              "uncertain": true
+            },
+            "flags": [
+              "DISCREPANCY"
+            ],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Терапевт / гастроэнтеролог, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": "Опечатка «холидох»; повышенная эхогенность печени только в описании"
+    },
+    {
+      "file": "синт_06_внематочная_беременность.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 29
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "ECTOPIC_PREGNANCY",
+            "attributes": {
+              "side": "right",
+              "hcgPositive": true,
+              "uncertain": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный гинеколог, немедленно"
+            }
+          },
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "volumeMl": 30,
+              "echogenic": "со взвесью",
+              "location": "малый таз"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "СРОЧНО",
+              "route": "Гинеколог, 3 дн."
+            }
+          }
+        ],
+        "notTriggered": [
+          {
+            "code": "OVARIAN_LESION",
+            "reason": "NORMAL",
+            "side": "right"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": "Жёлтое тело 18 мм — NORMAL"
+    },
+    {
+      "file": "синт_07_перекрут_придатков.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 24
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "OVARIAN_TORSION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 62,
+              "noFlow": true,
+              "whirlpool": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный гинеколог, немедленно"
+            }
+          },
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "volumeMl": 15,
+              "echogenic": "анэхогенная",
+              "location": "малый таз"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "—",
+              "route": "— (NO_ROUTE, ниже порога)"
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_08_апоплексия_гемоперитонеум.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 31
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "OVARIAN_APOPLEXY",
+            "attributes": {
+              "side": "left",
+              "freeFluidMl": 150
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный гинеколог, немедленно"
+            }
+          },
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "volumeMl": 150,
+              "echogenic": "со сгустками",
+              "beyondPelvis": true,
+              "location": "подпечёночно"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный гинеколог / дежурный хирург, немедленно"
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "left",
+              "functional": true,
+              "sizeMm": 35
+            },
+            "flags": []
+          }
+        ],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": "Геморрагическое жёлтое тело 35 мм — часть апоплексии; OVARIAN_LESION не обязателен и не штрафуется"
+    },
+    {
+      "file": "синт_09_тубоовариальный_абсцесс.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 36
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "TUBO_OVARIAN_ABSCESS",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 58,
+              "iudInPlace": true,
+              "uncertain": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный гинеколог, немедленно"
+            }
+          },
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "volumeMl": 25,
+              "echogenic": "со взвесью",
+              "location": "малый таз"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "СРОЧНО",
+              "route": "Гинеколог, 3 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "IUD_MALPOSITION",
+            "reason": "NORMAL"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": "O-RADS к воспалительному образованию не применяется — флага INCOMPLETE нет"
+    },
+    {
+      "file": "синт_10_рождающийся_узел.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 44
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "figo": 0,
+              "prolapsing": true,
+              "sizeMm": 32
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный гинеколог, немедленно"
+            }
+          },
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "figo": 4,
+              "sizeMm": 22
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Гинеколог, 180 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_11_ущемленная_грыжа.docx",
+      "studyType": "SOFT_TISSUE",
+      "patient": {
+        "sex": "M",
+        "age": 66
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "incarcerated": true,
+              "reducible": false,
+              "obstruction": true,
+              "sizeMm": 16,
+              "content": "петля тонкой кишки"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный хирург, немедленно"
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "HERNIA",
+            "reason": "NEGATION",
+            "side": "left"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_12_камень_мочеточника_обструкция.docx",
+      "studyType": "KIDNEY",
+      "patient": {
+        "sex": "M",
+        "age": 45
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "location": "ureter",
+              "sizeMm": 7,
+              "obstruction": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный уролог, немедленно"
+            }
+          },
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "left",
+              "pelvisMm": 22,
+              "ureterDilated": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Уролог, 7 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_13_свободная_жидкость_сгустки.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 27
+      },
+      "checks": "Экстренная",
+      "expected": {
+        "findings": [
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "volumeMl": 200,
+              "echogenic": "со сгустками",
+              "beyondPelvis": true,
+              "location": "боковой канал"
+            },
+            "flags": [
+              "DISCREPANCY"
+            ],
+            "backendExpected": {
+              "level": "ЭКСТРЕННО",
+              "route": "Дежурный гинеколог / дежурный хирург, немедленно"
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "OVARIAN_LESION",
+            "reason": "NORMAL",
+            "side": "right"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": "В заключении только «свободная жидкость»"
+    },
+    {
+      "file": "синт_14_субмукозная_миома_FIGO1.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 39
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "figo": 1,
+              "deformsCavity": true,
+              "sizeMm": 18
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Оперирующий гинеколог, 7 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_15_O-RADS_4.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 54
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "left",
+              "orads": 4,
+              "solid": true,
+              "septated": true,
+              "vascularized": true,
+              "menopause": true,
+              "sizeMm": 62
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Онкогинеколог, 7 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_16_BI-RADS_5.docx",
+      "studyType": "BREAST",
+      "patient": {
+        "sex": "F",
+        "age": 61
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "birads": 5,
+              "sizeMm": 19,
+              "suspiciousLymphNodes": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Онколог / маммолог-онколог, 3 дн."
+            }
+          }
+        ],
+        "notTriggered": [
+          {
+            "code": "BREAST_LESION",
+            "reason": "NORMAL",
+            "side": "left"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": "BI-RADS 1 слева -> NORMAL"
+    },
+    {
+      "file": "синт_17_EU-TIRADS_4_18мм.docx",
+      "studyType": "THYROID",
+      "patient": {
+        "sex": "F",
+        "age": 45
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "tirads": 4,
+              "tiradsSystem": "EU",
+              "sizeMm": 18
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Эндокринолог, 14 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_18_TI-RADS_4b_Kwak.docx",
+      "studyType": "THYROID",
+      "patient": {
+        "sex": "F",
+        "age": 50
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "tirads": 5,
+              "tiradsRaw": "4b",
+              "tiradsSystem": "KWAK",
+              "sizeMm": 9,
+              "suspiciousFeatures": [
+                "микрокальцинаты"
+              ]
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Эндокринолог, 14 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_19_полип_ЖП_9мм.docx",
+      "studyType": "ABDOMEN",
+      "patient": {
+        "sex": "M",
+        "age": 47
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLBLADDER_POLYP",
+            "attributes": {
+              "sizeMm": 9,
+              "sessile": true,
+              "vascularized": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 14 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "GALLSTONES",
+            "reason": "NEGATION"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_20_камень_ЖП_32мм_60лет.docx",
+      "studyType": "ABDOMEN",
+      "patient": {
+        "sex": "F",
+        "age": 60
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "location": "gallbladder",
+              "sizeMm": 32,
+              "count": 1,
+              "mobile": true,
+              "choledochMm": 5
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 14 дн."
+            }
+          },
+          {
+            "code": "HEPATIC_STEATOSIS",
+            "attributes": {
+              "uncertain": true
+            },
+            "flags": [
+              "DISCREPANCY"
+            ],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Терапевт / гастроэнтеролог, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_21_паховая_грыжа_вправимая.docx",
+      "studyType": "SOFT_TISSUE",
+      "patient": {
+        "sex": "M",
+        "age": 52
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "incarcerated": false,
+              "reducible": true,
+              "sizeMm": 18,
+              "content": "сальник"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 14 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "HERNIA",
+            "reason": "NEGATION",
+            "side": "right"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_22_нефролитиаз_без_обструкции.docx",
+      "studyType": "KIDNEY",
+      "patient": {
+        "sex": "F",
+        "age": 41
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "location": "kidney",
+              "sizeMm": 6,
+              "obstruction": false
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Уролог, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "HYDRONEPHROSIS",
+            "reason": "NEGATION"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_23_остаточная_моча_320.docx",
+      "studyType": "PROSTATE",
+      "patient": {
+        "sex": "M",
+        "age": 74
+      },
+      "checks": "Плановая (нет в архиве)",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 320
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Уролог, 7 дн."
+            }
+          },
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 78,
+              "intravesicalMm": 14
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Уролог, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "HYDRONEPHROSIS",
+            "reason": "NEGATION"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_24_отрицание_тромбоза.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "patient": {
+        "sex": "F",
+        "age": 36
+      },
+      "checks": "Ловушка",
+      "expected": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "reason": "NEGATION"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "reason": "NEGATION"
+          }
+        ]
+      },
+      "mustNotFind": [
+        "DEEP_VEIN_THROMBOSIS"
+      ],
+      "note": ""
+    },
+    {
+      "file": "синт_25_сладж_без_камней.docx",
+      "studyType": "ABDOMEN",
+      "patient": {
+        "sex": "F",
+        "age": 38
+      },
+      "checks": "Ловушка",
+      "expected": {
+        "findings": [
+          {
+            "code": "BILIARY_SLUDGE",
+            "attributes": {},
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Гастроэнтеролог, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [
+          {
+            "code": "GALLSTONES",
+            "reason": "NEGATION"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [
+        "GALLSTONES"
+      ],
+      "note": ""
+    },
+    {
+      "file": "синт_26_после_холецистэктомии.docx",
+      "studyType": "ABDOMEN",
+      "patient": {
+        "sex": "M",
+        "age": 55
+      },
+      "checks": "Ловушка",
+      "expected": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "GALLSTONES",
+            "reason": "POST_SURGERY"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [
+        "GALLSTONES"
+      ],
+      "note": ""
+    },
+    {
+      "file": "синт_27_пупочная_грыжа_без_ущемления.docx",
+      "studyType": "SOFT_TISSUE",
+      "patient": {
+        "sex": "F",
+        "age": 42
+      },
+      "checks": "Ловушка (отрицание признака)",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "incarcerated": false,
+              "reducible": true,
+              "sizeMm": 8,
+              "content": "предбрюшинная клетчатка"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 14 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [],
+      "note": "Грыжа — находка; отрицается только ущемление"
+    },
+    {
+      "file": "синт_28_жёлтое_тело_25мм.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 30
+      },
+      "checks": "Ловушка (норма)",
+      "expected": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "OVARIAN_LESION",
+            "reason": "NORMAL",
+            "side": "left"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [
+        "OVARIAN_LESION"
+      ],
+      "note": ""
+    },
+    {
+      "file": "синт_29_водянка_ЖП.docx",
+      "studyType": "ABDOMEN",
+      "patient": {
+        "sex": "F",
+        "age": 56
+      },
+      "checks": "Код без примеров в архиве",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLBLADDER_HYDROPS",
+            "attributes": {
+              "sizeMm": 128
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 7 дн."
+            }
+          },
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "location": "gallbladder",
+              "sizeMm": 14,
+              "mobile": false,
+              "choledochMm": 4
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Хирург, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [
+          {
+            "code": "ACUTE_CHOLECYSTITIS",
+            "reason": "NEGATION"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [
+        "ACUTE_CHOLECYSTITIS"
+      ],
+      "note": "Ловушка: увеличенный напряжённый ЖП без признаков воспаления — не острый холецистит"
+    },
+    {
+      "file": "синт_30_внутриматочные_синехии.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 34
+      },
+      "checks": "Код без примеров в архиве",
+      "expected": {
+        "findings": [
+          {
+            "code": "INTRAUTERINE_SYNECHIAE",
+            "attributes": {},
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Гинеколог, 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "UTERINE_FIBROID",
+            "reason": "NEGATION"
+          },
+          {
+            "code": "FREE_FLUID",
+            "reason": "NEGATION"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": ""
+    },
+    {
+      "file": "синт_31_низкое_положение_ВМС.docx",
+      "studyType": "PELVIS_FEMALE",
+      "patient": {
+        "sex": "F",
+        "age": 38
+      },
+      "checks": "Код без примеров в архиве",
+      "expected": {
+        "findings": [
+          {
+            "code": "IUD_MALPOSITION",
+            "attributes": {
+              "position": "partialExpulsion",
+              "uncertain": true
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Гинеколог, 14 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "OVARIAN_LESION",
+            "reason": "NORMAL",
+            "side": "right"
+          },
+          {
+            "code": "FREE_FLUID",
+            "reason": "NEGATION"
+          }
+        ]
+      },
+      "mustNotFind": [],
+      "note": "position: допустимо cervical; доминантный фолликул 19 мм — не образование"
+    },
+    {
+      "file": "синт_32_посттромботические_изменения.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "patient": {
+        "sex": "M",
+        "age": 61
+      },
+      "checks": "Код без примеров в архиве",
+      "expected": {
+        "findings": [
+          {
+            "code": "POST_THROMBOTIC_CHANGES",
+            "attributes": {
+              "side": "left",
+              "vein": "бедренная, подколенная",
+              "recanalization": "полная"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Флеболог / сосудистый хирург, 30 дн."
+            }
+          },
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "attributes": {
+              "side": "left",
+              "varicose": false,
+              "refluxSec": 2.5
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "—",
+              "route": "— (NO_ROUTE, ниже порога)"
+            }
+          }
+        ],
+        "notTriggered": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "reason": "NEGATION"
+          }
+        ],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": [
+          {
+            "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+            "reason": "NEGATION"
+          }
+        ]
+      },
+      "mustNotFind": [
+        "DEEP_VEIN_THROMBOSIS"
+      ],
+      "note": "Ловушка: неполная компрессия и пристеночные массы при полной реканализации — не острый ТГВ"
+    },
+    {
+      "file": "синт_33_аневризма_подколенной_артерии.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "patient": {
+        "sex": "M",
+        "age": 68
+      },
+      "checks": "Код без примеров в архиве",
+      "expected": {
+        "findings": [
+          {
+            "code": "UNRECOGNIZED_ABNORMALITY",
+            "attributes": {
+              "text": "Аневризма правой подколенной артерии (24 мм) с пристеночным тромбозом"
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Координатор (ручной разбор), 1 дн."
+            }
+          },
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "right",
+              "artery": "ОБА",
+              "maxStenosisPct": 30
+            },
+            "flags": [],
+            "backendExpected": {
+              "level": "плановый",
+              "route": "Терапевт (коррекция факторов риска), 30 дн."
+            }
+          }
+        ],
+        "notTriggered": [],
+        "protocolFlags": []
+      },
+      "optional": {
+        "findings": [],
+        "notTriggered": []
+      },
+      "mustNotFind": [
+        "DEEP_VEIN_THROMBOSIS"
+      ],
+      "note": "Ловушка: пристеночный тромб в артерии — не тромбоз вен"
+    }
+  ]
+}

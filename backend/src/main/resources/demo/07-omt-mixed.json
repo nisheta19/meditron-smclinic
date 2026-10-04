@@ -1,0 +1,94 @@
+{
+  "resultId": "demo-07",
+  "status": "DONE",
+  "modelVersion": "demo-0.1",
+  "processedAt": "2026-09-10T10:07:00+03:00",
+  "patient": {
+    "externalId": "mis-0007",
+    "fullName": "Пациент 007",
+    "birthDate": "1987-03-03",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-omt-6",
+    "version": 1,
+    "studyType": "PELVIS_FEMALE",
+    "studyDate": "2026-09-10"
+  },
+  "conclusion": "Диффузные изменения миометрия по типу аденомиоза (интрамуральная миома малых размеров, FIGO 4), нельзя исключить патологию эндометрия. Жидкостная структура правого яичника (фолликулярная киста? O-RADS 1), свободная жидкость со взвесью 40 мл.",
+  "conclusionFound": true,
+  "findings": [
+    {
+      "code": "ENDOMETRIAL_POLYP",
+      "evidence": {
+        "text": "нельзя исключить патологию эндометрия"
+      },
+      "attributes": {
+        "uncertain": true,
+        "sizeMm": 11
+      },
+      "confidence": 0.7,
+      "flags": []
+    },
+    {
+      "code": "ADENOMYOSIS",
+      "evidence": {
+        "text": "Диффузные изменения миометрия по типу аденомиоза"
+      },
+      "attributes": {
+        "uncertain": true
+      },
+      "confidence": 0.85,
+      "flags": []
+    },
+    {
+      "code": "UTERINE_FIBROID",
+      "evidence": {
+        "text": "интрамуральная миома малых размеров, FIGO 4"
+      },
+      "attributes": {
+        "figo": 4,
+        "sizeMm": 15
+      },
+      "confidence": 0.9,
+      "flags": []
+    },
+    {
+      "code": "OVARIAN_LESION",
+      "evidence": {
+        "text": "Жидкостная структура правого яичника (фолликулярная киста? O-RADS 1)"
+      },
+      "attributes": {
+        "functional": true,
+        "orads": 1,
+        "sizeMm": 41,
+        "side": "right",
+        "uncertain": true
+      },
+      "confidence": 0.8,
+      "flags": [
+        {
+          "code": "DISCREPANCY",
+          "note": "O-RADS 1 при размере 41 мм — функциональная киста больше 3 см"
+        }
+      ]
+    },
+    {
+      "code": "FREE_FLUID",
+      "evidence": {
+        "text": "свободная жидкость со взвесью 40 мл"
+      },
+      "attributes": {
+        "volumeMl": 40,
+        "echogenic": "со взвесью",
+        "location": "малый таз"
+      },
+      "confidence": 0.85,
+      "flags": []
+    }
+  ],
+  "notTriggered": [],
+  "error": null,
+  "dictionaryVersion": "dict-v2.1",
+  "flags": []
+}

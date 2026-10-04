@@ -1,0 +1,45 @@
+{
+  "resultId": "demo-05",
+  "status": "DONE",
+  "modelVersion": "demo-0.1",
+  "processedAt": "2026-09-09T10:05:00+03:00",
+  "patient": {
+    "externalId": "mis-0005",
+    "fullName": "Пациент 005",
+    "birthDate": "1964-04-14",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-veins-7",
+    "version": 1,
+    "studyType": "LOWER_LIMB_VESSELS",
+    "studyDate": "2026-09-09"
+  },
+  "conclusion": "Несостоятельность ствола БПВ слева с варикозной трансформацией притоков и ствола. Данных за тромбоз поверхностных и глубоких вен нижних конечностей на момент исследования не получено.",
+  "conclusionFound": true,
+  "findings": [
+    {
+      "code": "VENOUS_INSUFFICIENCY",
+      "evidence": {
+        "text": "Несостоятельность ствола БПВ слева с варикозной трансформацией"
+      },
+      "attributes": {
+        "side": "left"
+      },
+      "confidence": 0.93,
+      "flags": []
+    }
+  ],
+  "notTriggered": [
+    {
+      "code": "DEEP_VEIN_THROMBOSIS",
+      "evidence": {
+        "text": "Данных за тромбоз поверхностных и глубоких вен нижних конечностей на момент исследования не получено"
+      },
+      "reason": "NEGATION"
+    }
+  ],
+  "error": null,
+  "dictionaryVersion": "dict-v2.1",
+  "flags": []
+}

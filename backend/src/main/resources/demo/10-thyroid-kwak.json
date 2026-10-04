@@ -1,0 +1,45 @@
+{
+  "resultId": "demo-10",
+  "status": "DONE",
+  "modelVersion": "demo-0.2",
+  "dictionaryVersion": "dict-v2.1",
+  "processedAt": "2026-10-03T10:00:00+03:00",
+  "patient": {
+    "externalId": "mis-0010",
+    "fullName": "Пациент 010",
+    "birthDate": "1976-05-17",
+    "sex": "F"
+  },
+  "protocol": {
+    "externalId": "proto-thyroid-synth-18",
+    "version": 1,
+    "studyType": "THYROID",
+    "studyDate": "2026-10-03"
+  },
+  "conclusion": "Узел левой доли щитовидной железы, TI-RADS 4b.",
+  "conclusionFound": true,
+  "flags": [],
+  "findings": [
+    {
+      "code": "THYROID_NODULE",
+      "evidence": {
+        "text": "Узел левой доли щитовидной железы, TI-RADS 4b"
+      },
+      "attributes": {
+        "tirads": 5,
+        "tiradsRaw": "4b",
+        "tiradsSystem": "KWAK",
+        "sizeMm": 9,
+        "side": "left",
+        "suspiciousFeatures": [
+          "микрокальцинаты"
+        ],
+        "uncertain": false
+      },
+      "confidence": 0.9,
+      "flags": []
+    }
+  ],
+  "notTriggered": [],
+  "error": null
+}

@@ -1,0 +1,38 @@
+{
+  "resultId": "demo-03",
+  "status": "DONE",
+  "modelVersion": "demo-0.1",
+  "processedAt": "2026-09-08T10:03:00+03:00",
+  "patient": {
+    "externalId": "mis-0003",
+    "fullName": "Пациент 003",
+    "birthDate": "1993-11-20",
+    "sex": "M"
+  },
+  "protocol": {
+    "externalId": "proto-gb-16",
+    "version": 1,
+    "studyType": "ABDOMEN",
+    "studyDate": "2026-09-08"
+  },
+  "conclusion": "Образование в желчном пузыре- полип (без динамики по сравнению с УЗИ от 01.2026)",
+  "conclusionFound": true,
+  "findings": [
+    {
+      "code": "GALLBLADDER_POLYP",
+      "evidence": {
+        "text": "размером 3,6*3,5 мм -полип"
+      },
+      "attributes": {
+        "sizeMm": 3.6,
+        "growth": false
+      },
+      "confidence": 0.92,
+      "flags": []
+    }
+  ],
+  "notTriggered": [],
+  "error": null,
+  "dictionaryVersion": "dict-v2.1",
+  "flags": []
+}
