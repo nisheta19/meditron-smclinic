@@ -9,6 +9,7 @@ import Patients from './pages/Patients';
 import PatientCard from './pages/PatientCard';
 import Dictionary from './pages/Dictionary';
 import Dashboard from './pages/Dashboard';
+import Login, { isAuthed } from './pages/Login';
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
@@ -29,6 +30,7 @@ export default function App() {
   const [rev, setRev] = useState(0);
   const [toasts, setToasts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [authed, setAuthed] = useState(isAuthed);
   const [ready, setReady] = useState(USE_MOCK);
   // 721–1000 px: меню сворачивается само; на телефоне — нижняя панель, класс collapsed не нужен
   const narrow = useMedia('(min-width: 721px) and (max-width: 1000px)');
@@ -42,6 +44,9 @@ export default function App() {
     setTimeout(() => setToasts((t) => t.filter((x) => x.key !== key)), 4000);
   }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [section, id]);
+
+  // Авторизация: без входа показывается только страница логина (документация /open-api доступна без входа)
+  if (!authed && section !== 'open-api' && !isDocsPath()) return <Login onLogin={() => setAuthed(true)} />;
 
   if (section === 'open-api' || isDocsPath()) {
     return <Suspense fallback={<p className="state">Загружаем документацию API…</p>}><ApiDocs /></Suspense>;
