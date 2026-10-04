@@ -68,17 +68,29 @@ cd C:\hackaton\final
 Вариант с Docker (PostgreSQL + backend + ML):
 
 ```powershell
-Copy-Item .env.example .env
-docker compose up --build -d
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+docker compose up --build -d --wait --wait-timeout 180
 docker compose ps
 ```
 
 Порты Docker по умолчанию: backend `8080`, ML `8000`, PostgreSQL `5432`.
 При использовании скриптов передайте `--backend http://127.0.0.1:8080`.
 Данные PostgreSQL и очередь ML сохраняются в разных именованных томах.
-Конфигурация Compose проверена; сборка и запуск контейнеров на этом компьютере
-не выполнены из-за ошибки запуска Docker Desktop. Сквозные испытания проведены
-на настоящих процессах Java/Python и PostgreSQL, без подмены бэкенда.
+Все три Docker-контейнера собраны и запущены с состоянием
+`healthy`. В Docker прошли 165 ML-тестов, 18 JUnit-тестов, 12 сквозных сценариев
+и обработка 89/89 исходных DOCX. Проверены все 15 API backend и 4 API ML.
+Подробные команды, сохранение данных и повторные проверки: [Docker](docs/docker.md).
+
+На этом Windows-компьютере у Docker Desktop воспроизводится ошибка временных
+сокетов после перезапуска. Для запуска с её устранением подготовлен скрипт:
+
+```powershell
+.\scripts\Start-Docker.ps1 -RepairDesktop
+```
+
+Он останавливает Desktop, сохраняет только две проверенные папки временных сокетов,
+создаёт новые и запускает проект. Базы, образы и настройки сохраняются.
+При работающем Docker достаточно `.\scripts\Start-Docker.ps1`.
 
 Вариант без Docker: Java 21+, Maven, Python 3.12 и PostgreSQL 16.
 

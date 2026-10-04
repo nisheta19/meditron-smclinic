@@ -53,9 +53,118 @@
     "attempts": 3
   },
   "dockerComposeConfigValid": true,
-  "dockerContainersExecuted": false,
+  "dockerContainersExecuted": true,
   "backendJarSha256": "764ce132e7d5facbe83c34ade3afee7abf985b49354ba56550940f23b0835256",
   "mlPythonSha256": "244f137d811e9ddb98c6deea78b13dd5c63e67fa15e5078429f95579a19135d7",
   "dictionarySha256": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b",
-  "sourceArchiveSha256": "58eb8c1f4539c71286291f874203bc00b34b1df8e87a32620618f105594f903c"
+  "sourceArchiveSha256": "58eb8c1f4539c71286291f874203bc00b34b1df8e87a32620618f105594f903c",
+  "initialVerificationEnvironment": "native",
+  "docker": {
+    "checkedAt": "2026-10-04T13:24:44.126445+00:00",
+    "passed": true,
+    "desktopVersion": "4.69.0",
+    "engineVersion": "29.4.0",
+    "composeVersion": "5.1.1",
+    "pythonVersion": "Python 3.12.15",
+    "javaVersion": "21.0.12.1",
+    "postgresVersion": "postgres (PostgreSQL) 16.15",
+    "mlTests": 165,
+    "backendTests": 18,
+    "integrationScenarios": 12,
+    "httpRequests": 741,
+    "apiCoverage": {
+      "backend": {
+        "covered": [
+          "DELETE /api/findings/{findingId}",
+          "GET /api/dictionary/findings",
+          "GET /api/integration/events/status",
+          "GET /api/patients",
+          "GET /api/patients/{patientId}",
+          "GET /api/patients/{patientId}/findings",
+          "GET /api/ping",
+          "GET /api/protocols/{protocolId}",
+          "PATCH /api/findings/{findingId}",
+          "POST /api/integration/events",
+          "POST /api/integration/events/retry",
+          "POST /api/integration/ml/results",
+          "POST /api/integration/protocols",
+          "POST /api/patients/{patientId}/findings",
+          "POST /api/patients/{patientId}/findings/confirm"
+        ],
+        "uncovered": [],
+        "total": 15
+      },
+      "ml": {
+        "covered": [
+          "GET /api/mis/events/{event_id}",
+          "GET /health",
+          "POST /api/mis/events",
+          "POST /api/mis/events/{event_id}/retry"
+        ],
+        "uncovered": [],
+        "total": 4
+      }
+    },
+    "corpusDocuments": 89,
+    "corpusDelivered": 89,
+    "findingsStoredAfterBackendRules": 137,
+    "corpusMedianSeconds": 0.525,
+    "corpusMaxSeconds": 0.76,
+    "outageChecks": {
+      "checkedAt": "2026-10-04T13:08:35.782855+00:00",
+      "passed": true,
+      "checks": [
+        "gateway_502_without_ml",
+        "same_event_succeeds_after_ml_recovery",
+        "callback_retained_when_backend_down",
+        "sqlite_queue_and_result_id_survive_container_recreation",
+        "automatic_delivery_after_backend_recovery",
+        "one_patient_one_protocol_no_duplicates",
+        "postgres_and_sqlite_survive_recreation_of_all_containers"
+      ],
+      "attempts": 3
+    },
+    "desktopRecovery": {
+      "ordinaryDesktopRestartPassed": false,
+      "reason": "Docker Desktop recreates inaccessible Windows AF_UNIX runtime sockets",
+      "workaround": "scripts/Start-Docker.ps1 -RepairDesktop",
+      "recoveryRunsPassed": 2,
+      "settingsAndVolumesReset": false,
+      "patientPageAndMlJournalPreserved": true,
+      "deliveryCountBeforeAndAfterRecovery": 109
+    },
+    "postRecoveryIntegrationScenarios": 12,
+    "postRecoveryHttpRequests": 206,
+    "sampleDocxRoundtrip": {
+      "status": "DONE",
+      "delivery": "delivered"
+    },
+    "services": [
+      {
+        "service": "backend",
+        "state": "running",
+        "health": "healthy",
+        "ports": "127.0.0.1:8080->8080/tcp"
+      },
+      {
+        "service": "ml",
+        "state": "running",
+        "health": "healthy",
+        "ports": "127.0.0.1:8000->8000/tcp"
+      },
+      {
+        "service": "postgres",
+        "state": "running",
+        "health": "healthy",
+        "ports": "127.0.0.1:5432->5432/tcp"
+      }
+    ],
+    "images": {
+      "meditron-final-backend": "sha256:536c0be41ce0e2ee7a3846805ad148e24ed735674ae80766d0d5174d12f3f13f",
+      "meditron-final-ml": "sha256:a1b7f873ec536d9367e659343838dba0cf7cd05e4c47f5aa792e3b81fb440efd",
+      "postgres:16-alpine": "sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea"
+    },
+    "backendJarSha256": "1c38679c16a9488ee8f80bd1fdeda7b4292bd97f858b6e10a2a5a6df437d127d",
+    "dictionarySha256": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b"
+  }
 }
