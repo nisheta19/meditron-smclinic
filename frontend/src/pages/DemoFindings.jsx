@@ -66,7 +66,7 @@ export default function Findings() {
     && (!search || `${r.patientName} ${r.findingName} ${r.card?.cardNumber ?? ''}`.toLowerCase().includes(search.toLowerCase())));
   const chipFn = CHIPS.find(([k]) => k === chip)[2];
   const visible = scoped.filter(chipFn);
-  const { sorted, sort, toggle } = useSort(visible, COLS.map((c) => ({ key: c.key, get: c.sort })), { key: 'due', dir: 1 });
+  const { sorted, sort, toggle } = useSort(visible, COLS.map((c) => ({ key: c.key, get: c.sort })), { key: null, dir: 1 });
 
   const ids = sorted.map((r) => r.routeId);
   const all = ids.length > 0 && ids.every((id) => sel.sel.has(id));
@@ -90,7 +90,7 @@ export default function Findings() {
 
       {sel.sel.size > 0 && (
         <div className="bulkbar" role="region" aria-label="Действия с выбранными">
-          <span>Выбрано: <b>{sel.sel.size}</b></span>
+          <span>Выбрано: {sel.sel.size}</span>
           <button className="chip" onClick={sel.clear}>Снять выделение</button>
           <button className="btn-main" onClick={() => setNotifyIds([...sel.sel])}>Отправить уведомление</button>
         </div>

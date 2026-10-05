@@ -86,6 +86,9 @@ try {
     await page.reload();
     await page.locator('.npc-event').first().click();
     await page.locator('.pc-row.confirmed').waitFor();
+    const confirmed = page.locator('.pc-row.confirmed').first();
+    assert.equal(await confirmed.locator('.review-level button, .sq').count(), 0);
+    assert.equal(await confirmed.getByRole('button', { name: /^Действия:/ }).count(), 1);
   });
   await test('manual fields follow YAML, typed BI-RADS, remove finding', async () => {
     await card('breast');
@@ -104,7 +107,21 @@ try {
     assert.equal(manual.attributes.uncertain, false);
     assert.equal('category' in manual.attributes, false);
     const row = page.locator(`[data-finding-id="${manual.id}"]`);
-    await row.getByRole('button', { name: /^Удалить:/ }).click();
+    await row.getByRole('button', { name: /^Действия:/ }).click();
+    await page.getByRole('menuitem', { name: 'Редактировать', exact: true }).click();
+    const edit = page.getByRole('dialog', { name: 'Редактировать находку', exact: true });
+    assert.equal(await edit.getByLabel('BI-RADS', { exact: true }).inputValue(), '4');
+    assert.equal(await edit.getByLabel('Под вопросом', { exact: true }).inputValue(), 'false');
+    await edit.getByLabel('Размер, мм', { exact: true }).fill('16');
+    await edit.getByLabel('Комментарий', { exact: true }).fill('Проверка редактирования');
+    await edit.getByRole('button', { name: 'Сохранить', exact: true }).click();
+    await edit.waitFor({ state: 'hidden' });
+    const saved = (await api(`/api/patients/${fixture.cases.breast.id}`)).currentFindings.find(f => f.id === manual.id);
+    assert.equal(saved.status, 'CONFIRMED'); assert.equal(saved.attributes.sizeMm, 16);
+    assert.equal(saved.attributes.uncertain, false); assert.equal(saved.comment, 'Проверка редактирования');
+    await page.reload(); await page.locator('.npc-event').first().click();
+    await row.getByRole('button', { name: /^Действия:/ }).click();
+    await page.getByRole('menuitem', { name: 'Удалить', exact: true }).click();
     await page.getByRole('dialog').getByLabel('Причина').fill('Проверка интерфейса');
     await page.getByRole('dialog').getByRole('button', { name: 'Удалить', exact: true }).click();
     await until(async () => !(await api(`/api/patients/${fixture.cases.breast.id}`)).currentFindings.some((f) => f.id === manual.id));
@@ -125,13 +142,18 @@ try {
       assert.ok(!text.includes('Значимых находок нет'));
     }
   });
-  await test('missing conclusion warning and normal notTriggered', async () => {
+  await test('missing conclusion and normal notTriggered remain available in More', async () => {
     await card('missing');
-    assert.ok((await page.locator('.protocol-review').innerText()).includes('не найдено заключение'));
+    await page.locator('.npc-more').click();
+    await page.getByRole('dialog').getByText(/не найдено заключение/).waitFor();
+    await page.getByRole('dialog').getByRole('button', { name: 'Закрыть', exact: true }).first().click();
     await page.getByRole('button',{name:'Закрыть карточку'}).click();
     await card('normal'); assert.equal(await page.locator('.findings-table .pc-row').count(), 0);
     assert.equal(await page.locator('.pc-main .pc-nt').count(), 0);
-    assert.ok(await page.locator('.protocol-review .pc-nt').count());
+    assert.equal(await page.locator('.protocol-review .pc-nt').count(), 0);
+    await page.locator('.npc-more').click();
+    await page.getByRole('dialog').locator('.pc-nt').waitFor();
+    await page.getByRole('dialog').getByRole('button', { name: 'Закрыть', exact: true }).first().click();
     await page.getByRole('button',{name:'Закрыть карточку'}).click();
   });
   await test('previous version read-only, independent old protocol editable', async () => {

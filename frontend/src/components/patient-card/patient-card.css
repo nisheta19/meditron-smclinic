@@ -8,7 +8,7 @@
 :where(.npc-page, .npc-card, .npc-search) :is(h1,h2,h3,p,ul,dl,dd) { margin:0; padding:0; }
 :where(.npc-page, .npc-card, .npc-search) button { font:inherit; color:inherit; border:0; margin:0; padding:0; background:none; text-align:left; cursor:pointer; }
 :where(.npc-page, .npc-card, .npc-search) button:disabled { opacity:1; cursor:default; }
-:where(.npc-page, .npc-card, .npc-search) button:focus-visible { outline:2px solid var(--npc-green); outline-offset:4px; }
+:where(.npc-page, .npc-card, .npc-search) button:focus-visible { outline:1px solid #818181; outline-offset:2px; }
 :where(.npc-page, .npc-card, .npc-search) svg { flex:none; display:block; }
 .npc-search { height:64px; border-radius:24px; background:#fff; display:flex; align-items:center; gap:24px; padding:11px 11px 11px 24px; }
 .npc-search input { flex:1; min-width:0; border:0; outline:none; padding:0; background:transparent; color:#000; font:400 16px/19px 'Patient Inter',sans-serif; }
@@ -172,6 +172,8 @@
 .protocol-review .pc-row { margin:0 0 8px; background:#f5f5f5; color:#000; }
 .protocol-review .pc-row-main { padding:9px 14px 9px 25px; min-height:52px; }
 .protocol-review .pc-row-main > span:first-child { color:#818181; }
+.protocol-review .f-cols > span { min-width:0; overflow-wrap:anywhere; }
+.protocol-review .pc-row-main > span:nth-child(-n+2) { padding-right:12px; }
 .protocol-review .pc-actions { display:flex; gap:10px; justify-self:end; }
 .protocol-review .pc-actions .sq { width:24px; height:24px; border-radius:7px; display:grid; place-items:center; padding:0; }
 .protocol-review .pc-actions .sq svg { width:18px; height:18px; }

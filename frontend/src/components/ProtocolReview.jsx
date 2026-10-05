@@ -7,6 +7,7 @@ import { ArrowDown, CheckMark, Close } from './Icons';
 import { Dialog, ErrorBox, ReasonDialog } from './ui';
 import ProtocolText, { focusEvidence } from './ProtocolText';
 import AddFindingDialog from './AddFindingDialog';
+import FindingMenu from './FindingMenu';
 const list = v => Array.isArray(v) ? v.join(', ') : v;
 const ORGAN = { PELVIS_FEMALE:'Органы малого таза', ABDOMEN:'Брюшная полость', BREAST:'Молочные железы', THYROID:'Щитовидная железа', PROSTATE:'Предстательная железа', LOWER_LIMB_VESSELS:'Сосуды нижних конечностей', KIDNEY:'Почки', SOFT_TISSUE:'Мягкие ткани' };
 
@@ -32,6 +33,8 @@ export default function ProtocolReview({ card, protocolId, routes = [], onChange
   };
   if (action?.type === 'add') return <AddFindingDialog studyType={p?.studyType} onClose={() => setAction(null)}
     onSubmit={body => act(() => api.addFinding(card.id, { ...body, protocolId, doctor: CURRENT_DOCTOR }), 'Находка добавлена')} />;
+  if (action?.type === 'edit') return <AddFindingDialog studyType={p?.studyType} finding={action.f} onClose={() => setAction(null)}
+    onSubmit={body => act(() => api.updateFinding(action.f.id, { ...body, doctor: CURRENT_DOCTOR }), 'Находка сохранена')} />;
   if (action?.type === 'reject') return <ReasonDialog title={`Отклонить: ${action.f.name}`} label="Комментарий врача" action="Отклонить" onClose={() => setAction(null)}
     onSubmit={comment => act(() => api.updateFinding(action.f.id, { status:'REJECTED', comment, doctor:CURRENT_DOCTOR }), 'Находка отклонена')} />;
   if (action?.type === 'remove') return <ReasonDialog title={`Удалить: ${action.f.name}`} label="Причина" action="Удалить" danger onClose={() => setAction(null)}
@@ -52,16 +55,12 @@ export default function ProtocolReview({ card, protocolId, routes = [], onChange
     <div className="pc-protocol">{proto.error ? <ErrorBox error={proto.error} onRetry={proto.reload} /> : !p ? <p>Загружаем протокол…</p> :
       <ProtocolText text={p.text ?? p.conclusion} findings={findings} notTriggered={[]} names={names} />}</div>
     {p?.error && <p role="alert">{p.error.message} ({p.error.code})</p>}
-    {p?.status === 'DONE' && !p.conclusionFound && <p>В протоколе не найдено заключение.</p>}
-    {p?.flags?.length > 0 && <Flags flags={p.flags} />}
     <h2 className="review-findings-heading">Находки</h2>
     <FindingsTable findings={findings} protoById={Object.fromEntries(protocols.map(x => [x.id,x]))} fallbackStudy={p?.studyType} editable={editable}
       emptyText={!p || proto.error ? 'Результат пока недоступен.' : p.status === 'FAILED' ? 'Извлечь находки не удалось.' : p.status === 'ANNULLED' ? 'Протокол аннулирован.' : undefined}
       onConfirm={f => act(() => api.updateFinding(f.id, {status:'CONFIRMED', doctor:CURRENT_DOCTOR}), 'Находка подтверждена').catch(() => {})}
-      onReject={f => setAction({type:'reject',f})} onRemove={f => setAction({type:'remove',f})} />
+      onReject={f => setAction({type:'reject',f})} onEdit={f => setAction({type:'edit',f})} onRemove={f => setAction({type:'remove',f})} />
     <button className="pc-add" disabled={!editable} onClick={() => setAction({type:'add'})}>+ Добавить</button>
-    {p?.notTriggered?.length > 0 && <details className="pc-nt"><summary>Почему не стало находкой ({p.notTriggered.length})</summary>
-      <ul>{p.notTriggered.map((n,i) => <li key={i}><q>{n.evidence.text}</q><span>{n.name ?? names[n.code] ?? n.code}: {NOT_TRIGGERED[n.reason] ?? n.reason}</span></li>)}</ul></details>}
     <section className="review-routes"><h2>Маршрут</h2>
       <div className="review-route-head"><span>Специалист</span><span>Этап</span><span>Посетить до</span></div>
       {routes.map(r => <div className="review-route" key={r.id}>
@@ -120,10 +119,13 @@ export function MoreDialog({ c, protocol: p, names, onClose }) {
 export function StandaloneFindingReview({ finding:f, onChanged, onClose }) {
   const run = useAction();
   const [remove,setRemove] = useState(false);
+  const [edit,setEdit] = useState(false);
+  if (edit) return <AddFindingDialog finding={f} onClose={onClose}
+    onSubmit={async body => {await run(() => api.updateFinding(f.id,{...body,doctor:CURRENT_DOCTOR}),'Находка сохранена',true);onChanged();}} />;
   if (remove) return <ReasonDialog title={`Удалить: ${f.name}`} label="Причина" action="Удалить" danger onClose={() => setRemove(false)}
     onSubmit={async reason => {await run(() => api.removeFinding(f.id,reason || undefined),'Находка удалена',true);onChanged();onClose();}} />;
   return <Dialog title={f.name} onClose={onClose} actions={<>
-    {f.status === 'CONFIRMED' && <button className="btn danger" onClick={() => setRemove(true)}>Удалить находку</button>}
+    {f.status === 'CONFIRMED' && <FindingMenu name={f.name} onEdit={() => setEdit(true)} onRemove={() => setRemove(true)} />}
     <button className="btn primary" onClick={onClose}>Закрыть</button>
   </>}>
     <p>Находка добавлена отдельно от протокола.</p>
@@ -134,15 +136,15 @@ export function StandaloneFindingReview({ finding:f, onChanged, onClose }) {
 }
 
 /* ---------- Находки ---------- */
-function FindingsTable({ findings, protoById, fallbackStudy, editable, emptyText, onConfirm, onReject, onRemove }) {
-  const [sort, setSort] = useState({ key: 'organ', dir: 1 });
+function FindingsTable({ findings, protoById, fallbackStudy, editable, emptyText, onConfirm, onReject, onEdit, onRemove }) {
+  const [sort, setSort] = useState(null);
   const [open, setOpen] = useState(null);
   const organ = (f) => ORGAN[protoById[f.protocolId]?.studyType ?? fallbackStudy] ?? '—';
   const levelName = f => f.status === 'REJECTED' ? 'Отклонена' : ({EMERGENCY:'Экстренно',URGENT:'Срочно',PLANNED:'Планово'})[f.level] ?? '—';
-  const rows = [...findings].sort((a, b) => (sort.key === 'organ' ? organ(a).localeCompare(organ(b), 'ru') : sort.key === 'level' ? levelName(a).localeCompare(levelName(b),'ru') : a.name.localeCompare(b.name, 'ru')) * sort.dir);
+  const rows = sort ? [...findings].sort((a, b) => (sort.key === 'organ' ? organ(a).localeCompare(organ(b), 'ru') : sort.key === 'level' ? levelName(a).localeCompare(levelName(b),'ru') : a.name.localeCompare(b.name, 'ru')) * sort.dir) : findings;
   const head = (key, label) => (
-    <button className={`col-head${sort.key === key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key, dir: s.key === key ? -s.dir : 1 }))}>
-      {label}<ArrowDown size={12} className={sort.key === key && sort.dir < 0 ? 'asc' : undefined} />
+    <button className={`col-head${sort?.key === key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key, dir: s?.key === key ? -s.dir : 1 }))}>
+      {label}<ArrowDown size={12} className={sort?.key === key && sort.dir > 0 ? 'asc' : undefined} />
     </button>
   );
   if (!findings.length) return <p className="pc-empty">{emptyText ?? '—'}</p>;
@@ -160,17 +162,16 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, emptyText
               onKeyDown={(e) => e.key === 'Enter' && e.target === e.currentTarget && e.currentTarget.click()}>
               <span>{organ(f)}</span>
               <span className="pc-fname">{f.name}</span>
-              <span className="review-level"><button disabled title="Срочность рассчитывается по справочнику" className={`review-pill${f.level === 'EMERGENCY' && f.status !== 'REJECTED' ? ' npc-danger' : ''}`}><span>{levelName(f)}</span><PillChevron /></button></span>
+              <span className={`review-level${f.level === 'EMERGENCY' && f.status !== 'REJECTED' ? ' npc-danger' : ''}`}>
+                {f.status === 'SUGGESTED' ? <button disabled title="Срочность рассчитывается по справочнику" className="review-pill"><span>{levelName(f)}</span><PillChevron /></button> : levelName(f)}
+              </span>
               {editable && (
                 <span className="pc-actions" onClick={(e) => e.stopPropagation()}>
                   {f.status === 'SUGGESTED' && <>
                     <button className="sq ok" aria-label={`Подтвердить: ${f.name}`} title="Подтвердить" onClick={() => onConfirm(f)}><CheckMark size={24} /></button>
                     <button className="sq no" aria-label={`Отклонить: ${f.name}`} title="Отклонить" onClick={() => onReject(f)}><Close size={24} /></button>
                   </>}
-                  {f.status === 'CONFIRMED' && <>
-                    <span className="sq ok static" title="Подтверждена"><CheckMark size={24} /></span>
-                    <button className="sq no" aria-label={`Удалить: ${f.name}`} title="Удалить находку" onClick={() => onRemove(f)}><Close size={24} /></button>
-                  </>}
+                  {f.status === 'CONFIRMED' && <FindingMenu name={f.name} onEdit={() => onEdit(f)} onRemove={() => onRemove(f)} />}
                 </span>
               )}
             </div>

@@ -43,7 +43,7 @@ export default function PatientCard({ id }) {
       {protocolId && <ProtocolReview key={protocolId} card={c} protocolId={protocolId} routes={patient.routes.filter(r => r.source.protocolId === protocolId)} onChanged={reload} onSave={saveReview} />}
     </PatientCardPage>
     {dialog?.type === 'finding' && <StandaloneFindingReview finding={dialog.finding} onChanged={reload} onClose={() => setDialog(null)} />}
-    {dialog?.type === 'more' && <PatientMore card={c} onClose={() => setDialog(null)} />}
+    {dialog?.type === 'more' && <PatientMore card={c} protocolId={protocolId} onClose={() => setDialog(null)} />}
     {dialog?.type === 'notify' && <ClinicalNotifyDialog routes={dialog.routes ?? routes} onClose={() => setDialog(null)} onDone={reload} />}
     {dialog?.type === 'route' && <Dialog title={dialog.event.title} wide onClose={() => setDialog(null)}>
       <p>{dialog.event.source.stageTitle}</p><div className="npc-card-detail"><RouteDetails details={dialog.event.details} /></div>
@@ -56,8 +56,9 @@ export default function PatientCard({ id }) {
   </>;
 }
 
-function PatientMore({card, onClose}) {
-  const protocol = useAsync(() => card.currentProtocol ? api.protocol(card.currentProtocol.id) : Promise.resolve(null), [card.currentProtocol?.id]);
+function PatientMore({card, protocolId, onClose}) {
+  const selectedId = protocolId ?? card.currentProtocol?.id;
+  const protocol = useAsync(() => selectedId ? api.protocol(selectedId) : Promise.resolve(null), [selectedId]);
   if (protocol.error) return <Dialog title="Данные пациента" onClose={onClose}><ErrorBox error={protocol.error} onRetry={protocol.reload} /></Dialog>;
   return <MoreDialog c={card} protocol={protocol.data} names={{}} onClose={onClose} />;
 }

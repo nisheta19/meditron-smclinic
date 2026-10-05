@@ -5,11 +5,11 @@ import { useAsync } from '../lib/hooks';
 import { fieldType, parseAttributes } from '../lib/findingFields';
 import { Dialog, ErrorBox } from './ui';
 
-export default function AddFindingDialog({ studyType, onSubmit, onClose }) {
+export default function AddFindingDialog({ studyType, finding, onSubmit, onClose }) {
   const [q, setQ] = useState('');
-  const [code, setCode] = useState('');
-  const [values, setValues] = useState({});
-  const [comment, setComment] = useState('');
+  const [code, setCode] = useState(finding?.code ?? '');
+  const [values, setValues] = useState(finding?.attributes ?? {});
+  const [comment, setComment] = useState(finding?.comment ?? '');
   const [busy, setBusy] = useState(false);
   const data = useAsync(() => api.dictionary({ studyType, full: !USE_MOCK }), [studyType]);
   const entries = (Array.isArray(data.data) ? data.data : data.data?.findings ?? []).filter((e) => e.active);
@@ -21,17 +21,17 @@ export default function AddFindingDialog({ studyType, onSubmit, onClose }) {
   const submit = async () => {
     if (!entry || error || busy) return;
     setBusy(true);
-    try { await onSubmit({ code, attributes, comment: comment.trim() || undefined }); onClose(); }
+    try { await onSubmit({ code, attributes, comment: finding ? comment.trim() : comment.trim() || undefined }); onClose(); }
     catch { setBusy(false); }
   };
-  return <Dialog title="Добавить находку" wide onClose={onClose} actions={<>
+  return <Dialog title={finding ? 'Редактировать находку' : 'Добавить находку'} wide onClose={onClose} actions={<>
     <button className="btn ghost" onClick={onClose}>Отмена</button>
-    <button className="btn primary" disabled={!entry || !!error || busy || data.loading} onClick={submit}>Добавить находку</button>
+    <button className="btn primary" disabled={!entry || !!error || busy || data.loading || !!data.error} onClick={submit}>{finding ? 'Сохранить' : 'Добавить находку'}</button>
   </>}>
     <label className="field"><span>Поиск в словаре</span><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Название, код или синоним" autoFocus /></label>
     {data.error ? <ErrorBox error={data.error} onRetry={data.reload} /> : <div className="pick-list" role="listbox" aria-label="Тип находки">
       {filtered.map((e) => <button key={e.code} role="option" aria-selected={code === e.code} className="pick"
-        onClick={() => { setCode(e.code); setValues({}); }}><b>{e.name}</b><small>{e.code}</small></button>)}
+        onClick={() => { if (e.code !== code) { setCode(e.code); setValues(e.code === finding?.code ? finding.attributes ?? {} : {}); } }}><b>{e.name}</b><small>{e.code}</small></button>)}
       {!filtered.length && <p className="muted">{data.loading ? 'Загружаем справочник…' : 'В словаре нет подходящих типов.'}</p>}
     </div>}
     {entry && <div className="form-grid">{(entry.attributes ?? []).map((key) => {

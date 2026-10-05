@@ -46,7 +46,7 @@ export default function DoctorMenu({ name, onLogout, onError, onOpenChange }) {
   return <div ref={root} className={`doctor-menu${open ? ' is-open' : ''}`} onBlur={event => {
     if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) changeOpen(false);
   }}>
-    <button ref={trigger} type="button" className="nav-user doctor-menu-trigger" title={name}
+    <button ref={trigger} type="button" className="nav-user doctor-menu-trigger"
       aria-label={`Профиль врача: ${name}`} aria-expanded={open} aria-controls={open ? menuId : undefined}
       onClick={() => changeOpen(!open)}>{identity}</button>
     {open && <div id={menuId} className="doctor-menu-card" aria-label="Профиль врача">
