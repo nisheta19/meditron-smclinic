@@ -109,7 +109,7 @@ export default function PatientCard({ id }) {
         </section>
 
         <span className="pc-vline" aria-hidden="true" />
-        <History c={c} protocols={protocols} findings={allFindings} onOpenProtocol={(pid) => { setSelected(pid); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+        <History c={c} protocols={protocols} findings={allFindings} current={protocolId} onOpenProtocol={(pid) => { setSelected(pid); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
       </div>
 
       {dialog?.type === 'more' && <MoreDialog c={c} onClose={() => setDialog(null)} />}
@@ -323,13 +323,14 @@ function RouteBlock({ route: r, findings, onChanged, onNotify }) {
 /* ---------- История приёмов ---------- */
 const HISTORY_LIMIT = 10;   // макет: 10 записей, остальные — под «Подробнее»
 
-export function History({ c, protocols, findings, onOpenProtocol }) {
+/** current — протокол, открытый сейчас в карточке: его запись не активна (переходить некуда) */
+export function History({ c, protocols, findings, current, onOpenProtocol }) {
   const [all, setAll] = useState(false);
   const routes = [...c.routes, ...c.history.routes];
   const events = [
     // Исследование → «Результат» (заключение протокола)
     ...protocols.map((p) => ({ key: p.id, at: p.receivedAt, title: 'Исследование', text: p.conclusion || `${STUDY[p.studyType]}: ${PROCESSING[p.status]?.[0]}`,
-      hint: STUDY[p.studyType], onClick: () => onOpenProtocol(p.id) })),
+      hint: STUDY[p.studyType], onClick: p.id === current ? undefined : () => onOpenProtocol(p.id) })),
     // Приём специалиста → его название; неявка и пропуск — подписью
     ...routes.flatMap((r) => r.steps.filter((s) => s.completedAt || s.status === 'NO_SHOW').map((s) => ({
       key: s.id, at: s.completedAt ?? r.createdAt, title: stepLabel(s.name),
