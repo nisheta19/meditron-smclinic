@@ -1,26 +1,56 @@
-// «Отправка пушей из находок» (макет Untitled.fig): та же карточка пациента, но вместо протокола —
-// маршрут (кто и когда должен посетить), уведомления (отправлено / прочитано / записался) и находки со статусом.
+// «Отправка пушей из находок» (макеты Untitled.fig → pushes.fig): карточка пациента, где вместо протокола —
+// маршруты (строка на маршрут, раскрывается: находки, история этапов, решение врача, открытые задачи),
+// уведомления по всем маршрутам (кому, когда отправлено и прочитано, записался ли) и находки со статусом.
 // Открывается по строке из «Находок»: #/push/<patientId>/<routeId>.
 import { useMemo, useState } from 'react';
 import { api, caps } from '../api';
-import { LEVEL, fmtStamp, now, nWord, stepLabel, DAYS } from '../lib/format';
+import { LEVEL, STEP, fmtStamp, now, stepLabel } from '../lib/format';
 import { go, useAsync } from '../lib/hooks';
-import { ArrowDown, CloseLg } from '../components/Icons';
+import { ArrowDown, Chevron, CloseLg } from '../components/Icons';
 import { SearchBar } from '../components/kit';
 import { ErrorBox } from '../components/ui';
 import NotifyDialog from '../components/NotifyDialog';
-import { History, MoreDialog, ORGAN, PatientInfo, longDate } from './PatientCard';
+import { History, MoreDialog, ORGAN, PatientInfo } from './PatientCard';
 
 const RANK = { EMERGENCY: 0, URGENT: 1, PLANNED: 2 };
-const longStamp = (v) => `${longDate(v)} · ${new Date(v).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+const OPEN = ['ACTIVE', 'NOT_ENGAGED'];
+const dmy = (v) => (v ? new Date(v).toLocaleDateString('ru-RU') : '');
+const dm = (v) => (v ? `${new Date(v).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })} · ${new Date(v).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}` : '');
+const TYPE = { SURGICAL_STANDARD: 'Хирургический', CONSULTATION: 'Наблюдение', ONCOLOGY_FAST: 'Онкологический', URGENT_ESCALATION: 'Экстренный' };
+
+/** Что видит врач в колонке «Этап» и в раскрытой строке маршрута */
+export function routeView(r, findings) {
+  const cur = r.steps.find((s) => s.id === r.currentStepId);
+  const consult = r.steps.find((s) => s.type === 'SPECIALIST_CONSULTATION');
+  const spec = findings[r.findingIds[0]]?.targetSpecialty ?? (consult ? stepLabel(consult.name) : 'Маршрут');
+  const stage = r.status === 'COMPLETED' ? 'Маршрут завершён' : r.status === 'CANCELLED' ? 'Маршрут отменён' : !cur ? '—'
+    : cur.type === 'SPECIALIST_CONSULTATION' ? { PENDING: 'Ждёт записи', NOTIFIED: 'Уведомлён, ждёт записи', BOOKED: 'Записан на консультацию', NO_SHOW: 'Неявка на консультацию' }[cur.status] ?? STEP[cur.status]?.[0]
+    : cur.type === 'HOSPITALIZATION_REFERRAL' ? 'Направлен на госпитализацию'
+    : cur.type === 'HOSPITALIZATION' ? (cur.status === 'BOOKED' ? 'Госпитализация назначена' : 'Ждёт госпитализации')
+    : cur.type === 'FOLLOW_UP' ? 'Ждёт контрольного визита' : cur.type === 'BIOPSY' ? 'Ждёт биопсии'
+    : cur.type === 'ESCALATION' ? 'Экстренная эскалация' : stepLabel(cur.name);
+  const visited = r.steps.filter((s) => s.completedAt).map((s) => s.completedAt).sort().at(-1) ?? null;
+  const overdue = OPEN.includes(r.status) && cur && cur.dueDate < new Date(now()).toISOString().slice(0, 10) && !['BOOKED', 'COMPLETED'].includes(cur.status);
+  // Решение врача — по тому, куда маршрут пошёл после консультации
+  const next = consult?.status === 'COMPLETED' ? r.steps[r.steps.indexOf(consult) + 1] : null;
+  const decision = consult?.status !== 'COMPLETED' ? 'Ждёт консультации'
+    : !next ? 'Маршрут завершён' : next.type === 'HOSPITALIZATION_REFERRAL' ? 'Оперативное лечение показано'
+    : next.type === 'BIOPSY' ? 'Показана биопсия' : next.type === 'FOLLOW_UP' ? 'Динамическое наблюдение' : stepLabel(next.name);
+  const TASK = { SPECIALIST_CONSULTATION: ['Записать на консультацию', 'координатор'], HOSPITALIZATION_REFERRAL: ['Оформить направление на госпитализацию', 'врач'],
+    HOSPITALIZATION: ['Назначить дату госпитализации', 'менеджер'], FOLLOW_UP: ['Записать на контрольный визит', 'координатор'],
+    BIOPSY: ['Назначить биопсию', 'врач'], ESCALATION: ['Связаться с пациентом срочно', 'дежурный врач'] };
+  const task = OPEN.includes(r.status) && cur && TASK[cur.type] ? `${TASK[cur.type][0]} — ${TASK[cur.type][1]}, до ${dmy(cur.dueDate).slice(0, 5)}` : 'Нет';
+  return { cur, spec, type: TYPE[r.templateCode] ?? r.templateCode, stage, visited, overdue, decision, task };
+}
 
 export default function PushCard({ id, routeId }) {
   const card = useAsync(() => api.patient(id), [id]);
   const [dialog, setDialog] = useState(null);
   const c = card.data;
-  const routes = c ? [...c.routes, ...c.history.routes] : [];
-  const route = routes.find((r) => r.id === routeId) ?? c?.routes[0] ?? null;
-  const notes = useAsync(() => (route && caps.notifications ? api.notifications(route.id) : Promise.resolve([])), [route?.id, card.data]);
+  const routes = useMemo(() => (c ? [...c.routes, ...c.history.routes] : []), [c]);
+  const notes = useAsync(async () => (caps.notifications
+    ? (await Promise.all(routes.map((r) => api.notifications(r.id).then((l) => l.map((n) => ({ ...n, routeId: n.routeId ?? r.id }))).catch(() => [])))).flat()
+    : []), [routes]);
 
   if (card.error) return <ErrorBox error={card.error} onRetry={card.reload} />;
   if (!c) return <p className="state">Загружаем карточку пациента…</p>;
@@ -29,8 +59,12 @@ export default function PushCard({ id, routeId }) {
   const allFindings = Object.fromEntries([...c.currentFindings, ...c.history.findings].map((f) => [f.id, f]));
   const findings = c.currentFindings.filter((f) => ['SUGGESTED', 'CONFIRMED'].includes(f.status));
   const protoById = Object.fromEntries(protocols.map((p) => [p.id, p]));
-  const urgent = route?.steps.find((s) => s.id === route.currentStepId)?.type === 'ESCALATION';
-  const canNotify = route && ['ACTIVE', 'NOT_ENGAGED'].includes(route.status) && !urgent;
+  const views = Object.fromEntries(routes.map((r) => [r.id, routeView(r, allFindings)]));
+  // Кому можно написать: открытые маршруты без экстренной эскалации; выбранный в «Находках» — первым
+  const targets = routes.filter((r) => OPEN.includes(r.status) && views[r.id].cur?.type !== 'ESCALATION')
+    .sort((a, b) => (b.id === routeId) - (a.id === routeId))
+    .map((r) => ({ routeId: r.id, specialist: views[r.id].spec, label: `${views[r.id].spec} · ${views[r.id].type}` }));
+  const reload = () => { card.reload(); notes.reload(); };
 
   return (
     <>
@@ -46,13 +80,13 @@ export default function PushCard({ id, routeId }) {
           <PatientInfo c={c} onMore={() => setDialog('more')} />
 
           <h2 className="pc-subtitle">Маршрут</h2>
-          {route ? <RouteSteps route={route} /> : <p className="pc-empty">{caps.routes ? 'Маршрут по пациенту ещё не составлен.' : 'Сервер пока не поддерживает маршруты.'}</p>}
+          {routes.length ? <RoutesTable routes={routes} views={views} findings={allFindings} notes={notes.data ?? []} focus={routeId} />
+            : <p className="pc-empty">{caps.routes ? 'Маршрут по пациенту ещё не составлен.' : 'Сервер пока не поддерживает маршруты.'}</p>}
 
           <h2 className="pc-subtitle">Уведомления</h2>
-          {route && <NotesTable notes={notes.data ?? []} route={route} loading={notes.loading} />}
-          {urgent && <p className="callout red pc-note">Экстренная находка: пациенту сообщения не отправляются, задача передана дежурному врачу.</p>}
-          <button className="btn-main push-send" disabled={!canNotify} onClick={() => setDialog('notify')}
-            title={canNotify ? undefined : 'Нет активного маршрута для уведомления'}>Отправить уведомление</button>
+          <NotesTable notes={notes.data ?? []} routes={routes} views={views} loading={notes.loading} />
+          <button className="btn-main push-send" disabled={!targets.length} onClick={() => setDialog('notify')}
+            title={targets.length ? undefined : 'Нет открытого маршрута, по которому можно написать пациенту'}>Отправить уведомление</button>
 
           <h2 className="pc-subtitle">Находки</h2>
           <FindingsTable findings={findings} protoById={protoById} fallbackStudy={c.currentProtocol?.studyType} />
@@ -62,8 +96,114 @@ export default function PushCard({ id, routeId }) {
       </div>
 
       {dialog === 'more' && <MoreDialog c={c} onClose={() => setDialog(null)} />}
-      {dialog === 'notify' && <NotifyDialog routeIds={[route.id]} onClose={() => setDialog(null)} onDone={() => { card.reload(); notes.reload(); }} />}
+      {dialog === 'notify' && <NotifyDialog targets={targets} onClose={() => setDialog(null)} onDone={reload} />}
     </>
+  );
+}
+
+function SortHead({ cols, sort, setSort }) {
+  return (
+    <div className="pt-head">
+      {cols.map((c) => (c.get ? (
+        <button key={c.key} className={`col-head${sort.key === c.key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key: c.key, dir: s.key === c.key ? -s.dir : 1 }))}>
+          {c.label}<ArrowDown size={12} className={sort.key === c.key && sort.dir > 0 ? 'asc' : undefined} />
+        </button>
+      ) : <span key={c.key} />))}
+    </div>
+  );
+}
+const sortRows = (rows, cols, sort) => {
+  const col = cols.find((c) => c.key === sort.key);
+  return [...rows].sort((a, b) => { const x = col.get(a), y = col.get(b); return (typeof x === 'string' ? x.localeCompare(y, 'ru') : x - y) * sort.dir; });
+};
+
+/** Маршруты: строка на маршрут, по стрелке раскрывается подробная карточка */
+function RoutesTable({ routes, views, findings, notes, focus }) {
+  const [open, setOpen] = useState(() => new Set(focus ? [focus] : []));
+  const [sort, setSort] = useState({ key: 'due', dir: 1 });
+  const cols = [
+    { key: 'spec', label: 'Специалист и тип', get: (r) => views[r.id].spec },
+    { key: 'stage', label: 'Этап', get: (r) => views[r.id].stage },
+    { key: 'due', label: 'Посетить до', get: (r) => views[r.id].cur?.dueDate ?? '9999' },
+    { key: 'visit', label: 'Дата посещения', get: (r) => views[r.id].visited ?? '' },
+    { key: 'more', label: '' },
+  ];
+  const toggle = (id) => setOpen((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  return (
+    <div className="pt pt-routes">
+      <SortHead cols={cols} sort={sort} setSort={setSort} />
+      {sortRows(routes, cols, sort).map((r) => {
+        const v = views[r.id], isOpen = open.has(r.id);
+        const history = [
+          [r.createdAt, 'Маршрут создан'],
+          ...notes.filter((n) => n.routeId === r.id).map((n) => [n.sentAt, 'Уведомлён']),
+          ...r.steps.filter((s) => s.completedAt).map((s) => [s.completedAt, `${stepLabel(s.name)}: ${STEP[s.status][0].toLowerCase()}`]),
+        ].sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+        return (
+          <div key={r.id} className={`pt-route${isOpen ? ' open' : ''}${r.id === focus ? ' focus' : ''}`}>
+            <button className="pt-row" aria-expanded={isOpen} onClick={() => toggle(r.id)}>
+              <span><b>{v.spec}</b><small>{v.type}</small></span>
+              <span>{v.stage}</span>
+              <span className={v.overdue ? 'alarm' : ''}>{v.cur ? `до ${dmy(v.cur.dueDate)}` : '—'}</span>
+              <span>{v.visited ? fmtStamp(v.visited) : '—'}</span>
+              <Chevron size={12} className="pt-chev" />
+            </button>
+            {isOpen && (
+              <div className="pt-more">
+                <div><small>Находки маршрута</small>
+                  <ul>{r.findingIds.map((fid) => findings[fid]).filter(Boolean).map((f) => <li key={f.id}>{f.name}</li>)}</ul></div>
+                <div><small>История этапов</small>
+                  <ul>{history.map(([at, what], i) => <li key={i}><time>{dm(at)}</time> {what}</li>)}</ul></div>
+                <div><small>Решение врача</small><p>{v.decision}</p></div>
+                <div><small>Открытые задачи</small><p>{v.task}</p></div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Уведомления по всем маршрутам пациента */
+function NotesTable({ notes, routes, views, loading }) {
+  const [sort, setSort] = useState({ key: 'sent', dir: -1 });
+  const byRoute = Object.fromEntries(routes.map((r) => [r.id, r]));
+  // «Запись»: после последнего уведомления по маршруту пациент записался на консультацию
+  const lastByRoute = {};
+  notes.forEach((n) => { if (!lastByRoute[n.routeId] || n.sentAt > lastByRoute[n.routeId].sentAt) lastByRoute[n.routeId] = n; });
+  const booked = (n) => {
+    const consult = byRoute[n.routeId]?.steps.find((s) => s.type === 'SPECIALIST_CONSULTATION');
+    return ['BOOKED', 'COMPLETED'].includes(consult?.status) && lastByRoute[n.routeId]?.id === n.id;
+  };
+  const read = (n) => (n.readAt === undefined ? null : n.readAt && Date.parse(n.readAt) <= now() ? n.readAt : false);
+  const cols = [
+    { key: 'text', label: 'Сообщение', get: (n) => n.text },
+    { key: 'route', label: 'Маршрут', get: (n) => views[n.routeId]?.spec ?? '' },
+    { key: 'sent', label: 'Дата отправки', get: (n) => n.sentAt },
+    { key: 'read', label: 'Прочитано', get: (n) => read(n) || '' },
+    { key: 'booked', label: 'Запись', get: (n) => +booked(n) },
+  ];
+  const rows = sortRows(notes, cols, sort);
+  return (
+    <div className="pt pt-notes">
+      <SortHead cols={cols} sort={sort} setSort={setSort} />
+      {rows.map((n) => {
+        const r = read(n);
+        return (
+          <div key={n.id} className="pt-row">
+            <span className="pt-msg" title={n.text}>{n.text}</span>
+            <span>{views[n.routeId]?.spec ?? '—'}</span>
+            <span>{fmtStamp(n.sentAt)}</span>
+            <span>{r ? fmtStamp(r) : <em className="muted">{r === null ? '—' : 'Не прочитано'}</em>}</span>
+            <span className="pt-booked">{booked(n)
+              ? <svg className="pt-yes" width="24" height="24" viewBox="0 0 24 24" aria-label="Записался"><path d="M6 12.5l4 4 8-8" /></svg>
+              : <svg className="pt-no" width="24" height="24" viewBox="0 0 24 24" aria-label="Не записался"><path d="M8 8l8 8M16 8l-8 8" /></svg>}</span>
+          </div>
+        );
+      })}
+      {!notes.length && <p className="pc-empty">{loading ? 'Загружаем…' : caps.notifications ? 'Уведомлений ещё не было.' : 'Сервер пока не отдаёт уведомления.'}</p>}
+    </div>
   );
 }
 
@@ -87,44 +227,6 @@ function SortTable({ cols, rows, initial, rowKey, className, empty }) {
       {!rows.length && <p className="pc-empty">{empty}</p>}
     </div>
   );
-}
-
-function RouteSteps({ route }) {
-  const today = new Date(now()).toISOString().slice(0, 10);
-  const steps = route.steps.map((s, i) => ({ ...s, n: i + 1 }));
-  const visit = (s) => {
-    if (s.completedAt) return [longStamp(s.completedAt), ''];
-    if (s.status === 'BOOKED') return ['Записан', 'muted'];
-    if (s.status === 'NO_SHOW') return ['Неявка', 'alarm'];
-    if (['SKIPPED', 'CANCELLED'].includes(s.status)) return ['Пропущен', 'muted'];
-    const late = Math.round((Date.parse(today) - Date.parse(s.dueDate)) / 864e5);
-    return late > 0 ? [`Просрочен на ${nWord(late, DAYS)}`, 'alarm'] : ['Ожидает', 'muted'];
-  };
-  const cols = [
-    { key: 'n', label: '№', get: (s) => s.n, cell: (s) => `${s.n}.` },
-    { key: 'spec', label: 'Специалист', get: (s) => stepLabel(s.name), cell: (s) => stepLabel(s.name) },
-    { key: 'due', label: 'Должен посетить', get: (s) => s.dueDate, cell: (s) => <><i>до</i> {longDate(s.dueDate)}</> },
-    { key: 'visit', label: 'Дата посещения', get: (s) => s.completedAt ?? s.dueDate, cell: (s) => { const [t, cls] = visit(s); return <em className={cls}>{t}</em>; } },
-  ];
-  return <SortTable className="pt-route" cols={cols} rows={steps} initial={{ key: 'n', dir: 1 }} rowKey={(s) => s.id} />;
-}
-
-function NotesTable({ notes, route, loading }) {
-  const consult = route.steps.find((s) => s.type === 'SPECIALIST_CONSULTATION');
-  const booked = ['BOOKED', 'COMPLETED'].includes(consult?.status);
-  const lastId = [...notes].sort((a, b) => a.sentAt.localeCompare(b.sentAt)).at(-1)?.id;
-  const read = (n) => (n.readAt === undefined ? null : n.readAt && Date.parse(n.readAt) <= now() ? n.readAt : false);
-  const cols = [
-    { key: 'text', label: 'Сообщение', get: (n) => n.text, cell: (n) => <span className="pt-msg" title={n.text}>{n.text}</span> },
-    { key: 'sent', label: 'Дата отправки', get: (n) => n.sentAt, cell: (n) => fmtStamp(n.sentAt) },
-    { key: 'read', label: 'Дата прочтения', get: (n) => read(n) || '', cell: (n) => { const r = read(n); return r ? longStamp(r) : <em className="muted">{r === null ? '—' : 'Не прочитано'}</em>; } },
-    // «Запись»: после последнего уведомления пациент записался — галочка; иначе крестик
-    { key: 'booked', label: 'Запись', get: (n) => +(booked && n.id === lastId), cell: (n) => (booked && n.id === lastId
-      ? <svg className="pt-yes" width="24" height="24" viewBox="0 0 24 24" aria-label="Записался"><path d="M6 12.5l4 4 8-8" /></svg>
-      : <svg className="pt-no" width="24" height="24" viewBox="0 0 24 24" aria-label="Не записался"><path d="M8 8l8 8M16 8l-8 8" /></svg>) },
-  ];
-  return <SortTable className="pt-notes" cols={cols} rows={notes} initial={{ key: 'sent', dir: 1 }} rowKey={(n) => n.id}
-    empty={loading ? 'Загружаем…' : caps.notifications ? 'Уведомлений ещё не было.' : 'Сервер пока не отдаёт уведомления.'} />;
 }
 
 function FindingsTable({ findings, protoById, fallbackStudy }) {

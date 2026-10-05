@@ -1,4 +1,5 @@
-// HTTP-клиент по контракту openapi.yaml (v0.2.0). Каждая функция = один эндпоинт.
+// HTTP-клиент по контракту docs/openapi.yaml (v0.4.0). Каждая функция = один эндпоинт.
+// Авторизация backend: cookie-сессия (credentials: 'include') + CSRF-заголовок для изменяющих запросов.
 
 const env = import.meta.env;
 const override = new URLSearchParams(location.search).get('mock'); // ?mock=1 / ?mock=0
@@ -16,16 +17,33 @@ export class ApiError extends Error {
   get notImplemented() { return [404, 405].includes(this.status) && !this.code; }
 }
 
-async function request(method, path, { query, body } = {}) {
+/** Событие «сессия истекла / нет входа» — App показывает страницу авторизации */
+export const UNAUTHORIZED = 'sm-route:unauthorized';
+
+// CSRF: GET /api/auth/csrf → { token, headerName }. После входа Spring выдаёт новый токен — перечитываем.
+let csrf = null;
+async function loadCsrf(force = false) {
+  if (csrf && !force) return csrf;
+  const res = await fetch(`${API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => null);
+  csrf = res?.ok ? await res.json().catch(() => null) : null;
+  return csrf;
+}
+
+async function request(method, path, { query, body } = {}, retried = false) {
   const qs = new URLSearchParams(Object.entries(query ?? {}).filter(([, v]) => v !== undefined && v !== '' && v !== null && v !== false));
+  const headers = {};
+  if (body) headers['Content-Type'] = 'application/json';
+  if (method !== 'GET') { const t = await loadCsrf(); if (t?.token) headers[t.headerName || 'X-XSRF-TOKEN'] = t.token; }
   const res = await fetch(`${API_URL}${path}${qs.size ? `?${qs}` : ''}`, {
-    method,
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
+    method, credentials: 'include', headers, body: body ? JSON.stringify(body) : undefined,
   }).catch(() => { throw new ApiError(0, 'NETWORK', `Сервер ${API_URL} недоступен`); });
   if (res.status === 204) return null;
   const data = await res.json().catch(() => null);
   if (!res.ok) {
+    // 403 на изменяющем запросе — чаще всего устаревший CSRF-токен: обновляем и повторяем один раз
+    if (res.status === 403 && method !== 'GET' && !retried) { await loadCsrf(true); return request(method, path, { query, body }, true); }
+    if (res.status === 401 && !path.startsWith('/api/auth/')) dispatchEvent(new Event(UNAUTHORIZED));
+    if (res.status === 401) throw new ApiError(401, 'UNAUTHORIZED', data?.message || 'Нужно войти в систему');
     // Ошибки контракта приходят как { code, message }; для нереализованных путей Spring отдаёт свой формат без code
     const missing = [404, 405].includes(res.status) && !data?.code;
     throw new ApiError(res.status, data?.code, missing ? `Сервер пока не поддерживает ${method} ${path}` : data?.message);
@@ -50,6 +68,10 @@ const send = (method) => (p, body, query) => request(method, p, { body, query })
 const [post, patch, put, del] = ['POST', 'PATCH', 'PUT', 'DELETE'].map(send);
 
 export const httpApi = {
+  // Авторизация (единственный тестовый аккаунт backend)
+  login: async (body) => { await loadCsrf(true); const acc = await post('/api/auth/login', body); await loadCsrf(true); return acc; },
+  me: () => get('/api/auth/me'),
+  logout: async () => { await post('/api/auth/logout').catch(() => null); csrf = null; },
   // Пациенты и протоколы
   patients: (params) => get('/api/patients', params),
   patient: (id) => get(`/api/patients/${id}`).then(flatCard),

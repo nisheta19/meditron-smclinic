@@ -1,17 +1,37 @@
 openapi: 3.0.3
 info:
   title: СМ-Клиника — маршрутизация по результатам УЗИ
-  version: 0.2.0
+  version: 0.4.0
   description: |
     Контракт API для фронта по утверждённой схеме:
     МИС → ML (извлекает текст и находки) → POST /api/integration/ml/results →
     карточка пациента → врач подтверждает / добавляет / удаляет находки →
     составление маршрута(ов) → уведомления → трекинг.
     Пациенты и протоколы создаются только из результатов ML; фронт их не создаёт.
+
+    0.3.0 (словарь dict-v2): у находок появились level (EMERGENCY / URGENT / PLANNED) и flags,
+    у протоколов — flags, у пациента в инбоксе — maxLevel; инбокс сортируется: экстренные сверху.
+
+    0.4.0 — сверка с работающим backend (openapi-runtime.yaml):
+    - авторизация: cookie-сессия + CSRF-заголовок (securitySchemes), запросы фронта идут с credentials;
+    - исправлены описания, которые YAML читал как лишние ключи (Protocol.text, Finding.*, NotTriggered.matchedRule, DictionaryEntry.urgent);
+    - объявлены теги Auth / MIS / System, добавлены методы интеграции МИС, /api/ping и параметр full у словаря;
+    - методы с x-implemented: false backend пока не реализует (отвечает 404/405): маршруты, уведомления,
+      шаблоны маршрутов и правка словаря. Фронт определяет это автоматически и работает с находками без маршрутов;
+    - у уведомления добавлено readAt (дата прочтения) — нужно экрану «Отправка уведомлений».
 servers:
   - url: http://localhost:8080
+    description: backend напрямую
+  - url: /
+    description: тот же адрес, что и фронт (прокси /api в Vite / nginx)
 tags:
+  - name: Auth
+    description: Вход врача — единственный тестовый аккаунт, cookie-сессия и CSRF
   - name: Integration
+    description: Вход от ML (не для фронта)
+  - name: MIS
+    description: Передача протоколов из МИС в ML (не для фронта)
+  - name: System
   - name: Patients
   - name: Protocols
   - name: Findings
@@ -21,6 +41,62 @@ tags:
   - name: Notifications
 
 paths:
+  # ---------- Авторизация (cookie-сессия + CSRF) ----------
+  /api/auth/csrf:
+    get:
+      tags: [Auth]
+      operationId: csrf
+      summary: CSRF-токен для изменяющих запросов
+      description: |
+        Возвращает имя заголовка и токен. Фронт отправляет его во всех POST / PATCH / PUT / DELETE.
+        После входа Spring выдаёт новый токен — его нужно запросить заново.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Csrf' }
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Вход врача (создаёт cookie-сессию)
+      security: [ { csrfHeader: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Login' }
+      responses:
+        '200':
+          description: Вход выполнен, cookie сессии установлена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      operationId: me
+      summary: Текущий пользователь — проверка сессии при открытии приложения
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Выход (закрывает сессию)
+      security: [ { cookieAuth: [], csrfHeader: [] } ]
+      responses:
+        '204': { description: Сессия закрыта }
+
   # ---------- Вход от ML (не для фронта) ----------
   /api/integration/ml/results:
     post:
@@ -47,9 +123,13 @@ paths:
       tags: [Patients]
       summary: Список пациентов для архива
       parameters:
+        - { name: sortBy, in: query, schema: { type: string, enum: [default, patient, finding, due, receivedAt, studyDate], default: default }, description: Сортировка до пагинации; пустые значения последние }
+        - { name: sortDirection, in: query, schema: { type: string, enum: [asc, desc], default: asc } }
         - { name: search, in: query, schema: { type: string }, description: Поиск по ФИО / номеру карты }
-        - { name: reviewState, in: query, schema: { $ref: '#/components/schemas/ReviewState' }, description: «Новые» = PENDING; ATTENTION — протокол не прочитан или без заключения }
+        - { name: reviewState, in: query, schema: { $ref: '#/components/schemas/ReviewState' }, description: «Новые» = PENDING; ATTENTION — протокол не прочитан или без заключения (флаг NO_CONCLUSION) }
+        - { name: needsRouteReview, in: query, schema: { type: boolean }, description: 'true — только случаи без определённого направления; false — остальные; без параметра — все пациенты' }
         - { name: studyType, in: query, schema: { $ref: '#/components/schemas/StudyType' } }
+        - { name: maxLevel, in: query, schema: { $ref: '#/components/schemas/FindingLevel' }, description: Чип «Экстренные» — maxLevel=EMERGENCY }
         - { name: dateFrom, in: query, schema: { type: string, format: date }, description: По дате исследования }
         - { name: dateTo, in: query, schema: { type: string, format: date } }
         - { name: page, in: query, schema: { type: integer, default: 0 } }
@@ -175,6 +255,7 @@ paths:
       parameters:
         - { name: studyType, in: query, schema: { $ref: '#/components/schemas/StudyType' } }
         - { name: q, in: query, schema: { type: string }, description: Поиск по названию / синонимам }
+        - { name: full, in: query, schema: { type: boolean, default: false }, description: 'true — полные записи для ML (атрибуты, правила извлечения); фронту не нужно' }
       responses:
         '200':
           description: OK
@@ -182,6 +263,7 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/DictionaryEntry' } }
     post:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Dictionary]
       summary: Добавить тип находки (новый триггер без изменения кода)
       requestBody:
@@ -198,6 +280,7 @@ paths:
 
   /api/dictionary/findings/{code}:
     put:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Dictionary]
       summary: Изменить тип находки
       parameters: [ { name: code, in: path, required: true, schema: { type: string } } ]
@@ -216,6 +299,7 @@ paths:
   # ---------- Маршруты ----------
   /api/route-templates:
     get:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Routes]
       summary: Шаблоны маршрутов
       responses:
@@ -227,6 +311,7 @@ paths:
 
   /api/patients/{patientId}/routes:
     get:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Routes]
       summary: Маршруты пациента
       parameters: [ { $ref: '#/components/parameters/patientId' } ]
@@ -237,6 +322,7 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/Route' } }
     post:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Routes]
       summary: Составить маршрут(ы) по подтверждённым находкам
       description: |
@@ -263,6 +349,7 @@ paths:
 
   /api/routes:
     get:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Tracking]
       summary: Трекинг — все маршруты для координатора
       parameters:
@@ -281,6 +368,7 @@ paths:
 
   /api/routes/{routeId}/notifications:
     get:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Notifications]
       summary: История уведомлений пациенту по маршруту
       parameters: [ { $ref: '#/components/parameters/routeId' } ]
@@ -291,6 +379,7 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/Notification' } }
     post:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Notifications]
       summary: Кнопка «Пуш» — отправить уведомление (имитация)
       description: |
@@ -317,6 +406,7 @@ paths:
 
   /api/routes/{routeId}:
     get:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Routes]
       summary: Маршрут с этапами
       parameters: [ { $ref: '#/components/parameters/routeId' } ]
@@ -328,6 +418,7 @@ paths:
               schema: { $ref: '#/components/schemas/Route' }
         '404': { $ref: '#/components/responses/NotFound' }
     delete:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Routes]
       summary: Отменить маршрут
       parameters:
@@ -338,6 +429,7 @@ paths:
 
   /api/routes/{routeId}/steps/{stepId}:
     patch:
+      x-implemented: false   # backend пока не реализует (404/405); фронт скрывает зависящие функции
       tags: [Routes]
       summary: Сменить статус этапа (записан, приём состоялся, неявка…)
       parameters:
@@ -360,7 +452,67 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Route' }
 
+  # ---------- МИС → ML (не для фронта; есть в backend) ----------
+  /api/integration/protocols:
+    post:
+      tags: [MIS]
+      summary: Передать DOCX в ML (multipart — metadata JSON + file DOCX)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                metadata: { type: object }
+                file: { type: string, format: binary }
+      responses:
+        '200': { description: Принято, content: { application/json: { schema: { type: object } } } }
+  /api/integration/events:
+    post:
+      tags: [MIS]
+      summary: Передать JSON-событие МИС в ML, включая аннулирование без файла
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses:
+        '200': { description: Принято, content: { application/json: { schema: { type: object } } } }
+  /api/integration/events/retry:
+    post:
+      tags: [MIS]
+      summary: Повторить доставку результата после устранения ошибки backend
+      parameters: [ { name: eventId, in: query, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object } } } }
+  /api/integration/events/status:
+    get:
+      tags: [MIS]
+      summary: Статус обработки и доставки callback; успех — delivery=delivered
+      parameters: [ { name: eventId, in: query, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object } } } }
+  /api/ping:
+    get:
+      tags: [System]
+      summary: Проверка, что backend запущен
+      security: []
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object, properties: { status: { type: string, example: ok } } } } } }
+
+security:
+  - cookieAuth: []
+    csrfHeader: []
+
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+      description: "Cookie сессии после POST /api/auth/login. Фронт шлёт запросы с credentials: 'include' (или через прокси с того же адреса)"
+    csrfHeader:
+      type: apiKey
+      in: header
+      name: X-XSRF-TOKEN
+      description: Токен из GET /api/auth/csrf (поле token, имя заголовка — headerName). Обязателен для POST / PATCH / PUT / DELETE
   parameters:
     patientId: { name: patientId, in: path, required: true, schema: { type: string } }
     protocolId: { name: protocolId, in: path, required: true, schema: { type: string } }
@@ -368,6 +520,11 @@ components:
     routeId: { name: routeId, in: path, required: true, schema: { type: string } }
 
   responses:
+    Unauthorized:
+      description: Нет сессии или она истекла — нужно войти
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
     NotFound:
       description: Не найдено
       content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
@@ -379,6 +536,38 @@ components:
       content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   schemas:
+    Account:
+      type: object
+      properties:
+        login:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    Login:
+      type: object
+      properties:
+        login:
+          type: string
+          maxLength: 128
+          minLength: 0
+        password:
+          type: string
+          maxLength: 128
+          minLength: 0
+      required:
+      - login
+      - password
+    Csrf:
+      type: object
+      properties:
+        token:
+          type: string
+        headerName:
+          type: string
+        parameterName:
+          type: string
     Error:
       type: object
       properties:
@@ -387,7 +576,28 @@ components:
 
     StudyType:
       type: string
-      enum: [PELVIS_FEMALE, ABDOMEN, BREAST, THYROID, PROSTATE, LOWER_LIMB_VESSELS]
+      enum: [PELVIS_FEMALE, ABDOMEN, BREAST, THYROID, PROSTATE, LOWER_LIMB_VESSELS, KIDNEY, SOFT_TISSUE]
+
+    FindingLevel:
+      type: string
+      description: |
+        Уровень срочности по словарю. EMERGENCY — экстренно: красная метка, вверху инбокса,
+        задача дежурному врачу, пациенту система не пишет. URGENT — срочно (1–3 дня). PLANNED — плановый маршрут.
+      enum: [EMERGENCY, URGENT, PLANNED]
+
+    Flag:
+      type: object
+      description: |
+        Флаг качества протокола / находки. От ML: DISCREPANCY (РАСХОЖДЕНИЕ), INCOMPLETE (НЕПОЛНОЕ ОПИСАНИЕ),
+        NO_CONCLUSION, PREP_VIOLATED, OUTDATED_TERM, INCORRECT_TERM, TEMPLATE_NORM.
+        От бэкенда: SYSTEM_UNKNOWN, SYSTEM_CONVERTED, MINOR, MERGED_GYNECOLOGY, DUPLICATE.
+        Полный список с описаниями — блок flags в findings-dictionary.yaml.
+      properties:
+        code: { type: string, example: DISCREPANCY }
+        name: { type: string, example: РАСХОЖДЕНИЕ, description: Русское название для бейджа }
+        note: { type: string, nullable: true, example: 'в заключении только «свободная жидкость», в описании — сгустки' }
+        setBy: { type: string, enum: [ML, BACKEND] }
+      required: [code]
 
     ReviewState:
       type: string
@@ -415,15 +625,44 @@ components:
         id: { type: string }
         externalId: { type: string, description: ID пациента в МИС }
         fullName: { type: string }
+        lastName: { type: string, nullable: true, description: Фамилия }
+        firstName: { type: string, nullable: true, description: Имя }
+        middleName: { type: string, nullable: true, description: Отчество при наличии }
+        shortName: { type: string, example: 'Белова Н. О.', description: Готовая строка для списка }
         birthDate: { type: string, format: date }
         age: { type: integer, description: Вычисляется на сервере }
         sex: { type: string, enum: [F, M] }
         cardNumber: { type: string }
         reviewState: { $ref: '#/components/schemas/ReviewState' }
+        needsRouteReview: { type: boolean, description: Требуется решение врача по направлению }
+        maxLevel:
+          allOf: [ { $ref: '#/components/schemas/FindingLevel' } ]
+          nullable: true
+          description: Самый срочный уровень среди активных находок текущего протокола; по нему сортируется инбокс (EMERGENCY сверху)
         receivedAt: { type: string, format: date-time, description: Когда последний протокол поступил в систему }
         pendingFindings: { type: integer, description: Сколько находок ждут подтверждения }
         activeRoutes: { type: integer }
         lastStudyDate: { type: string, format: date }
+        studyType:
+          allOf: [ { $ref: '#/components/schemas/StudyType' } ]
+          nullable: true
+          description: Тип исследования текущего протокола — вторая строка колонки «Находка»
+        activeFindings: { type: integer, description: Сколько активных (SUGGESTED + CONFIRMED) находок в текущем протоколе — для «+N» }
+        topFindings:
+          type: array
+          description: До 2 самых срочных активных находок текущего протокола (по level, затем по targetDays) — колонка «Находка»
+          items: { $ref: '#/components/schemas/TopFinding' }
+
+    TopFinding:
+      type: object
+      properties:
+        id: { type: string }
+        code: { type: string, example: SUPERFICIAL_THROMBOPHLEBITIS }
+        name: { type: string, example: Тромбоз поверхностных вен / тромбофлебит }
+        status: { $ref: '#/components/schemas/FindingStatus' }
+        level: { $ref: '#/components/schemas/FindingLevel' }
+        targetSpecialty: { type: string, nullable: true, example: Дежурный хирург / флеболог }
+        targetDays: { type: integer, nullable: true, example: 0 }
 
     PatientPage:
       type: object
@@ -434,26 +673,29 @@ components:
         total: { type: integer }
 
     PatientCard:
-      allOf:
-        - $ref: '#/components/schemas/PatientShort'
-        - type: object
+      type: object
+      description: Ответ GET /api/patients/{id} — шапка пациента вложена в поле patient
+      properties:
+        patient: { $ref: '#/components/schemas/PatientShort' }
+        currentProtocol:
+          allOf: [ { $ref: '#/components/schemas/ProtocolShort' } ]
+          nullable: true
+          description: Последний (не заменённый новой версией) протокол; полный текст — GET /api/protocols/{id}
+        currentFindings:
+          type: array
+          description: Блок «Находки» — находки последнего протокола и ручные находки (кроме REMOVED)
+          items: { $ref: '#/components/schemas/Finding' }
+        routes:
+          type: array
+          description: Блок «Маршрут» — пока всегда пустой (маршруты в разработке)
+          items: { $ref: '#/components/schemas/Route' }
+        history:
+          type: object
+          description: Блок «История приёмов» — всё, что было до текущего протокола
           properties:
-            currentProtocol: { $ref: '#/components/schemas/ProtocolShort' }
-            currentFindings:
-              type: array
-              description: Блок «Находки» — по последнему протоколу
-              items: { $ref: '#/components/schemas/Finding' }
-            routes:
-              type: array
-              description: Блок «Составление route» — активные маршруты
-              items: { $ref: '#/components/schemas/Route' }
-            history:
-              type: object
-              description: Блок «История болезни» — всё, что было до текущего протокола
-              properties:
-                protocols: { type: array, items: { $ref: '#/components/schemas/ProtocolShort' } }
-                findings: { type: array, items: { $ref: '#/components/schemas/Finding' } }
-                routes: { type: array, items: { $ref: '#/components/schemas/Route' }, description: Завершённые и отменённые }
+            protocols: { type: array, items: { $ref: '#/components/schemas/ProtocolShort' } }
+            findings: { type: array, items: { $ref: '#/components/schemas/Finding' }, description: Подтверждённые находки прошлых протоколов }
+            routes: { type: array, items: { $ref: '#/components/schemas/Route' }, description: Пока всегда пустой }
 
     ProtocolShort:
       type: object
@@ -468,14 +710,15 @@ components:
         conclusionFound: { type: boolean }
         findingsCount: { type: integer }
         receivedAt: { type: string, format: date-time }
+        flags: { type: array, items: { $ref: '#/components/schemas/Flag' }, description: Флаги уровня протокола }
 
     Protocol:
-      allOf:
-        - $ref: '#/components/schemas/ProtocolShort'
-        - type: object
-          properties:
+      type: object
+      description: Ответ GET /api/protocols/{id} — краткие данные протокола вложены в поле protocol
+      properties:
+            protocol: { $ref: '#/components/schemas/ProtocolShort' }
             patientId: { type: string }
-            text: { type: string, nullable: true, description: Полный текст, если ML его прислал; от него считаются evidence.start/end }
+            text: { type: string, nullable: true, description: 'Полный текст, если ML его прислал; от него считаются evidence.start/end' }
             modelVersion: { type: string }
             error:
               type: object
@@ -513,9 +756,14 @@ components:
           additionalProperties: true
           example: { sizeMm: 8, side: left, category: 'BI-RADS 4', uncertain: false }
         confidence: { type: number, format: float, minimum: 0, maximum: 1, nullable: true }
-        modelVersion: { type: string, nullable: true, example: ml-0.3, description: Версия ML, извлёкшей находку }
-        ruleVersion: { type: string, example: dict-v3, description: Версия словаря, по которой выбран специалист }
+        modelVersion: { type: string, nullable: true, example: ml-0.3, description: 'Версия ML, извлёкшей находку' }
+        ruleVersion: { type: string, example: dict-v2, description: 'Версия словаря, по которой выбран специалист' }
         targetSpecialty: { type: string, example: Оперирующий гинеколог }
+        targetDays: { type: integer, nullable: true, example: 7, description: 'Целевой срок до консультации, дней (0 — немедленно)' }
+        matchedRule: { type: string, nullable: true, example: 'UTERINE_FIBROID.rules[4]', description: Какое правило словаря сработало — для объяснимости }
+        level: { $ref: '#/components/schemas/FindingLevel' }
+        urgent: { type: boolean, description: 'Устаревшее, = level == EMERGENCY' }
+        flags: { type: array, items: { $ref: '#/components/schemas/Flag' } }
         routeId: { type: string, nullable: true }
         reviewedBy: { type: string, nullable: true }
         reviewedAt: { type: string, format: date-time, nullable: true }
@@ -544,7 +792,11 @@ components:
       type: object
       properties:
         code: { type: string }
+        name: { type: string, description: Название находки из словаря }
         evidence: { $ref: '#/components/schemas/Evidence' }
+        source: { type: string, enum: [ML, BACKEND], description: Кто отбросил кандидата }
+        matchedRule: { type: string, nullable: true, description: 'Правило словаря, по которому маршрут не нужен (для BELOW_THRESHOLD)' }
+        attributes: { type: object, additionalProperties: true, nullable: true }
         reason:
           type: string
           description: NEGATION/NORMAL/POST_SURGERY приходят от ML; BELOW_THRESHOLD/OUT_OF_SCOPE ставит бэкенд по словарю
@@ -564,7 +816,11 @@ components:
           type: object
           additionalProperties: true
           example: { minSizeMm: 10 }
-        urgent: { type: boolean, default: false }
+        level: { $ref: '#/components/schemas/FindingLevel' }
+        maxLevel:
+          allOf: [ { $ref: '#/components/schemas/FindingLevel' } ]
+          description: Самый срочный уровень, который может дать находка при каком-либо правиле
+        urgent: { type: boolean, default: false, description: 'Устаревшее, = maxLevel == EMERGENCY' }
         active: { type: boolean, default: true }
       required: [code, name, targetSpecialty]
 
@@ -643,6 +899,7 @@ components:
         text: { type: string, example: 'Ваш результат УЗИ готов. Рекомендуется консультация врача-гинеколога для определения дальнейшей тактики.' }
         sentAt: { type: string, format: date-time }
         sentBy: { type: string, description: Кто нажал «Пуш» или SYSTEM }
+        readAt: { type: string, format: date-time, nullable: true, description: 'Когда пациент открыл сообщение; null — не прочитано. Нужно экрану «Отправка уведомлений»' }
 
     MlResult:
       type: object
@@ -652,6 +909,7 @@ components:
         resultId: { type: string }
         status: { $ref: '#/components/schemas/ProcessingStatus' }
         modelVersion: { type: string }
+        dictionaryVersion: { type: string, example: dict-v2 }
         processedAt: { type: string, format: date-time }
         patient:
           type: object
@@ -659,6 +917,9 @@ components:
           properties:
             externalId: { type: string }
             fullName: { type: string }
+            lastName: { type: string, nullable: true }
+            firstName: { type: string, nullable: true }
+            middleName: { type: string, nullable: true }
             birthDate: { type: string, format: date }
             sex: { type: string, enum: [F, M] }
         protocol:
@@ -672,6 +933,10 @@ components:
         text: { type: string, nullable: true }
         conclusion: { type: string }
         conclusionFound: { type: boolean }
+        flags:
+          type: array
+          description: Флаги уровня протокола (NO_CONCLUSION, PREP_VIOLATED, DISCREPANCY...)
+          items: { $ref: '#/components/schemas/MlFlag' }
         findings:
           type: array
           items:
@@ -682,6 +947,7 @@ components:
               evidence: { $ref: '#/components/schemas/Evidence' }
               attributes: { type: object, additionalProperties: true }
               confidence: { type: number, minimum: 0, maximum: 1 }
+              flags: { type: array, items: { $ref: '#/components/schemas/MlFlag' } }
         notTriggered:
           type: array
           items:
@@ -697,3 +963,10 @@ components:
           properties:
             code: { type: string }
             message: { type: string }
+
+    MlFlag:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, example: DISCREPANCY }
+        note: { type: string, nullable: true }

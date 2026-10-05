@@ -10,14 +10,15 @@ import PatientFilters from '../components/PatientFilters';
 import { EMPTY_FILTERS, LEVEL_TO_URGENCY, activeCount, matchFilters, topUrgency } from '../lib/patientFilters';
 
 const PRESETS = {
-  inbox: [['all', 'Все входящие', (p) => p.reviewState !== 'OK'], ['PENDING', 'Новые находки'], ['ATTENTION', 'Нужна проверка']],
+  // «Входящие» берёт сервер: needsRouteReview=true — случаи без определённого направления
+  inbox: [['all', 'Все входящие', () => true], ['PENDING', 'Новые находки'], ['ATTENTION', 'Нужна проверка']],
   archive: [['all', 'Все', () => true], ['PENDING', 'Новые находки'], ['ATTENTION', 'Нужна проверка'], ['OK', 'Проверено']],
 };
 const REVIEW_TEXT = { PENDING: 'Ждут подтверждения врача', ATTENTION: 'Протокол не прочитан', OK: 'Проверено' };
 
 const COLS = [
   { key: 'patient', label: 'Пациент', width: 'minmax(0, 226fr)', sort: (p) => p.fullName,
-    cell: (p) => <Stack main={shortName(p.fullName)} sub={ageText(p.age)} faint={fmtDate(p.birthDate)} /> },
+    cell: (p) => <Stack main={p.shortName ?? shortName(p.fullName)} sub={ageText(p.age)} faint={fmtDate(p.birthDate)} /> },
   { key: 'study', label: 'Исследование', width: 'minmax(0, 213fr)', sort: (p) => p.receivedAt,
     cell: (p) => <Stack main={STUDY[p.studyType ?? p.card?.currentProtocol?.studyType] ?? 'Исследование'} sub={p.cardNumber ?? `ID ${p.externalId}`} faint={fmtStamp(p.receivedAt)} /> },
   { key: 'findings', label: 'Находки', width: 'minmax(0, 199fr)', sort: (p) => p.pendingFindings,

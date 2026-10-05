@@ -1,5 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
-import { USE_MOCK, API_URL, capsReady, demo } from './api';
+import { USE_MOCK, API_URL, UNAUTHORIZED, api, detectCaps, demo } from './api';
+import { session } from './api/session';
 import { CURRENT_DOCTOR } from './config';
 import { fmtDateTime } from './lib/format';
 import { Revision, Toast, go, useMedia, useRoute } from './lib/hooks';
@@ -9,8 +10,12 @@ import Patients from './pages/Patients';
 import PatientCard from './pages/PatientCard';
 import Dictionary from './pages/Dictionary';
 import Dashboard from './pages/Dashboard';
-import Login, { isAuthed, logout } from './pages/Login';
+import Login, { logout } from './pages/Login';
 import PushCard from './pages/PushCard';
+import MobileRecord from './pages/MobileRecord';
+
+// Мобильная страница записи по ссылке из SMS: /next-step/<id> (или #/next-step/<id>) — без входа
+const mobileRecordId = () => location.pathname.match(/\/next-step\/([^/]+)/)?.[1];
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
@@ -31,13 +36,23 @@ export default function App() {
   const [rev, setRev] = useState(0);
   const [toasts, setToasts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
-  const [authed, setAuthed] = useState(isAuthed);
-  const [ready, setReady] = useState(USE_MOCK);
+  // authed: null — проверяем сессию (GET /api/auth/me), true/false — результат
+  const [authed, setAuthed] = useState(() => (session.has() ? null : false));
+  const [ready, setReady] = useState(false);
   // 721–1000 px: меню сворачивается само; на телефоне — нижняя панель, класс collapsed не нужен
   const narrow = useMedia('(min-width: 721px) and (max-width: 1000px)');
   const mobile = useMedia('(max-width: 720px)');
   const isCollapsed = !mobile && (collapsed || narrow);
-  useEffect(() => { capsReady.then(() => setReady(true)); }, []);
+  useEffect(() => {
+    if (authed !== null) return;
+    api.me().then(() => setAuthed(true), () => { session.clear(); setAuthed(false); });
+  }, [authed]);
+  useEffect(() => { if (authed) detectCaps().then(() => setReady(true)); }, [authed]);   // возможности сервера — после входа
+  useEffect(() => {
+    const drop = () => { session.clear(); setReady(false); setAuthed(false); };   // 401 из любого запроса
+    addEventListener(UNAUTHORIZED, drop);
+    return () => removeEventListener(UNAUTHORIZED, drop);
+  }, []);
 
   const toast = useCallback((text, tone = 'ok') => {
     const key = Math.random();
@@ -47,6 +62,9 @@ export default function App() {
   useEffect(() => { window.scrollTo(0, 0); }, [section, id]);
 
   // Авторизация: без входа показывается только страница логина (документация /open-api доступна без входа)
+  const recordId = mobileRecordId() ?? (section === 'next-step' ? id : null);
+  if (recordId) return <MobileRecord id={decodeURIComponent(recordId)} />;
+  if (authed === null && section !== 'open-api' && !isDocsPath()) return <p className="state">Проверяем вход…</p>;
   if (!authed && section !== 'open-api' && !isDocsPath()) return <Login onLogin={() => setAuthed(true)} />;
 
   if (section === 'open-api' || isDocsPath()) {
@@ -65,7 +83,7 @@ export default function App() {
     <Toast.Provider value={toast}>
       <Revision.Provider value={rev}>
         <div className={`layout${isCollapsed ? ' collapsed' : ''}`}>
-          <header className="mobile-top"><Logo height={22} /><UserMenu mobile onLogout={() => { logout(); setAuthed(false); }} /></header>
+          <header className="mobile-top"><Logo height={22} /><UserMenu mobile onLogout={() => logout().then(() => { setReady(false); setAuthed(false); })} /></header>
           <aside className="sidebar">
             <a className="brand" href="#/findings" aria-label="СМ-Клиника, на главную"><Logo /></a>
             <nav className="nav" aria-label="Разделы">
@@ -76,7 +94,7 @@ export default function App() {
               ))}
             </nav>
             <div className="nav-bottom">
-              <UserMenu onLogout={() => { logout(); setAuthed(false); }} />
+              <UserMenu onLogout={() => logout().then(() => { setReady(false); setAuthed(false); })} />
               {!narrow && <button className="nav-item faint" onClick={() => setCollapsed((v) => !v)} aria-expanded={!collapsed} title={collapsed ? 'Развернуть' : 'Свернуть'}>
                 <ArrowLeft size={16} className={collapsed ? 'flip' : undefined} /><span>Свернуть</span>
               </button>}

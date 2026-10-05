@@ -1,28 +1,36 @@
 // Страница авторизации по макету Figma (auth.fig, кадр «Авторизация»).
-// Пока заглушка: вход при любом логине и пароле. Выход — в меню профиля внизу бокового меню. Сессия хранится в localStorage.
+// Вход: POST /api/auth/login (cookie-сессия backend). В демо-режиме подходит любой логин и пароль. Выход — в меню профиля.
 import { useState } from 'react';
+import { api } from '../api';
+import { session } from '../api/session';
 import { Logo } from '../components/Icons';
 import background from '../assets/auth/background.webp';
 import doctor from '../assets/auth/doctor.webp';
 
-const KEY = 'sm-route:auth';
-
-/** Вошёл ли пользователь (переживает перезагрузку страницы) */
-export const isAuthed = () => { try { return !!localStorage.getItem(KEY); } catch { return false; } };
-/** Выход: забыть сессию — App покажет страницу авторизации */
-export const logout = () => { try { localStorage.removeItem(KEY); } catch { /* нет хранилища — сессия и так не сохранялась */ } };
-const remember = (login) => { try { localStorage.setItem(KEY, JSON.stringify({ login, at: Date.now() })); } catch { /* приватный режим — вход до перезагрузки */ } };
+/** Выход: закрыть сессию на backend и забыть её здесь — App покажет страницу авторизации */
+export async function logout() {
+  await api.logout().catch(() => null);
+  session.clear();
+}
 
 export default function Login({ onLogin }) {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    setBusy(true);
-    remember(login.trim());
-    setTimeout(() => onLogin(login.trim()), 250);   // короткая пауза — кнопка успевает показать нажатие
+    setBusy(true); setError(null);
+    try {
+      // backend: POST /api/auth/login (cookie-сессия); в демо-режиме подходит любой логин и пароль
+      const account = await api.login({ login: login.trim(), password });
+      session.save(account);
+      onLogin(account);
+    } catch (err) {
+      setBusy(false);
+      setError(err.status === 401 || err.status === 400 ? 'Неверный логин или пароль' : err.message);
+    }
   };
 
   return (
@@ -45,6 +53,7 @@ export default function Login({ onLogin }) {
           <span>Пароль</span>
           <input name="password" type="password" autoComplete="current-password" placeholder="●●●●●●●●●" value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
+        {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="btn-main auth-submit" disabled={busy}>{busy ? 'Входим…' : 'Войти в систему'}</button>
       </form>
     </div>

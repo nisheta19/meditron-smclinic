@@ -1,59 +1,103 @@
+// «Отправить уведомление» по макету pushes.fig: маршрут, шаблон (радио), текст сообщения, «Отправить» / «Отмена».
+// Одно уведомление (из карточки) или пачка (выделенные строки «Находок»). Сообщение уходит SMS со ссылкой
+// на мобильную страницу записи /next-step/<routeId>. Сервер сам защищает от спама (429) и экстренных находок (409).
 import { useState } from 'react';
 import { api, caps } from '../api';
-import { CHANNEL } from '../lib/format';
-import { Dialog } from './ui';
+import { useEsc } from './ui';
+import { CloseLg } from './Icons';
+import Dropdown from './Dropdown';
 
-/** «Пуш» по одному или нескольким маршрутам. Сервер сам защищает от спама (429) и экстренных находок (409). */
-export default function NotifyDialog({ routeIds, recent = 0, onClose, onDone }) {
-  const [channel, setChannel] = useState('PERSONAL_ACCOUNT');
-  const [text, setText] = useState('');
+export const PUSH_TEMPLATES = [
+  { id: 'remind', title: 'Напоминание о записи',
+    text: 'Напоминание: по результату УЗИ Вам рекомендована консультация специалиста ({специалист}). Консультация нужна, чтобы уточнить результат исследования. Вы можете выбрать удобный формат — очно или онлайн: {ссылка}' },
+  { id: 'noshow', title: 'После неявки',
+    text: 'Запланированная консультация ({специалист}) не состоялась. Если вопрос остаётся актуальным, выберите другое время — очно или онлайн: {ссылка}' },
+  { id: 'ready', title: 'Результат готов',
+    text: 'Ваш результат УЗИ готов. В исследовании описаны изменения, по которым рекомендуется консультация специалиста ({специалист}). Записаться: {ссылка}' },
+];
+// Адрес для пациента: VITE_PUBLIC_URL (публичный адрес фронта) или текущий origin; из файла — относительная ссылка
+const PUBLIC_URL = (import.meta.env.VITE_PUBLIC_URL || (/^https?:$/.test(location.protocol) ? location.origin : '')).replace(/\/$/, '');
+export const recordLink = (routeId) => `${PUBLIC_URL}/next-step/${encodeURIComponent(routeId)}`;
+const fill = (text, t) => text.replaceAll('{специалист}', (t.specialist ?? 'профильный врач').toLowerCase()).replaceAll('{ссылка}', recordLink(t.routeId));
+
+/**
+ * targets: [{ routeId, specialist, label }] — маршруты для выбора (одиночная отправка) или все выбранные (пачка).
+ * Старый вызов routeIds={[…]} тоже поддерживается.
+ */
+export default function NotifyDialog({ targets: given, routeIds = [], recent = 0, bulk, onClose, onDone }) {
+  const targets = given ?? routeIds.map((routeId) => ({ routeId }));
+  const many = bulk || (targets.length > 1 && !given);
+  const [routeId, setRouteId] = useState(targets[0]?.routeId);
+  const [tpl, setTpl] = useState(PUSH_TEMPLATES[0].id);
+  const [text, setText] = useState(PUSH_TEMPLATES[0].text);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
+  useEsc(onClose);
+
+  const chosen = many ? targets : targets.filter((t) => t.routeId === routeId);
+  const preview = many ? text : fill(text, chosen[0] ?? {});
+  const pick = (id) => { setTpl(id); setText(PUSH_TEMPLATES.find((t) => t.id === id).text); };
 
   const send = async () => {
     setBusy(true);
     const res = { sent: 0, tooFrequent: 0, errors: [] };
-    for (const id of routeIds) {
-      try { await api.notify(id, { channel, ...(text.trim() && { text: text.trim() }) }); res.sent++; }
+    for (const t of chosen) {
+      try { await api.notify(t.routeId, { channel: 'SMS', text: fill(text, t) }); res.sent++; }
       catch (e) { e.status === 429 ? res.tooFrequent++ : res.errors.push(e.notImplemented ? 'сервер пока не принимает уведомления (метод не реализован)' : e.message); }
     }
     setResult(res); setBusy(false); onDone?.(res);
   };
 
-  if (result) return (
-    <Dialog title={result.sent ? 'Уведомления отправлены' : 'Уведомление не отправлено'} onClose={onClose} actions={<button className="btn primary" onClick={onClose}>Готово</button>}>
-      <ul className="result">
-        <li>Отправлено: <b>{result.sent}</b></li>
-        {result.tooFrequent > 0 && <li>Пропущено, уже уведомлены за 24 ч: <b>{result.tooFrequent}</b></li>}
-        {[...new Set(result.errors)].map((m) => <li key={m}>Не отправлено ({result.errors.filter((x) => x === m).length}): {m}</li>)}
-      </ul>
-    </Dialog>
-  );
-
   return (
-    <Dialog title={routeIds.length > 1 ? `Уведомление: ${routeIds.length} маршрутов` : 'Уведомление пациенту'} onClose={onClose} actions={<>
-      <button className="btn ghost" onClick={onClose}>Отмена</button>
-      <button className="btn primary" disabled={busy} onClick={send}>{busy ? 'Отправляем…' : 'Отправить'}</button>
-    </>}>
-      {!caps.notifications && <p className="callout">Сервер пока не сообщил, что принимает уведомления. Попробуем отправить — если метод
-        не поддерживается, в итоге будет указано, какие сообщения не ушли.</p>}
-      {recent > 0 && <p className="callout">Уже получили сообщение за последние 24 ч: {recent}. Сервер их пропустит, чтобы не перегружать пациентов.</p>}
-      <fieldset>
-        <legend>Канал</legend>
-        <div className="chips wrap">
-          {Object.entries(CHANNEL).map(([k, l]) => (
-            <label key={k} className="chip"><input type="radio" name="channel" checked={channel === k} onChange={() => setChannel(k)} />{l}</label>
-          ))}
-        </div>
-      </fieldset>
-      <label className="field">
-        <span>Текст сообщения</span>
-        <textarea rows={4} value={text} onChange={(e) => setText(e.target.value)}
-          placeholder="Оставьте пустым: возьмётся нейтральный текст из шаблона текущего этапа" />
-      </label>
-      <p className="hint">
-        {channel === 'SMS' ? 'В SMS не указывайте находку и диагноз: только приглашение открыть личный кабинет.' : 'Сообщение не должно содержать диагноз: только рекомендацию и способ записаться.'}
-      </p>
-    </Dialog>
+    <div className="overlay" onMouseDown={onClose}>
+      <div className="push-dialog" role="dialog" aria-modal="true" aria-label="Отправить уведомление" onMouseDown={(e) => e.stopPropagation()}>
+        <h2>{result ? (result.sent ? 'Уведомление отправлено' : 'Уведомление не отправлено') : 'Отправить уведомление'}</h2>
+        <button className="push-close" aria-label="Закрыть" onClick={onClose}><CloseLg size={22} /></button>
+
+        {result ? (
+          <>
+            <ul className="push-result">
+              <li>Отправлено: <b>{result.sent}</b></li>
+              {result.tooFrequent > 0 && <li>Пропущено, уже уведомлены за 24 ч: <b>{result.tooFrequent}</b></li>}
+              {[...new Set(result.errors)].map((m) => <li key={m}>Не отправлено ({result.errors.filter((x) => x === m).length}): {m}</li>)}
+            </ul>
+            <div className="push-actions"><button className="btn-main" onClick={onClose}>Готово</button></div>
+          </>
+        ) : (
+          <>
+            {!caps.notifications && <p className="callout">Сервер пока не сообщил, что принимает уведомления. Попробуем отправить — в итоге будет видно, что не ушло.</p>}
+            {recent > 0 && <p className="callout">Уже получили сообщение за последние 24 ч: {recent}. Сервер их пропустит.</p>}
+
+            <div className="push-field">
+              <span>Маршрут</span>
+              {many
+                ? <div className="push-box">Выбрано маршрутов: {targets.length}</div>
+                : <Dropdown ariaLabel="Маршрут" value={routeId} onChange={setRouteId} options={targets.map((t) => [t.routeId, t.label ?? t.specialist ?? 'Маршрут'])} />}
+            </div>
+
+            <div className="push-field" role="radiogroup" aria-label="Шаблон">
+              <span>Шаблон</span>
+              {PUSH_TEMPLATES.map((t) => (
+                <label key={t.id} className={`push-radio${tpl === t.id ? ' on' : ''}`}>
+                  <input type="radio" name="push-tpl" checked={tpl === t.id} onChange={() => pick(t.id)} />
+                  <i aria-hidden="true" />{t.title}
+                </label>
+              ))}
+            </div>
+
+            <label className="push-field">
+              <span>Сообщение</span>
+              <textarea rows={3} value={many ? text : preview} onChange={(e) => setText(e.target.value)} />
+              {many && <small>{'{специалист}'} и {'{ссылка}'} подставятся для каждого пациента</small>}
+            </label>
+
+            <div className="push-actions">
+              <button className="btn-main" disabled={busy || !chosen.length || !text.trim()} onClick={send}>{busy ? 'Отправляем…' : 'Отправить уведомление'}</button>
+              <button className="chip" onClick={onClose}>Отмена</button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

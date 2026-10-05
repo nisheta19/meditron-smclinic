@@ -212,7 +212,16 @@ function patientShort(p) {
     activeRoutes: db.routes.filter((r) => r.patientId === p.id && OPEN.includes(r.status)).length,
     lastStudyDate: last?.studyDate,
     ...topOf(p.id, last),
+    ...nameParts(fullName),
+    // needsRouteReview (runtime backend): есть находки без определённого направления или протокол требует проверки
+    needsRouteReview: !!(pending > 0 || (last && (last.status === 'FAILED' || !last.conclusionFound))
+      || db.findings.some((f) => f.patientId === p.id && f.status === 'CONFIRMED' && !f.routeId)),
   };
+}
+
+function nameParts(full = '') {
+  const [lastName = '', firstName = '', middleName = ''] = full.trim().split(/\s+/);
+  return { lastName, firstName, middleName, shortName: [lastName, firstName && `${firstName[0]}.`, middleName && `${middleName[0]}.`].filter(Boolean).join(' ') };
 }
 
 function topOf(pid, cur) {
@@ -267,10 +276,17 @@ const reply = (fn) => new Promise((resolve, reject) => setTimeout(() => {
   try { resolve(JSON.parse(JSON.stringify(fn() ?? null, (k, v) => (k.startsWith('_') ? undefined : v)))); } catch (e) { reject(e); }
 }, 150));
 
+import { session } from '../session';
+
 export const mockApi = {
+  // Авторизация в демо: вход с любым логином и паролем
+  login: ({ login } = {}) => reply(() => ({ login: login || 'doctor', roles: ['DOCTOR'] })),
+  me: () => reply(() => (session.has() ? { login: 'doctor', roles: ['DOCTOR'] } : fail(401, 'UNAUTHORIZED', 'Нужно войти в систему'))),
+  logout: () => reply(() => null),
   patients: (q = {}) => reply(() => page(db.patients.map(patientShort).filter((p) =>
     (!q.search || has(p.fullName, q.search) || has(p.cardNumber, q.search) || has(p.externalId, q.search))
     && (!q.reviewState || p.reviewState === q.reviewState)
+    && (q.needsRouteReview == null || String(p.needsRouteReview) === String(q.needsRouteReview))
     && (!q.studyType || db.protocols.some((x) => x.patientId === p.id && x.studyType === q.studyType))
     && (!q.dateFrom || p.lastStudyDate >= q.dateFrom) && (!q.dateTo || p.lastStudyDate <= q.dateTo))
     .sort((a, b) => b.receivedAt.localeCompare(a.receivedAt)), q)),

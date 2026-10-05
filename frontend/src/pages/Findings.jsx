@@ -23,7 +23,7 @@ const CHIPS = [
 
 const COLS = [
   { key: 'patient', label: 'Пациент', width: 'minmax(0, 226fr)', sort: (r) => r.patientName,
-    cell: (r) => <Stack main={shortName(r.patientName)} sub={ageText(r.card?.age)} faint={r.card && fmtDate(r.card.birthDate)} /> },
+    cell: (r) => <Stack main={r.card?.shortName ?? shortName(r.patientName)} sub={ageText(r.card?.age)} faint={r.card && fmtDate(r.card.birthDate)} /> },
   { key: 'finding', label: 'Находка', width: 'minmax(0, 213fr)', sort: (r) => r.findingName,
     cell: (r) => <Stack main={r.findingName} sub={r.protocol && STUDY[r.protocol.studyType]} faint={r.protocol && fmtStamp(r.protocol.receivedAt)} /> },
   { key: 'stage', label: 'Этап', width: 'minmax(0, 199fr)', sort: (r) => r.progress ?? -1,
@@ -56,7 +56,7 @@ export default function Findings() {
     const info = routeInfo(card, r.routeId);
     const code = info?.finding?.code;
     return { ...r, card, protocol: info?.protocol, progress: info?.progress, stepType: info?.step?.type, notes: notes.data?.[r.routeId],
-      sex: card?.sex, age: card?.age, codes: code ? [code] : [], urgency: urgencyOf(info?.finding?.level ? info.finding : dict[code]) };
+      specialist: info?.finding?.targetSpecialty, sex: card?.sex, age: card?.age, codes: code ? [code] : [], urgency: urgencyOf(info?.finding?.level ? info.finding : dict[code]) };
   })), [byRoutes, items, cards.data, notes.data, dict]);
 
   const open = rows.filter((r) => OPEN.includes(r.routeStatus));
@@ -94,7 +94,7 @@ export default function Findings() {
           <button className="btn-main" onClick={() => setNotifyIds([...sel.sel])}>Отправить уведомление</button>
         </div>
       )}
-      {notifyIds && <NotifyDialog routeIds={notifyIds} recent={recent} onClose={() => setNotifyIds(null)}
+      {notifyIds && <NotifyDialog bulk targets={notifyIds.map((id) => ({ routeId: id, specialist: rows.find((r) => r.routeId === id)?.specialist }))} recent={recent} onClose={() => setNotifyIds(null)}
         onDone={() => { sel.clear(); list.reload(); }} />}
     </>
   );
@@ -118,7 +118,7 @@ function findingRows(patients, cards, dict) {
         progress: 0, currentStepName: f.status === 'SUGGESTED' ? 'Проверка врачом' : 'Маршрут не составлен',
         stepType: urgent ? 'ESCALATION' : 'SPECIALIST_CONSULTATION', currentStepStatus: 'PENDING', routeStatus: 'ACTIVE',
         dueDate, overdue: !!dueDate && dueDate < today, lastNotificationAt: null, notes: null, isNew: f.status === 'SUGGESTED',
-        sex: p.sex, age: p.age, codes: [f.code], urgency: urgencyOf(f.level ? f : { urgent, targetDays: days }),
+        specialist: f.targetSpecialty ?? entry.targetSpecialty, sex: p.sex, age: p.age, codes: [f.code], urgency: urgencyOf(f.level ? f : { urgent, targetDays: days }),
       };
     });
   });
