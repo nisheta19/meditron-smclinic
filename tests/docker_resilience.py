@@ -13,6 +13,8 @@ import time
 from uuid import uuid4
 
 import httpx
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
+from backend_session import authenticate
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'ml'))
@@ -70,6 +72,7 @@ def main():
             raise AssertionError('Delivery deadline exceeded: ' + str(status))
 
         def card():
+            authenticate(client, backend)
             page = request('GET', backend + '/api/patients', params={'search': identity})
             assert len(page['items']) == 1, page
             return request('GET', backend + '/api/patients/' + page['items'][0]['id'])

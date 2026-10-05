@@ -1,0 +1,40 @@
+@font-face { font-family: 'Auth Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('../assets/auth/inter-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Auth Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('../assets/auth/inter-cyrillic-400-normal.woff2') format('woff2'); unicode-range: U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+.auth { font-optical-sizing: none; width: 100%; min-height: 100dvh; overflow: hidden; background: #dbf0e9; }
+.auth-stage { position: relative; width: 1280px; height: var(--auth-height); min-height: 600px; zoom: var(--auth-scale); overflow: hidden; }
+.auth-background { position: absolute; left: -25px; top: -17px; width: 1330px; height: 862px; max-width: none; }
+.auth-logo { position: absolute; left: 213px; top: 89px; width: 395px; height: 63px; }
+.auth-doctor { position: absolute; left: 55px; top: 311px; width: 712px; height: 534px; max-width: none; }
+.auth-card { position: absolute; left: 808px; top: 17px; width: 456px; height: calc(100% - 33px); min-height: 566px; background: #fff; border-radius: 36px; }
+.auth-card h1 { position: absolute; left: -0.5px; top: 170px; width: 100%; font: 600 24px/33px 'Manrope Variable', sans-serif; color: #000; text-align: center; }
+.auth-intro { position: absolute; left: 65px; top: 209px; width: 326px; margin: 0; font: 400 16px/19px 'Auth Inter', sans-serif; text-align: center; color: #818181; }
+.auth-field { position: absolute; left: 27px; width: 401px; height: 80px; }
+.auth-login { top: 271px; }
+.auth-password { top: 371px; }
+.auth-field > span:first-child { position: absolute; top: -3px; left: 22px; padding: 0; font: 400 16px/19px 'Auth Inter', sans-serif; color: #818181; }
+.auth-field input { position: absolute; left: 0; top: 24px; width: 401px; height: 56px; margin: 0; padding: 0 22px; border: 0; border-radius: 22px; background: #f5f5f5; color: #000; font: 400 16px/19px 'Auth Inter', sans-serif; box-shadow: none; }
+.auth-field input::placeholder { color: #bbb; opacity: 1; }
+.auth-field input:focus { outline: none; }
+/* Native password masking keeps the caret, selection and scrolling aligned with the dots. */
+.auth-password input { caret-color: #000; font-size: 24px; line-height: 24px; letter-spacing: 6.463px; padding-left: 24.824px; }
+.auth-password input::-ms-reveal, .auth-password input::-ms-clear { display: none; }
+.auth-dots { position: absolute; left: 27.824px; right: 22px; top: 49.614px; height: 7.5px; display: flex; gap: 12.463px; overflow: hidden; pointer-events: none; }
+.auth-dots i { flex: 0 0 7.5px; height: 7.5px; border-radius: 50%; background: #bbb; }
+.auth-submit { position: absolute; left: 27px; top: 475px; width: 401px; height: 56px; padding: 8px 14.5px 8px 15.5px; border: 0; border-radius: 22px; background: #13ab7b; color: #fff; font: 400 16px/19px 'Auth Inter', sans-serif; }
+.auth-submit:disabled { cursor: wait; }
+.auth-error { position: absolute; top: 545px; left: 27px; right: 28px; margin: 0; color: #b42318; font-size: 14px; text-align: center; }
+@media (max-width: 899px) {
+  .auth-stage { width: 100%; min-height: 100dvh; height: auto; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 16px; }
+  .auth-background { width: 100%; height: 100%; left: 0; top: 0; object-fit: cover; }
+  .auth-logo { position: relative; left: auto; top: auto; width: min(395px, 90%); height: auto; margin-bottom: 24px; }
+  .auth-doctor { display: none; }
+  .auth-card { position: relative; left: auto; top: auto; width: min(456px, 100%); height: 600px; min-height: 566px; }
+  .auth-card h1 { top: 80px; font-size: 23px; }
+  .auth-intro { top: 122px; left: 16px; width: calc(100% - 32px); font-size: 14px; }
+  .auth-field, .auth-submit { left: 20px; width: calc(100% - 40px); }
+  .auth-field input { width: 100%; }
+  .auth-login { top: 200px; }
+  .auth-password { top: 300px; }
+  .auth-submit { top: 404px; }
+  .auth-error { top: 480px; }
+}

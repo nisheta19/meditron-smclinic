@@ -40,7 +40,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain security(HttpSecurity http, HttpSessionSecurityContextRepository contexts,
-                                 HttpSessionCsrfTokenRepository csrf, @Value("${auth.required:false}") boolean required) throws Exception {
+                                 HttpSessionCsrfTokenRepository csrf, @Value("${auth.required:true}") boolean required) throws Exception {
         http.cors(c -> {}).formLogin(AbstractHttpConfigurer::disable).httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable).requestCache(AbstractHttpConfigurer::disable)
                 .securityContext(c -> c.securityContextRepository(contexts))

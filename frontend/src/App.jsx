@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { USE_MOCK, API_URL, capsReady, demo } from './api';
 import { DOCTOR_DISPLAY_NAME } from './config';
 import { fmtDateTime } from './lib/format';
@@ -8,6 +8,9 @@ import Findings from './pages/Findings';
 import Patients from './pages/Patients';
 import PatientCard from './pages/PatientCard';
 import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import { currentAccount } from './api/auth';
+import DoctorMenu from './components/DoctorMenu';
 
 // Документация API грузится отдельным чанком и открывается только по прямому адресу
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
@@ -26,7 +29,20 @@ export default function App() {
   const [rev, setRev] = useState(0);
   const [toasts, setToasts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const authEpoch = useRef(0);
   const [ready, setReady] = useState(USE_MOCK);
+  const [auth, setAuth] = useState(USE_MOCK ? 'demo' : 'checking');
+  useEffect(() => {
+    if (USE_MOCK || isDocsPath() || location.hash.startsWith('#/open-api')) return;
+    let active = true;
+    const epoch = authEpoch.current;
+    currentAccount().then(() => { if (active && epoch === authEpoch.current) setAuth('signed-in'); })
+      .catch(() => { if (active && epoch === authEpoch.current) setAuth('signed-out'); });
+    const expired = () => { authEpoch.current += 1; setProfileOpen(false); setToasts([]); setAuth('signed-out'); };
+    addEventListener('auth-expired', expired);
+    return () => { active = false; removeEventListener('auth-expired', expired); };
+  }, [section]);
   // 721–1000 px: меню сворачивается само; на телефоне — нижняя панель, класс collapsed не нужен
   const narrow = useMedia('(min-width: 721px) and (max-width: 1000px)');
   const mobile = useMedia('(max-width: 720px)');
@@ -42,6 +58,10 @@ export default function App() {
 
   if (section === 'open-api' || isDocsPath()) {
     return <Suspense fallback={<p className="state">Загружаем документацию API…</p>}><ApiDocs /></Suspense>;
+  }
+
+  if (auth === 'checking' || auth === 'signed-out') {
+    return <Login checking={auth === 'checking'} onLogin={() => { setProfileOpen(false); setAuth('signed-in'); }} />;
   }
 
   const page = section === 'dashboard' ? <Dashboard />
@@ -65,11 +85,10 @@ export default function App() {
                 </a>
               ))}
             </nav>
-            <div className="nav-bottom">
-              <span className="nav-user" title={DOCTOR_DISPLAY_NAME}>
-                <span className="nav-avatar" aria-hidden="true" />
-                <span className="nav-user-text"><span>{DOCTOR_DISPLAY_NAME}</span><small>Врач</small></span>
-              </span>
+            <div className={`nav-bottom${profileOpen ? ' profile-open' : ''}`}>
+              <DoctorMenu name={DOCTOR_DISPLAY_NAME} onOpenChange={setProfileOpen}
+                onError={message => toast(message, 'bad')}
+                onLogout={() => { authEpoch.current += 1; setProfileOpen(false); setToasts([]); setAuth('signed-out'); }} />
               {!narrow && <button className="nav-item faint" onClick={() => setCollapsed((v) => !v)} aria-expanded={!collapsed} title={collapsed ? 'Развернуть' : 'Свернуть'}>
                 <ArrowLeft size={16} className={collapsed ? 'flip' : undefined} /><span>Свернуть</span>
               </button>}

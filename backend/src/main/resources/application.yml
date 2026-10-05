@@ -29,7 +29,7 @@ server:
 
 # Включать обязательный вход после подключения формы во фронте.
 auth:
-  required: ${AUTH_REQUIRED:false}
+  required: ${AUTH_REQUIRED:true}
   login: ${AUTH_LOGIN:123}
   password: ${AUTH_PASSWORD:123}
   allowed-origins: ${AUTH_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173,http://127.0.0.1:13000}

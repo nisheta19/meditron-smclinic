@@ -19,6 +19,8 @@ from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'ml'))
+sys.path.insert(0, str(ROOT / 'scripts'))
+from backend_session import authenticate
 import httpx
 import yaml
 from app.demo import docx
@@ -98,6 +100,12 @@ def card(meta):
 
 
 class Integration(unittest.TestCase):
+    def setUp(self):
+        CLIENT.cookies.clear()
+        CLIENT.headers.pop('X-CSRF-TOKEN', None)
+        if self._testMethodName != 'test_16_session_authentication':
+            authenticate(CLIENT, ARGS.backend)
+
     def positive(self, label='positive'):
         meta = metadata(label)
         file = make_file(label, 'Описание\nПолип эндометрия 8 мм.\nЗаключение\nПолип эндометрия 8 мм.')
@@ -426,6 +434,7 @@ class Integration(unittest.TestCase):
         schema = call('GET', '/v3/api-docs')
         self.assertFalse(schema['paths']['/api/auth/csrf']['get'].get('parameters'))
         call('GET', '/api/auth/me', 401)
+        call('GET', '/api/patients', 401)
         call('POST', '/api/auth/login', 403, json={'login': '123', 'password': '123'})
         token = call('GET', '/api/auth/csrf')
         headers = {token['headerName']: token['token']}

@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+const base = process.env.FRONTEND_URL || 'http://127.0.0.1:15175';
+const out = resolve('../.local/auth-integration');
+await mkdir(out, { recursive: true });
+const browser = await chromium.launch({ channel: 'msedge', headless: true });
+const page = await browser.newPage({ viewport: { width: 1280, height: 1531 }, deviceScaleFactor: 2 });
+await page.goto(`${base}/tests/profile-reference.html`);
+await page.evaluate(() => document.fonts.ready);
+await page.locator('.doctor-menu-trigger').click();
+await page.locator('.doctor-menu-card').screenshot({ path: resolve(out, 'profile-open.png') });
+const geometry = await page.locator('.doctor-menu-card, .doctor-menu-card .nav-avatar, .doctor-menu-card .nav-user-text, .doctor-menu-logout, .doctor-menu-logout svg').evaluateAll(elements => elements.map(element => ({ className: element.getAttribute('class'), box: element.getBoundingClientRect().toJSON() })));
+await writeFile(resolve(out, 'profile-geometry.json'), JSON.stringify(geometry, null, 2));
+console.log(geometry);
+await browser.close();

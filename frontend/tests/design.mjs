@@ -16,6 +16,7 @@ await mkdir(resolve(root, '.local'), { recursive: true });
 page.on('pageerror', (e) => errors.push(e.message));
 await page.route('**/api/**', async (route) => {
   const req = route.request(), u = new URL(req.url());
+  if (u.pathname === "/api/auth/me") return route.fulfill({ json: { login: "123", roles: ["DOCTOR"] } });
   let body;
   if (req.method() !== 'GET') { unexpected.push(`${req.method()} ${u.pathname}`); return route.abort(); }
   if (u.pathname === '/api/patients') {

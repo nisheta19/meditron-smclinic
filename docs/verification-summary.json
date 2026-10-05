@@ -1144,5 +1144,126 @@
     "formatRunsF1": 1.0,
     "clinicalValidation": false,
     "report": "docs/ml-generalization-v7.md"
+  },
+  "mlGeneralizationV8": {
+    "checkedAt": "2026-10-04T23:20:10.887966+00:00",
+    "modelVersion": "dict-v2.1-extractor-8",
+    "mlTests": 325,
+    "backendTests": 45,
+    "integrationScenarios": 17,
+    "backendApiCoverage": {
+      "covered": [
+        "DELETE /api/findings/{findingId}",
+        "GET /api/auth/csrf",
+        "GET /api/auth/me",
+        "GET /api/dictionary/findings",
+        "GET /api/integration/events/status",
+        "GET /api/patients",
+        "GET /api/patients/{patientId}",
+        "GET /api/patients/{patientId}/findings",
+        "GET /api/ping",
+        "GET /api/protocols/{protocolId}",
+        "PATCH /api/findings/{findingId}",
+        "POST /api/auth/login",
+        "POST /api/auth/logout",
+        "POST /api/integration/events",
+        "POST /api/integration/events/retry",
+        "POST /api/integration/ml/results",
+        "POST /api/integration/protocols",
+        "POST /api/patients/{patientId}/findings",
+        "POST /api/patients/{patientId}/findings/confirm"
+      ],
+      "uncovered": [],
+      "total": 19
+    },
+    "mlApiCoverage": {
+      "covered": [
+        "GET /api/mis/events/{event_id}",
+        "GET /health",
+        "POST /api/mis/events",
+        "POST /api/mis/events/{event_id}/retry"
+      ],
+      "uncovered": [],
+      "total": 4
+    },
+    "newSyntheticDocuments": 280,
+    "lastFreshDocuments": 40,
+    "lastFreshFullFactF1": 0.9166666666666666,
+    "lastFreshWorstFormattingF1": 0.9090909090909091,
+    "original89FullFactF1": 0.9050632911392406,
+    "clinicalValidation": false,
+    "report": "ml-generalization-v8.md",
+    "metrics": "ml-generalization-v8.metrics.json"
+  },
+  "authIntegration": {
+    "checkedAt": "2026-10-05",
+    "report": "docs/auth-integration.md",
+    "authRequiredByDefault": true,
+    "source": "deliverables/auth-adaptation",
+    "mlTests": 325,
+    "backendTests": {
+      "tests": 45,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "frontendUnitTests": 25,
+    "integrationScenarios": 17,
+    "backendApiCovered": 19,
+    "mlApiCovered": 4,
+    "browserChecks": {
+      "e2e": 19,
+      "design": 7,
+      "filters": 11,
+      "sorting": 6,
+      "dashboard": 7,
+      "authMocked": 13,
+      "authLive": 7
+    },
+    "totalChecks": 482,
+    "workingAuthRepeat": 7,
+    "frontendProductionBuild": true,
+    "dockerBuild": true,
+    "workingContainersHealthy": 4,
+    "visual": {
+      "reference": "deliverables/auth-adaptation/verification",
+      "pixelIdentical": [
+        "login-empty.png",
+        "login-filled.png",
+        "profile-open.png"
+      ],
+      "loginViewport": [
+        1280,
+        832
+      ],
+      "deviceScaleFactor": 2,
+      "stage": "Initial import, before the caret and popup position correction"
+    },
+    "testDatabaseIsolated": true,
+    "workingDatabasePreserved": true,
+    "mlChangedInThisUpdate": false,
+    "committed": false,
+    "pushed": false
+  },
+  "authUiCorrection": {
+    "checkedAt": "2026-10-05",
+    "mlTests": 325,
+    "backendTests": 45,
+    "frontendUnitTests": 25,
+    "integrationScenarios": 17,
+    "browserChecks": {
+      "authAndEditing": 14,
+      "liveAuth": 7,
+      "design": 7,
+      "dashboard": 7,
+      "filters": 11
+    },
+    "totalChecks": 458,
+    "nativePasswordMasking": true,
+    "stationaryProfile": true,
+    "productionFrontendUpdated": true,
+    "logs": ".local/auth-integration/ui-fix-*",
+    "committed": false,
+    "pushed": false
   }
 }

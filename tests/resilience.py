@@ -14,6 +14,8 @@ import sys
 import time
 from uuid import uuid4
 import httpx
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
+from backend_session import authenticate
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'ml'))
@@ -117,6 +119,7 @@ def main():
         backend=start_backend(); healthy(backend_url+'/actuator/health')
         done=wait_delivery(annul['eventId'])
         assert done['resultId']==pending['resultId'] and done['status']=='ANNULLED'
+        authenticate(client, backend_url)
         page=request('GET',backend_url+'/api/patients',params={'search':identity})
         assert len(page['items'])==1
         card=request('GET',backend_url+'/api/patients/'+page['items'][0]['id'])

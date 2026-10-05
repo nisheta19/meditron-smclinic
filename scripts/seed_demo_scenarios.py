@@ -14,6 +14,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'ml'))
 import httpx
+from backend_session import authenticate
 from app.demo import docx
 
 
@@ -45,6 +46,7 @@ CASES = [
 
 def seed(backend, prefix='demo-scenario-v1'):
     with httpx.Client(base_url=backend.rstrip('/'), timeout=40, trust_env=False) as client:
+        authenticate(client)
         def request(method, path, **kwargs):
             response = client.request(method, path, **kwargs)
             response.raise_for_status()

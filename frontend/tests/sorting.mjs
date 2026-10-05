@@ -1,5 +1,6 @@
 // Real API + browser: header clicks, both directions, missing values and test labels.
 import assert from 'node:assert/strict';
+import { signIn } from './auth-support.mjs';
 import { createRequire } from 'node:module';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -11,6 +12,7 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 832 } });
 const errors = [], results = [];
 page.on('pageerror', e => errors.push(e.message));
 try {
+  await signIn(page.context(), base);
   await page.goto(`${base}/#/findings?q=${prefix}`);
   await page.locator('.row-card').first().waitFor();
   for (const [key, label] of [['patient', 'Пациент'], ['finding', 'Находка'], ['due', 'Срок записи']]) {

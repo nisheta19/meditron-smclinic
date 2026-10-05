@@ -13,7 +13,7 @@ const results = [], errors = [], apiCalls = [];
 await mkdir(resolve(root, '.local'), { recursive: true });
 page.on('pageerror', e => errors.push(e.message));
 // A disconnected backend must not affect this screen or receive background polling.
-await page.route('**/api/**', route => { apiCalls.push(route.request().url()); return route.abort(); });
+await page.route('**/api/**', route => { if (new URL(route.request().url()).pathname === "/api/auth/me") return route.fulfill({ json: { login: "123", roles: ["DOCTOR"] } }); apiCalls.push(route.request().url()); return route.abort(); });
 const ready = async () => { await page.locator('.dash-mapsvg').waitFor(); await page.evaluate(() => document.fonts.ready); };
 const test = async (name, fn) => {
   try { await fn(); results.push({ name, ok: true }); console.log(`PASS ${name}`); }
@@ -78,7 +78,7 @@ try {
   await test('sidebar navigation works and list polling stops on return', async () => {
     const footer = await page.locator('.nav-bottom').boundingBox();
     await page.unroute('**/api/**');
-    await page.route('**/api/**', route => route.fulfill({ json: { items: [], total: 0, page: 0, size: 50 } }));
+    await page.route('**/api/**', route => route.fulfill({ json: new URL(route.request().url()).pathname === "/api/auth/me" ? { login: "123", roles: ["DOCTOR"] } : { items: [], total: 0, page: 0, size: 50 } }));
     await page.getByRole('link', { name: 'Находки', exact: true }).click();
     await page.locator('.chips').waitFor();
     assert.ok(page.url().endsWith('/#/findings'));
@@ -86,7 +86,7 @@ try {
     assert.deepEqual(await page.locator('.nav .nav-item').allTextContents(), ['Дашборд', 'Входящие', 'Находки']);
     await page.getByRole('link', { name: 'Дашборд', exact: true }).click(); await ready();
     await page.unroute('**/api/**');
-    await page.route('**/api/**', route => { apiCalls.push(route.request().url()); return route.abort(); });
+    await page.route('**/api/**', route => { if (new URL(route.request().url()).pathname === "/api/auth/me") return route.fulfill({ json: { login: "123", roles: ["DOCTOR"] } }); apiCalls.push(route.request().url()); return route.abort(); });
     await page.waitForTimeout(5500);
     assert.deepEqual(apiCalls, []);
   });

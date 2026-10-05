@@ -1,4 +1,5 @@
 // HTTP-клиент по контракту openapi.yaml (v0.2.0). Каждая функция = один эндпоинт.
+import { clearCsrf, csrfHeaders } from './auth.js';
 
 const env = import.meta.env ?? {};
 const override = new URLSearchParams(location.search).get('mock'); // ?mock=1 / ?mock=0
@@ -17,16 +18,22 @@ export class ApiError extends Error {
 }
 
 async function request(method, path, { query, body } = {}) {
+  const csrf = ['GET', 'HEAD', 'OPTIONS'].includes(method) ? {} : await csrfHeaders();
   const qs = new URLSearchParams(Object.entries(query ?? {}).filter(([, v]) => v !== undefined && v !== '' && v !== null));
   const res = await fetch(`${API_URL}${path}${qs.size ? `?${qs}` : ''}`, {
     method,
+    credentials: 'include',
     signal: AbortSignal.timeout(20000),
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...csrf },
     body: body ? JSON.stringify(body) : undefined,
   }).catch(() => { throw new ApiError(0, 'NETWORK', `Сервер ${API_URL} недоступен`); });
   if (res.status === 204) return null;
   const data = await res.json().catch(() => null);
   if (!res.ok) {
+    if (res.status === 401) {
+      clearCsrf();
+      window.dispatchEvent(new Event('auth-expired'));
+    }
     // Ошибки контракта приходят как { code, message }; для нереализованных путей Spring отдаёт свой формат без code
     const missing = [404, 405].includes(res.status) && !data?.code;
     throw new ApiError(res.status, data?.code, missing ? `Сервер пока не поддерживает ${method} ${path}` : data?.message);

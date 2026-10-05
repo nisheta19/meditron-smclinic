@@ -1,5 +1,6 @@
 // Requires a running demo stack, Playwright, and tests/frontend_fixtures.py.
 import assert from 'node:assert/strict';
+import { signIn } from './auth-support.mjs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createRequire } from 'node:module';
@@ -26,6 +27,7 @@ const card = async (key) => {
 };
 const search = async (text) => { await page.getByRole('searchbox').fill(text); await page.getByRole('button', { name: 'Найти', exact: true }).click(); };
 try {
+  await signIn(context, base);
   await test('real API, server order, pagination and search', async () => {
     await page.goto(base);
     await page.locator('.row-card').first().waitFor();

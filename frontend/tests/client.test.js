@@ -31,7 +31,9 @@ test('HTML with a successful HTTP status is not silently treated as an empty pat
   await assert.rejects(httpApi.patients(), { code: 'INVALID_RESPONSE' });
 });
 test('doctor actions preserve backend validation messages', async () => {
-  globalThis.fetch = async () => new Response(JSON.stringify({ code: 'PROTOCOL_INACTIVE', message: 'Протокол аннулирован' }), { status: 400 });
+  globalThis.fetch = async (url) => url.endsWith('/auth/csrf')
+    ? new Response(JSON.stringify({ headerName: 'X-CSRF-TOKEN', token: 'unit-token' }))
+    : new Response(JSON.stringify({ code: 'PROTOCOL_INACTIVE', message: 'Протокол аннулирован' }), { status: 400 });
   await assert.rejects(httpApi.updateFinding('f', { status: 'CONFIRMED' }), { code: 'PROTOCOL_INACTIVE', message: 'Протокол аннулирован' });
 });
 test('deletion accepts an empty 204 response', async () => {

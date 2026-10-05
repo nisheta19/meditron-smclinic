@@ -7,6 +7,7 @@ import sys
 import time
 from uuid import uuid4
 import httpx
+from backend_session import authenticate
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
                           'studyType':args.study_type,'studyDate':date.today().isoformat()}}
     try:
         with httpx.Client(base_url=args.backend.rstrip('/'), timeout=40, trust_env=False) as client:
+            authenticate(client)
             if args.file:
                 with args.file.open('rb') as stream:
                     response=client.post('/api/integration/protocols',files={

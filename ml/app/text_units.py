@@ -29,13 +29,26 @@ def logical_lines(text):
         # full stop. Headings/section boundaries are resolved before this call.
         next_field = bool(FIELD.match(line)) and not re.match(
             r'^(?:\w+\s+){0,3}контурами\s*:',line,re.I)
+        # A hard wrap may bisect the field name itself: "Шейка\nматки:".
+        # This is one anatomical heading, not a new uterus field.
+        if re.search(r'\bшейка\s*$',previous,re.I) and re.match(r'^матки\s*:',line,re.I):
+            next_field=False
         terminated = previous.endswith(('.', '!', '?', ';', ':'))
         continuing = line[:1].islower() or line[:1].isdigit() or CONTINUATION.match(line)
+        # A vessel acronym can start the continuation of a mixed-case diagnosis.
+        continuing = continuing or (re.search(r'\b(?:тромбофлебит|тромбоз|стеноз)\s*$',previous,re.I)
+                                    and re.match(r'^(?:БПВ|МПВ|ПДПВ|СФС|СПС|ПБА|ОБА|ГБА)\b',line))
         # Uppercase templates carry no sentence-case cue. A terminal adjective
         # needs its following noun; arbitrary uppercase fields must stay apart.
         if previous.isupper() and line.isupper() and not ANATOMY_HEADING.fullmatch(line):
             continuing = continuing or OPEN_ADJECTIVE.search(previous) or (
                 OPEN_NOUN.search(previous) and GENITIVE_START.match(line))
+            # All-caps exports remove the sentence-case signal entirely. Keep
+            # their sentence together until punctuation or an explicit field.
+            # A completed negative field remains a separate assertion.
+            closed_negative = re.search(r'\b(?:НЕТ|НЕ\s+(?:ВЫЯВЛЕН\w*|ОБНАРУЖЕН\w*|ОПРЕДЕЛЯ\w*|РАСШИРЕН\w*))\s*$', previous)
+            if not ANATOMY_HEADING.fullmatch(previous) and not closed_negative:
+                continuing = True
         # Parentheses may contain a morphology, unit or differential diagnosis;
         # their hard line break is not a new anatomical field.
         continuing = continuing or line.startswith('(') or previous.count('(') > previous.count(')')

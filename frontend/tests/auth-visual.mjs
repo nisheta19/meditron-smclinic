@@ -1,0 +1,18 @@
+import { chromium } from 'playwright';
+import { resolve } from 'node:path';
+import { mkdir } from 'node:fs/promises';
+const out = resolve('../.local/auth-integration');
+await mkdir(out, { recursive: true });
+const browser = await chromium.launch({ channel: 'msedge', headless: true });
+const page = await browser.newPage({ viewport: { width: 1280, height: 832 }, deviceScaleFactor: 2 });
+await page.route('**/api/auth/me', route => route.fulfill({ status: 401, json: { code: 'UNAUTHORIZED' } }));
+await page.goto(process.env.FRONTEND_URL || 'http://127.0.0.1:15175/');
+await page.evaluate(() => document.fonts.ready);
+await page.locator('.auth-submit:enabled').waitFor();
+await page.screenshot({ path: resolve(out, 'login-empty.png') });
+await page.getByLabel('Логин', { exact: true }).fill('maria_doctor');
+await page.getByLabel('Пароль', { exact: true }).fill('123456789');
+await page.locator('h1').click();
+await page.screenshot({ path: resolve(out, 'login-filled.png') });
+console.log('Saved empty and filled login screenshots at 1280 x 832, DPR 2.');
+await browser.close();

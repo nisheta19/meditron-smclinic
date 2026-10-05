@@ -23,6 +23,7 @@ const expectRequest = async (query) => {
     return url.pathname === '/api/patients' && Object.entries(query).every(([key, value]) => url.searchParams.get(key) === value);
   });
 };
+await page.route("**/api/auth/me", route => route.fulfill({ json: { login: "123", roles: ["DOCTOR"] } }));
 page.on('pageerror', (e) => errors.push(e.message));
 await page.route('**/api/patients?*', (route) => {
   requests.push(Object.fromEntries(new URL(route.request().url()).searchParams));

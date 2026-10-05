@@ -11,7 +11,7 @@ from .text_units import logical_lines
 NUM = r"\d+(?:[.,]\d+)?"
 MEASURE = re.compile(rf"(?<![\d−-])({NUM}(?:\s*(?:[xх×*–-]|\bна\b)\s*{NUM}){{0,2}})\s*(мм|см)(?![\w³²^])", re.I)
 CATEGORY = re.compile(r"(?<!\w)(EU\s*[-–]?\s*[TТ]I\s*[-–]?\s*RADS|[TТ]I\s*[-–]?\s*RADS|[BВ]I\s*[-–]?\s*RADS|BIRADS|BR|[OО]\s*[-–]?\s*RADS)\s*[-:=]?\s*([0-6]|IV|III|II|VI|V|I)([abcабв])?(?!\w)", re.I)
-NEG = re.compile(r"\b(?:не\s+(?:выяв\w*|определ\w*|в[уы]?изуализ\w*|лоцир\w*|обнаруж\w*|получ\w*)|без\s+признак\w*|отсутств\w*|нет)\b", re.I)
+NEG = re.compile(r"\b(?:не\s+(?:выяв\w*|определ\w*|в[уы]?изуализ\w*|лоцир\w*|обнаруж\w*|получ\w*|(?:за)?регистр\w*|флотир\w*)|без\s+признак\w*|отсутств\w*|нет)\b", re.I)
 UNCERTAIN = re.compile(r"\?|нельзя\s+исключить|не\s+исключается|вероятн\w*|возможно|предположительн\w*|под\s+(?:вопросом|подозрением)|подозр\w*\s+на", re.I)
 SURGERY = re.compile(r"после\s+(?:удаления|операции|резекции|холецистэктомии)|состояние\s+после|\bудал[её]н[аоы]?\b|\bудалени[ея]\b|миомэктомия|кистэктомия", re.I)
 EXCLUDED_SECTIONS = {"history", "recommendations", "prescriptions", "signature", "ordered_services", "laboratory_tests"}
@@ -40,17 +40,30 @@ def clause_boundaries(line):
     """Keep clinical abbreviations and measurement lists inside their clause."""
     boundaries=[]
     for m in BOUNDARY.finditer(line):
-        if m[0]=='.' and re.search(r'(?:\b(?:мол(?:очн)?|разм|диам|остаточ|до)|куб|см)$',line[:m.start()],re.I):continue
+        if m[0]=='.' and re.search(r'(?:\b(?:мол(?:очн)?|разм|диам|остаточ|до)|куб|см)$',line[:m.start()],re.I) and not re.match(r'\s*(?:Лоханк|ЧЛС|Мочеточник|Мочев|Почк|Заключени|Справа|Слева|В\s)',line[m.end():],re.I):continue
         if m[0]==';' and re.match(r'\s*\d',line[m.end():]):continue
         boundaries.append(m)
     boundaries.extend(re.finditer(r'\b(?:но|однако)\b|,\s*(?=рядом\s+с\s+яичником)|,\s*(?=(?:узел|киста|полип)\s+\d)',line,re.I))
+    # Opposite anatomical clauses have independent assertions and measurements.
+    if side_of(line) == 'both':
+        boundaries.extend(re.finditer(r',\s*(?=в\s+(?:прав\w*|лев\w*)\s+(?:почк\w*|молочн\w*|дол\w*|яичник\w*))', line, re.I))
+        if not NEG.search(line):
+            boundaries.extend(re.finditer(r'\bи\s+(?=(?:(?:эндометриоидн\w*|прост\w*)\s+)?(?:кист\w*|полип\w*|фиброаденом\w*|конкремент\w*|гидронефроз\w*|уретерогидронефроз\w*|тромбофлебит\w*|посттромботическ\w*)\b)',line,re.I))
+            boundaries.extend(re.finditer(r',\s*(?=(?:конкремент\w*|гидронефроз\w*|уретерогидронефроз\w*|тромбофлебит\w*|посттромботическ\w*)\b)',line,re.I))
     # Coordinated diagnoses keep separate anatomy and uncertainty scopes even
     # when Word places the entire conclusion in one paragraph.
     boundaries.extend(re.finditer(
         r',\s*(?=(?:(?:\w+(?:ой|ого|ых|ые|ая)|форм[аы])\s+){0,4}'
         r'(?:эндометриоз\w*|эндометри[йя]\b|кист[аы]\b|полип\w*|миом\w*|аденомиоз\w*))', line, re.I))
-    return sorted((m for m in boundaries if not (m[0].startswith(',') and
-        re.fullmatch(r'\s*(?:вероятн\w*|возможно|предположительн\w*)\s*',line[:m.start()],re.I))),key=lambda m:m.start())
+    def keep(m):
+        if not m[0].startswith(','):return True
+        if re.fullmatch(r'\s*(?:вероятн\w*|возможно|предположительн\w*)\s*',line[:m.start()],re.I):return False
+        tail=line[m.end():]
+        cue=NEG.search(tail)
+        sentence_start=max((b.end() for b in BOUNDARY.finditer(line[:m.start()])),default=0)
+        if cue and re.search(r'\bи\b',tail[:cue.start()]) and not re.search(r'[\d.;!?]',line[sentence_start:m.start()]+tail[:cue.start()]):return False
+        return True
+    return sorted((m for m in boundaries if keep(m)),key=lambda m:m.start())
 
 
 def blocks(raw, full_text):
@@ -89,8 +102,8 @@ def blocks(raw, full_text):
                 if re.search(r"лимфоуз|лимфатическ\w*\s+уз",piece,re.I): organ="lymph"
                 elif re.search(r"желчн\w*\s+пузыр",piece,re.I): organ="gallbladder"
                 elif re.search(r"яичник",piece,re.I): organ="ovary"
-                elif re.search(r"эндометри|м\s*[-–—]\s*эхо",piece,re.I): organ="endometrium"
-                elif re.search(r"поч(?:к[аиуе]|ек|ках|ке)\b",piece,re.I): organ="kidney"
+                elif re.search(r"эндометр(?:ий|ия|ию|ии|ием)\b|м\s*[-–—]\s*эхо",piece,re.I): organ="endometrium"
+                elif re.search(r"поч(?:к[аиуе]|ек|ках|ке)\b|мочеточник|лоханк|\bЧЛС\b",piece,re.I): organ="kidney"
                 elif re.search(r"шейк\w*\s+матки|цервикальн\w*\s+канал|эндоцервикс",piece,re.I): organ="cervix"
                 elif re.search(r"матк[аи]\b|миометри",piece,re.I): organ="uterus"
                 elif re.search(r"переше[еий]к",piece,re.I): organ="isthmus"
@@ -149,8 +162,15 @@ def expand_lesion_blocks(source,full,study):
         cuts=[]
         if len(list(CATEGORY.finditer(b.text)))>1:
             cuts.extend(m.start() for m in re.finditer(r',\s*(?=(?:справа|слева)\b)',b.text,re.I))
+            cuts.extend(m.start() for m in re.finditer(r',\s*(?=(?:втор\w*|трет\w*|а\s+на\s+\d+|и\s+отдельн\w*)\b)',b.text,re.I))
         lobes=list(re.finditer(r'\bв\s+(?:правой|левой)\s+доле\b',b.text,re.I))
         if len(lobes)>1:cuts.extend(m.start() for m in lobes[1:])
+        if study=='LOWER_LIMB_VESSELS' and side_of(b.text)=='both' and '%' in b.text:
+            cuts.extend(m.start() for m in re.finditer(r',\s*(?=(?:(?:прав\w*|лев\w*)\s+\w*\s*артери|справа|слева))',b.text,re.I))
+        # A new measured lesion is independent of the preceding stone/mass,
+        # even without punctuation. Do not split axes or shared size lists.
+        if dimensions(b.text):
+            cuts.extend(m.start() for m in re.finditer(r'\s+и\s+(?=(?:(?:отдельн\w*|смещаем\w*|подвижн\w*)\s+){0,2}(?:полип\w*|кист\w*|конкремент\w*)\s+\d)',b.text,re.I))
         # Explicit FIGO/type pairs are individual entities even in one sentence.
         if len(re.findall(r'\([0-8]\s*тип',b.text,re.I))>1:
             cuts.extend(m.start() for m in re.finditer(r',\s*(?=(?:в\s+области\s+[^,]+?\s+)?(?:интрамураль|субсерозн|субмукозн|интерстици))',b.text,re.I))
@@ -225,16 +245,22 @@ def lesion_count(text,infer=True):
 
 
 def measured(text, label):
-    m = re.search("(?:" + label + r")", text, re.I)
-    tail=text[m.end():m.end()+45] if m else ""
-    sizes = dimensions(tail)
-    if sizes and re.search(r"\b(?:полип\w*|кист\w*|образовани\w*|узел|холедох)\b",tail[:sizes[0][1]],re.I):
-        return None
-    return sizes[0][0] if sizes else None
+    for m in re.finditer("(?:" + label + r")", text, re.I):
+        tail = text[m.end():m.end()+60]
+        sizes = dimensions(tail)
+        if not sizes:
+            continue
+        bridge = tail[:sizes[0][1]]
+        # A labelled diameter cannot borrow the following lesion's size or
+        # cross a sentence boundary. Try a later explicit label instead.
+        if re.search(r"[;!?]|(?<!\d)\.(?!\d)|\b(?:полип\w*|кист\w*|конкремент\w*|камень|образовани\w*|узел|холедох|лоханк\w*)\b", bridge, re.I):
+            continue
+        return sizes[0][0]
+    return None
 
 
 def explicit_bool(text, positive, negative=None):
-    if negative and re.search(negative, text, re.I): return False
+    if negative and re.search(r'(?<!\w)(?:'+negative+r')', text, re.I): return False
     if re.search(positive, text, re.I): return True
     return None
 
@@ -317,7 +343,7 @@ def attributes(code, block, match_end=0):
         attrs['occlusion']=explicit_bool(text,r'\bокклюзи\w*',r'без\s+окклюзи\w*|окклюзи\w*\s+не\s+выяв')
     if code == "HERNIA":
         attrs.pop("sizeMm",None)
-        attrs["sizeMm"] = measured(text,r"грыжев\w*\s+ворот\w*|дефект\w*\s+апоневроз\w*")
+        attrs["sizeMm"] = measured(text,r"(?:грыжев\w*\s+)?ворот\w*|дефект\w*\s+апоневроз\w*")
         attrs["reducible"] = explicit_bool(text,r"\bвправим",r"невправим")
         attrs["incarcerated"] = explicit_bool(text,r"ущемл[её]н|признаки\s+ущемления|жидкость\s+в\s+грыжевом\s+мешке|нарушение\s+кровотока\s+в\s+содержимом",r"без\s+признаков\s+ущемления|неущемл")
     if code == "HYDRONEPHROSIS":
@@ -349,9 +375,22 @@ def negates(text, start, end):
     while end < len(text) and (text[end].isalnum() or text[end]=='_'):end += 1
     before,after=text[:start],text[end:]
     cue=NEG.search(after)
-    location_only = cue and re.fullmatch(r"[\s:—–,-]*(?:(?:достоверно|в|на|за|и|с|со|обеих|обоих|обоим|област\w*|проекци\w*|прав\w*|лев\w*|мал\w*|таз\w*|маткой|брюшн\w*|пахов\w*|полост\w*|дол[еяхию]\w*|яичник\w*|молочн\w*|предстательн\w*|желез\w*|почк\w*|почек|желчн\w*|пузыр\w*|просвет\w*|после|микци\w*|мочеиспускани\w*|позадиматочн\w*|пространств\w*|забрюшинн\w*|момент|исследования)\b[\s:—–,-]*)*",after[:cue.start()],re.I)
+    # A qualifier "without signs of growth/obstruction" after an asserted
+    # entity describes that entity; it does not deny its existence.
+    if cue and re.match(r'без\b',cue[0],re.I):cue=None
+    location_only = cue and re.fullmatch(r"[\s:—–,-]*(?:(?:достоверно|в|на|за|и|с|со|обеих|обоих|обоим|област\w*|проекци\w*|прав\w*|лев\w*|мал\w*|таз\w*|маткой|брюшн\w*|пахов\w*|полост\w*|дол[еяхию]\w*|яичник\w*|молочн\w*|предстательн\w*|желез\w*|почк\w*|почек|желчн\w*|пузыр\w*|просвет\w*|после|микци\w*|мочеиспускани\w*|позадиматочн\w*|пространств\w*|забрюшинн\w*|момент|исследования|вен\w*|артери\w*|част\w*|верхушк\w*)\b[\s:—–,-]*)*",after[:cue.start()],re.I)
+    if cue and not location_only:
+        # A terminal negative predicate applies to an enumerated noun phrase,
+        # but cannot cross a measurement or an independent affirmative verb.
+        bridge=after[:cue.start()]
+        coordinated=bool(re.search(r'\bи\b',bridge,re.I))
+        location_only=(coordinated and not re.search(r'[\d.;!?]|\b(?:есть|имеется|определяется|выявлен\w*|визуализ\w*|обнаружен\w*|размер\w*|составля\w*|отмеч\w*)\b',bridge,re.I)) or bool(re.fullmatch(r'\s*(?:(?:справа|слева)\s*)+',bridge,re.I))
     claim_negated=cue and re.search(r"(?:данных\s+за|признаков)\s*$",before,re.I)
-    return bool(location_only or claim_negated or re.search(r"(?:без\s+(?:признаков\s+)?|нет\s+(?:признаков\s+)?)$",before,re.I)
+    negative_list=re.search(r'\b(?:без|нет)\s+([\w\s,-]+)\s+(?:и|или)\s+(?:(?:\w+(?:ой|ого|ых|ая|ые|ей))\s+){0,3}$',before,re.I)
+    shared_prefix=negative_list and not re.search(r'\d|\b(?:есть|имеется|определяется|выявлен\w*|визуализ\w*|размер\w*)\b',negative_list[1],re.I)
+    negative_modifier=re.search(r'\b(?:без|нет)\s+(?:признак\w*\s+)?(?:\w+(?:ой|ого|ых|ая|ые|ей)\s+){0,3}$',before,re.I)
+    anatomical_tail=cue and re.fullmatch(r'\s*(?:(?:глубок\w*|поверхност\w*|вен\w*|кож[аиу]|справа|слева|ЧЛС)\s*)+',after[:cue.start()],re.I)
+    return bool(location_only or claim_negated or shared_prefix or negative_modifier or anatomical_tail or re.search(r"(?:\bне\s*|без\s+(?:признаков\s+)?|нет\s+(?:признаков\s+)?)$",before,re.I)
                 or re.match(r"\s*[:—–,-]?\s*(?:(?:справа|слева)\s*)?(?:не\s+(?:выяв\w*|определ\w*|визуализ\w*|лоцир\w*|обнаруж\w*|получ\w*|расширен\w*)|нет\b|отсутств\w*)",after,re.I))
 
 
@@ -371,14 +410,14 @@ def candidates_for(item, source_blocks, study):
             continue
         match = regex.search(text)
         if not match:
-            if code == "GALLSTONES" and (block.organ == "gallbladder" or block.section == "conclusion"):
+            if code == "GALLSTONES" and (block.organ == "gallbladder" or block.section == "conclusion" or re.search(r'хол[еи]дох',text,re.I)):
                 match = re.search(r"\bконкремент\w*|\bЖКБ\b",text,re.I)
             elif code == "GALLBLADDER_POLYP" and block.organ == "gallbladder":
                 match = re.search(r"\bполип\w*",text,re.I)
             elif code == "KIDNEY_STONES" and (block.organ == "kidney" or study == "KIDNEY"):
-                match = re.search(r"\bконкремент\w*|\bкам(?:ень|ни|ней)\b",text,re.I)
-            elif code == "OVARIAN_LESION" and block.organ == "ovary":
-                match = re.search(r"\bкист[аы]\b|(?:жидкостн|кистозн|солидн)\w*\s+образовани\w*",text,re.I)
+                match = re.search(r"\bконкремент\w*|\bмикролит\w*|\bкам(?:ень|ни|ней|ня|нем|нями|нях)\b",text,re.I)
+            elif code == "OVARIAN_LESION" and (block.organ == "ovary" or study=='PELVIS_FEMALE' and re.search(r'[OО]\s*[-–]?\s*RADS',text,re.I)):
+                match = re.search(r"\bкист(?:а|ы|у|ой|е|ами|ах)\b|(?:жидкостн|кистозн|солидн)\w*\s+образовани\w*",text,re.I)
         if code in {"BREAST_LESION","THYROID_NODULE"} and block.organ == "lymph":
             continue
         if code == "THYROID_NODULE" and re.search(r"лимфатическ\w*\s+уз",text,re.I):
@@ -393,7 +432,7 @@ def candidates_for(item, source_blocks, study):
             continue
         if code == "ACUTE_CHOLECYSTITIS" and re.search(r"хроническ\w*\s+холецистит|вне\s+обострения",text,re.I):
             continue
-        if code in {"GALLSTONES","GALLBLADDER_POLYP"} and re.search(r"холецистэктом|желчн\w*\s+пузырь\s+удал",text,re.I):
+        if code in {"GALLSTONES","GALLBLADDER_POLYP"} and not (code=='GALLSTONES' and re.search(r'хол[еи]дох',text,re.I)) and re.search(r"холецистэктом|желчн\w*\s+пузырь\s+удал",text,re.I):
             found.append(dict(code=code,block=block,attrs={},reason="POST_SURGERY"))
             continue
         if not match: continue
@@ -429,7 +468,8 @@ def candidates_for(item, source_blocks, study):
         attrs['uncertain']=bool(UNCERTAIN.search(text[left:right]))
         attrs["uncertain"] |= any(p.search(text) for p in suspected)
         if code == "ENDOMETRIAL_POLYP" and re.search(r"очагов|локальн|фокальн",match[0],re.I): attrs["uncertain"] = True
-        reason = "POST_SURGERY" if SURGERY.search(text) else "NEGATION" if negates(text,match.start(),match.end()) else None
+        surgery=SURGERY.search(text) and not (code=='GALLSTONES' and re.search(r'хол[еи]дох',text,re.I))
+        reason = "POST_SURGERY" if surgery else "NEGATION" if negates(text,match.start(),match.end()) else None
         if code == "HYDRONEPHROSIS" and re.search(r"ЧЛС\s+не\s+расширен",text,re.I): reason = "NEGATION"
         if code == "VENOUS_INSUFFICIENCY" and re.search(r"рефлюкс[^,.;]{0,100}не\s+рег[ие]ст(?:р|ир)",text,re.I): reason = "NEGATION"
         # negates() is anchored to the finding. An unrelated negative attribute
@@ -460,12 +500,15 @@ def descriptive_attributes(code, rows, source):
         if any(r["block"].start==b.start for r in rows): continue
         if code=="UTERINE_FIBROID" and b.organ=="uterus" and re.search(r"интрамураль|интерстици|субсерозн|субмукозн|FIGO|[0-8]\s*тип",b.text,re.I):
             marker=re.search(r"образовани\w*|уз(?:ел|лы|лов|ла)\b",b.text,re.I)
+            if not marker and re.search(r'FIGO|[0-8]\s*тип',b.text,re.I):marker=re.match(r'^',b.text)
         elif code=="ENDOMETRIAL_POLYP" and b.organ=="endometrium":
-            marker=re.search(r"образовани\w*|гиперэхогенн\w*\s+участок",b.text,re.I)
+            marker=re.search(r"полип\w*|образовани\w*|гиперэхогенн\w*\s+участок",b.text,re.I)
         elif code=="ENDOMETRIAL_HYPERPLASIA" and b.organ=="endometrium":
             marker=re.search(r"эндометри\w*|м\s*[-–—]\s*эхо",b.text,re.I)
         elif code=="CERVICAL_POLYP" and b.organ=="cervix":
-            marker=re.search(r"гиперэхогенн\w*\s+образовани\w*",b.text,re.I)
+            marker=re.search(r"полип\w*|гиперэхогенн\w*\s+образовани\w*",b.text,re.I)
+        elif code=="ARTERIAL_STENOSIS" and b.side in {'right','left'} and '%' in b.text:
+            marker=re.search(r'артери\w*|\b(?:ОБА|ПБА|ГБА|ПкА|ЗББА|ПББА|справа|слева)\b',b.text,re.I)
         elif code=="OVARIAN_LESION" and b.organ=="ovary":
             marker=re.search(r"(?:анэхогенн\w*|жидкостн\w*|аваскулярн\w*)\s+(?:\w+\s+){0,2}(?:включени\w*|образовани\w*|структур\w*)|полост[ьюи]+",b.text,re.I)
         elif code=="GALLBLADDER_POLYP" and b.organ=="gallbladder" and re.search(r"без\s+акустическ\w*\s+тени|неподвижн|пристеночн",b.text,re.I):
@@ -557,7 +600,7 @@ def analyze_legacy(parsed, raw, study, dictionary):
                       and r["attrs"].get("side")==b.side]
                 if same:
                     for r in same:r["attrs"].update(attrs)
-                else: rows.append(dict(code=code,block=b,attrs={**attrs,"uncertain":False,**({"side":b.side} if b.side else {})},reason=None))
+                else: rows.append(dict(code=code,block=b,attrs={**attributes(code,b),**attrs},reason=None))
         if code == "ENDOMETRIAL_HYPERPLASIA":
             menopause = [b for b in source if re.search(r"\b(?:пост)?менопауз",b.text,re.I) and not re.search(r"нет\s+менопауз|менопауза\s*:\s*нет",b.text,re.I)]
             if menopause and not v2 and not any(not r["reason"] for r in rows):
@@ -602,8 +645,12 @@ def analyze_legacy(parsed, raw, study, dictionary):
                 return None
             kinds={kind(r) for r in anchors}-{None}
             if code=='BREAST_LESION' and len(kinds)>1:
+                common_cats={r['attrs'].get(scale) for r in group if r['block'].section=='conclusion'}-{None}
                 for value in sorted(kinds):
-                    coherent_groups.append((side,[r for r in group if kind(r)==value or (kind(r) is None and 'sizeMm' not in r['attrs'])]))
+                    selected=[r for r in group if kind(r)==value or (kind(r) is None and 'sizeMm' not in r['attrs'])]
+                    if len(common_cats)==1:
+                        for r in selected:r['attrs'].setdefault(scale,next(iter(common_cats)))
+                    coherent_groups.append((side,selected))
                 continue
             key=scale or ('figo' if code=='UTERINE_FIBROID' else None)
             variants={r['attrs'].get(key) for r in anchors}-{None}
@@ -686,7 +733,11 @@ def analyze_legacy(parsed, raw, study, dictionary):
             allowed=item.get("attributes",["uncertain","sizeMm","side"])
             attrs={k:v for k,v in attrs.items() if k in allowed}
             start,end=min(b.start for b in evidence),max(b.end for b in evidence)
-            found.append({"code":output_code,"evidence":{"text":full[start:end],"start":start,"end":end},"attributes":attrs})
+            finding={"code":output_code,"evidence":{"text":full[start:end],"start":start,"end":end},"attributes":attrs}
+            if v2 and code=='BREAST_LESION':
+                anchor_kinds={kind(r) for r in group if 'sizeMm' in r['attrs']}-{None}
+                if len(anchor_kinds)==1:finding['_lesionKind']=next(iter(anchor_kinds))
+            found.append(finding)
     # Symmetric vascular maxima describe one bilateral fact. Categories for
     # paired glands remain separate, as required by their dictionary contract.
     for code in (i['code'] for i in items if i.get('extractionProfile',i['code']) in {'ARTERIAL_STENOSIS','VENOUS_INSUFFICIENCY'}):

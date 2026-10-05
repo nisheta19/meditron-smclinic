@@ -1,0 +1,2789 @@
+{
+  "date": "2026-10-05",
+  "modelVersion": "dict-v2.1-extractor-8",
+  "clinicalValidation": false,
+  "annotationSource": "assistant-authored synthetic cases; original real gold unchanged",
+  "stoppingCriterion": "full-fact F1 > 0.90 on a newly authored complex set, including formatting variants",
+  "stoppedBecause": "threshold reached on cycle 6; subsequent changes fixed regressions in prior cases",
+  "uniqueNewDocuments": 280,
+  "firstPassCycles": [
+    {
+      "cycle": 1,
+      "gold": "ml/eval/v8/round1-gold.json",
+      "goldSha256": "d7e89e29ca9b40f2d2a235e5315caa9de36702d8736c5485ff212dc7e6890868",
+      "documents": 48,
+      "expectedFindings": 62,
+      "studyCounts": {
+        "THYROID": 6,
+        "BREAST": 6,
+        "SOFT_TISSUE": 6,
+        "PROSTATE": 6,
+        "ABDOMEN": 6,
+        "PELVIS_FEMALE": 6,
+        "LOWER_LIMB_VESSELS": 6,
+        "KIDNEY": 6
+      },
+      "firstPass": {
+        "modelVersion": "dict-v2.1-extractor-7",
+        "goldSha256": "d7e89e29ca9b40f2d2a235e5315caa9de36702d8736c5485ff212dc7e6890868",
+        "clinicalValidation": false,
+        "variants": {
+          "original": {
+            "documents": 48,
+            "entities": {
+              "tp": 59,
+              "fp": 9,
+              "fn": 3,
+              "precision": 0.8676470588235294,
+              "recall": 0.9516129032258065,
+              "f1": 0.9076923076923077
+            },
+            "fullFacts": {
+              "tp": 51,
+              "fp": 17,
+              "fn": 11,
+              "precision": 0.75,
+              "recall": 0.8225806451612904,
+              "f1": 0.7846153846153846
+            },
+            "attributes": {
+              "correct": 172,
+              "total": 192,
+              "accuracy": 0.8958333333333334
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 4
+            },
+            "timingSeconds": {
+              "mean": 0.0682259937505781,
+              "max": 0.1357795000076294
+            }
+          },
+          "wrap35": {
+            "documents": 48,
+            "entities": {
+              "tp": 59,
+              "fp": 9,
+              "fn": 3,
+              "precision": 0.8676470588235294,
+              "recall": 0.9516129032258065,
+              "f1": 0.9076923076923077
+            },
+            "fullFacts": {
+              "tp": 51,
+              "fp": 17,
+              "fn": 11,
+              "precision": 0.75,
+              "recall": 0.8225806451612904,
+              "f1": 0.7846153846153846
+            },
+            "attributes": {
+              "correct": 172,
+              "total": 192,
+              "accuracy": 0.8958333333333334
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 4
+            },
+            "timingSeconds": {
+              "mean": 0.06977637499706664,
+              "max": 0.18016139999963343
+            }
+          },
+          "upper_wrap55": {
+            "documents": 48,
+            "entities": {
+              "tp": 58,
+              "fp": 10,
+              "fn": 4,
+              "precision": 0.8529411764705882,
+              "recall": 0.9354838709677419,
+              "f1": 0.8923076923076924
+            },
+            "fullFacts": {
+              "tp": 48,
+              "fp": 20,
+              "fn": 14,
+              "precision": 0.7058823529411765,
+              "recall": 0.7741935483870968,
+              "f1": 0.7384615384615385
+            },
+            "attributes": {
+              "correct": 168,
+              "total": 192,
+              "accuracy": 0.875
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 4
+            },
+            "timingSeconds": {
+              "mean": 0.06326944374207717,
+              "max": 0.10900769999716431
+            }
+          }
+        }
+      },
+      "sourceManifestAvailable": false
+    },
+    {
+      "cycle": 2,
+      "gold": "ml/eval/v8/round2-gold.json",
+      "goldSha256": "1f9284cac316dd951fab03ac99863c3788fac927f5b58918800812165f527b31",
+      "documents": 48,
+      "expectedFindings": 62,
+      "studyCounts": {
+        "THYROID": 6,
+        "BREAST": 6,
+        "SOFT_TISSUE": 6,
+        "PROSTATE": 6,
+        "ABDOMEN": 6,
+        "PELVIS_FEMALE": 6,
+        "LOWER_LIMB_VESSELS": 6,
+        "KIDNEY": 6
+      },
+      "firstPass": {
+        "modelVersion": "dict-v2.1-extractor-7",
+        "goldSha256": "1f9284cac316dd951fab03ac99863c3788fac927f5b58918800812165f527b31",
+        "clinicalValidation": false,
+        "variants": {
+          "original": {
+            "documents": 48,
+            "entities": {
+              "tp": 59,
+              "fp": 5,
+              "fn": 3,
+              "precision": 0.921875,
+              "recall": 0.9516129032258065,
+              "f1": 0.9365079365079365
+            },
+            "fullFacts": {
+              "tp": 54,
+              "fp": 10,
+              "fn": 8,
+              "precision": 0.84375,
+              "recall": 0.8709677419354839,
+              "f1": 0.8571428571428571
+            },
+            "attributes": {
+              "correct": 176,
+              "total": 189,
+              "accuracy": 0.9312169312169312
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 4
+            },
+            "timingSeconds": {
+              "mean": 0.07142831458865355,
+              "max": 0.13972970005124807
+            }
+          },
+          "wrap35": {
+            "documents": 48,
+            "entities": {
+              "tp": 58,
+              "fp": 5,
+              "fn": 4,
+              "precision": 0.9206349206349206,
+              "recall": 0.9354838709677419,
+              "f1": 0.928
+            },
+            "fullFacts": {
+              "tp": 53,
+              "fp": 10,
+              "fn": 9,
+              "precision": 0.8412698412698413,
+              "recall": 0.8548387096774194,
+              "f1": 0.848
+            },
+            "attributes": {
+              "correct": 175,
+              "total": 189,
+              "accuracy": 0.9259259259259259
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 4
+            },
+            "timingSeconds": {
+              "mean": 0.0635072375080199,
+              "max": 0.15815299993846565
+            }
+          },
+          "upper_wrap55": {
+            "documents": 48,
+            "entities": {
+              "tp": 59,
+              "fp": 6,
+              "fn": 3,
+              "precision": 0.9076923076923077,
+              "recall": 0.9516129032258065,
+              "f1": 0.9291338582677166
+            },
+            "fullFacts": {
+              "tp": 54,
+              "fp": 11,
+              "fn": 8,
+              "precision": 0.8307692307692308,
+              "recall": 0.8709677419354839,
+              "f1": 0.8503937007874016
+            },
+            "attributes": {
+              "correct": 176,
+              "total": 189,
+              "accuracy": 0.9312169312169312
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 4
+            },
+            "timingSeconds": {
+              "mean": 0.06874569790428116,
+              "max": 0.13780689996201545
+            }
+          }
+        }
+      },
+      "sourceManifestAvailable": false
+    },
+    {
+      "cycle": 3,
+      "gold": "ml/eval/v8/round3-gold.json",
+      "goldSha256": "5ccc2b6079fceedfcd433f004ea08b0eae8e7961f5a8b57d77e28a67168ad32f",
+      "documents": 48,
+      "expectedFindings": 71,
+      "studyCounts": {
+        "THYROID": 6,
+        "BREAST": 6,
+        "SOFT_TISSUE": 6,
+        "PROSTATE": 6,
+        "ABDOMEN": 6,
+        "PELVIS_FEMALE": 6,
+        "LOWER_LIMB_VESSELS": 6,
+        "KIDNEY": 6
+      },
+      "firstPass": {
+        "modelVersion": "dict-v2.1-extractor-7",
+        "goldSha256": "5ccc2b6079fceedfcd433f004ea08b0eae8e7961f5a8b57d77e28a67168ad32f",
+        "clinicalValidation": false,
+        "variants": {
+          "original": {
+            "documents": 48,
+            "entities": {
+              "tp": 64,
+              "fp": 4,
+              "fn": 7,
+              "precision": 0.9411764705882353,
+              "recall": 0.9014084507042254,
+              "f1": 0.920863309352518
+            },
+            "fullFacts": {
+              "tp": 56,
+              "fp": 12,
+              "fn": 15,
+              "precision": 0.8235294117647058,
+              "recall": 0.7887323943661971,
+              "f1": 0.8057553956834532
+            },
+            "attributes": {
+              "correct": 185,
+              "total": 211,
+              "accuracy": 0.8767772511848341
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 1
+            },
+            "timingSeconds": {
+              "mean": 0.07106681874332328,
+              "max": 0.13971060002222657
+            }
+          },
+          "wrap35": {
+            "documents": 48,
+            "entities": {
+              "tp": 64,
+              "fp": 4,
+              "fn": 7,
+              "precision": 0.9411764705882353,
+              "recall": 0.9014084507042254,
+              "f1": 0.920863309352518
+            },
+            "fullFacts": {
+              "tp": 56,
+              "fp": 12,
+              "fn": 15,
+              "precision": 0.8235294117647058,
+              "recall": 0.7887323943661971,
+              "f1": 0.8057553956834532
+            },
+            "attributes": {
+              "correct": 185,
+              "total": 211,
+              "accuracy": 0.8767772511848341
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 1
+            },
+            "timingSeconds": {
+              "mean": 0.06887665208584319,
+              "max": 0.12124919996131212
+            }
+          },
+          "upper_wrap55": {
+            "documents": 48,
+            "entities": {
+              "tp": 62,
+              "fp": 12,
+              "fn": 9,
+              "precision": 0.8378378378378378,
+              "recall": 0.8732394366197183,
+              "f1": 0.8551724137931035
+            },
+            "fullFacts": {
+              "tp": 53,
+              "fp": 21,
+              "fn": 18,
+              "precision": 0.7162162162162162,
+              "recall": 0.7464788732394366,
+              "f1": 0.7310344827586207
+            },
+            "attributes": {
+              "correct": 175,
+              "total": 211,
+              "accuracy": 0.8293838862559242
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 4
+            },
+            "timingSeconds": {
+              "mean": 0.08143137499913185,
+              "max": 0.17519179999362677
+            }
+          }
+        }
+      },
+      "sourceManifestAvailable": true,
+      "frozenInputs": {
+        "model": {
+          "app\\__init__.py": "814ef1ca6acc2685e4648365b5a8d83fd2dde8fdb63b7b28edddc69ce692b127",
+          "app\\__main__.py": "5e7672ea9596ee2a943c009ad934e23861f95a7fa818df234c8299c51e0e7850",
+          "app\\annotation.py": "db715371d9a71c768daa5c2742cc2bcb37e144b53c221bb69626ea00dd658627",
+          "app\\asgi.py": "7beb06c8b6276976aed47116eb9450c578bdb7af713cc0434ed584ec612d4bef",
+          "app\\attributes.py": "1cd96ac230c75c596d2da134689c7a3cdb364e5ae7a38d1180f4269f0ab84273",
+          "app\\backend.py": "341130094425857859f9486c36050da50248132f557fecb6fe9eabb6bfa07501",
+          "app\\benchmark_v2.py": "4532497da82b9f1c828383db22d123a71436e0539c72bcc7ad49e66de586928b",
+          "app\\check.py": "221b6e4f9e757ed94d961f04b2d33b9d9a034972993e9980899e27c0bea9c98c",
+          "app\\clinical.py": "5abcbe1c7230b4d5da124ac06f8208ddd5d10741f9c08e8ad8219a76e344ca24",
+          "app\\clinical_v2.py": "cd50d32213ac4576fa10fe653f725cdfedbfa16920a5ada952cbf2037d1e958c",
+          "app\\contracts.py": "5b06a53016d2ba86f3cfe47a170eae070c3579b24b26cbb8df10396a4cccb176",
+          "app\\corpus.py": "32cbad3782238971124d90932292ba1d8a9f062f7ec0a70d2f599d13d3c33a9a",
+          "app\\dataset.py": "4161a96ecdbbe0d81811c0c2de8473a5bbdbb45317583e68fa8a6fd8733d7231",
+          "app\\demo.py": "5d435981956569900d462a325560933ea23cf1937babb5c7c9c9313eaa752a26",
+          "app\\dictionary.py": "f5934e1bb95af653555bf1624c4cba0c60e3e79d6a5f3e558fdbdfd179383ab3",
+          "app\\evaluate.py": "8acb973ea6846c8b5181977f9f0220f8de98a2d430daf95c300ce326e30b9217",
+          "app\\extensions.py": "88351fb7e9b0448ec6dd95a5962988b0310da53b36ed03f0d67aa5202837f59d",
+          "app\\findings.py": "ad89be8860b3f39f8186677c89d233a1d56e106e04d88f906038d9a6d69c5081",
+          "app\\generalization.py": "5e2452742b86125c5dc1d102a33f2e58a649f4d7f7f6c0929c12279e0d2cbabe",
+          "app\\mis.py": "dc00340e73708223e1f1e88c547ba7f191b9a4007f0002583f5666035198e4cb",
+          "app\\parser.py": "6964bf662afb173f1ca6bbc98b8a5130eccc63d6e4759706e3a442dde81a1102",
+          "app\\processing.py": "f89b1537b160841a98898663578dc9eac50839c54d76fc42cbad653cf261fe32",
+          "app\\release.py": "dfe8e8840dadef8df937f2e315196ac5a35c3b9bb377de09d47d6db82a984dbc",
+          "app\\sections.py": "d20b2ff43436240afe945089faa89d9f0a0ba9bdb6728d25c9126f81139821ae",
+          "app\\server.py": "1c990ea4462552a104e8b4a3e46eb51c067c65c55b06ee744d59d3700e036918",
+          "app\\service.py": "1ddf36f37bbcbe27f206c349e1d44b879a057e920c231ca38a66f720e8ea75fa",
+          "app\\text_units.py": "5e50e4e56d3c3e15479710090af91597a4c2b3f38789184e88961aca0bfd9397",
+          "app\\validation.py": "e9c5d18b52e8a625ae6458146210a3580363d46472d375729bfe44ecdd75f5b1",
+          "app\\verify_corpus.py": "8f77f2c73868e29f638513ca2d680309f82752e0dd4c40fcc6366d6cc78e034d",
+          "configs\\findings-dictionary.yaml": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b"
+        },
+        "gold": "5ccc2b6079fceedfcd433f004ea08b0eae8e7961f5a8b57d77e28a67168ad32f"
+      },
+      "integrity": {
+        "modelUnchangedDuringInference": true,
+        "goldUnchanged": true,
+        "independentCountsConfirmed": true,
+        "goldSha256": "5ccc2b6079fceedfcd433f004ea08b0eae8e7961f5a8b57d77e28a67168ad32f"
+      }
+    },
+    {
+      "cycle": 4,
+      "gold": "ml/eval/v8/round4-gold.json",
+      "goldSha256": "a89edc357a1e7f96b566066ec6d114c020fa72bd7e8cdf61c2034748328d9a33",
+      "documents": 48,
+      "expectedFindings": 71,
+      "studyCounts": {
+        "THYROID": 6,
+        "BREAST": 6,
+        "SOFT_TISSUE": 6,
+        "PROSTATE": 6,
+        "ABDOMEN": 6,
+        "PELVIS_FEMALE": 6,
+        "LOWER_LIMB_VESSELS": 6,
+        "KIDNEY": 6
+      },
+      "firstPass": {
+        "modelVersion": "dict-v2.1-extractor-7",
+        "goldSha256": "a89edc357a1e7f96b566066ec6d114c020fa72bd7e8cdf61c2034748328d9a33",
+        "clinicalValidation": false,
+        "variants": {
+          "original": {
+            "documents": 48,
+            "entities": {
+              "tp": 65,
+              "fp": 2,
+              "fn": 6,
+              "precision": 0.9701492537313433,
+              "recall": 0.9154929577464789,
+              "f1": 0.9420289855072463
+            },
+            "fullFacts": {
+              "tp": 63,
+              "fp": 4,
+              "fn": 8,
+              "precision": 0.9402985074626866,
+              "recall": 0.8873239436619719,
+              "f1": 0.9130434782608695
+            },
+            "attributes": {
+              "correct": 194,
+              "total": 217,
+              "accuracy": 0.8940092165898618
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 0
+            },
+            "timingSeconds": {
+              "mean": 0.06817530416446971,
+              "max": 0.12219469994306564
+            }
+          },
+          "wrap35": {
+            "documents": 48,
+            "entities": {
+              "tp": 65,
+              "fp": 2,
+              "fn": 6,
+              "precision": 0.9701492537313433,
+              "recall": 0.9154929577464789,
+              "f1": 0.9420289855072463
+            },
+            "fullFacts": {
+              "tp": 63,
+              "fp": 4,
+              "fn": 8,
+              "precision": 0.9402985074626866,
+              "recall": 0.8873239436619719,
+              "f1": 0.9130434782608695
+            },
+            "attributes": {
+              "correct": 192,
+              "total": 217,
+              "accuracy": 0.8847926267281107
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 0
+            },
+            "timingSeconds": {
+              "mean": 0.06889431040326599,
+              "max": 0.13286389992572367
+            }
+          },
+          "upper_wrap55": {
+            "documents": 48,
+            "entities": {
+              "tp": 65,
+              "fp": 2,
+              "fn": 6,
+              "precision": 0.9701492537313433,
+              "recall": 0.9154929577464789,
+              "f1": 0.9420289855072463
+            },
+            "fullFacts": {
+              "tp": 62,
+              "fp": 5,
+              "fn": 9,
+              "precision": 0.9253731343283582,
+              "recall": 0.8732394366197183,
+              "f1": 0.8985507246376812
+            },
+            "attributes": {
+              "correct": 192,
+              "total": 217,
+              "accuracy": 0.8847926267281107
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 0
+            },
+            "timingSeconds": {
+              "mean": 0.06420141458511353,
+              "max": 0.11719490005634725
+            }
+          }
+        }
+      },
+      "sourceManifestAvailable": true,
+      "frozenInputs": {
+        "model": {
+          "app\\__init__.py": "814ef1ca6acc2685e4648365b5a8d83fd2dde8fdb63b7b28edddc69ce692b127",
+          "app\\__main__.py": "5e7672ea9596ee2a943c009ad934e23861f95a7fa818df234c8299c51e0e7850",
+          "app\\annotation.py": "db715371d9a71c768daa5c2742cc2bcb37e144b53c221bb69626ea00dd658627",
+          "app\\asgi.py": "7beb06c8b6276976aed47116eb9450c578bdb7af713cc0434ed584ec612d4bef",
+          "app\\attributes.py": "1cd96ac230c75c596d2da134689c7a3cdb364e5ae7a38d1180f4269f0ab84273",
+          "app\\backend.py": "341130094425857859f9486c36050da50248132f557fecb6fe9eabb6bfa07501",
+          "app\\benchmark_v2.py": "4532497da82b9f1c828383db22d123a71436e0539c72bcc7ad49e66de586928b",
+          "app\\check.py": "221b6e4f9e757ed94d961f04b2d33b9d9a034972993e9980899e27c0bea9c98c",
+          "app\\clinical.py": "39eceebee08934d8dd4d32d0c2c115925eb651b0a345a90365a1e3026c81e993",
+          "app\\clinical_v2.py": "739ac144683f062bdfb1020ff22f0e1b00dec69b9584e99d259c770099a4e8a3",
+          "app\\contracts.py": "5b06a53016d2ba86f3cfe47a170eae070c3579b24b26cbb8df10396a4cccb176",
+          "app\\corpus.py": "32cbad3782238971124d90932292ba1d8a9f062f7ec0a70d2f599d13d3c33a9a",
+          "app\\dataset.py": "4161a96ecdbbe0d81811c0c2de8473a5bbdbb45317583e68fa8a6fd8733d7231",
+          "app\\demo.py": "5d435981956569900d462a325560933ea23cf1937babb5c7c9c9313eaa752a26",
+          "app\\dictionary.py": "f5934e1bb95af653555bf1624c4cba0c60e3e79d6a5f3e558fdbdfd179383ab3",
+          "app\\evaluate.py": "8acb973ea6846c8b5181977f9f0220f8de98a2d430daf95c300ce326e30b9217",
+          "app\\extensions.py": "88351fb7e9b0448ec6dd95a5962988b0310da53b36ed03f0d67aa5202837f59d",
+          "app\\findings.py": "ad89be8860b3f39f8186677c89d233a1d56e106e04d88f906038d9a6d69c5081",
+          "app\\generalization.py": "5e2452742b86125c5dc1d102a33f2e58a649f4d7f7f6c0929c12279e0d2cbabe",
+          "app\\mis.py": "dc00340e73708223e1f1e88c547ba7f191b9a4007f0002583f5666035198e4cb",
+          "app\\parser.py": "6964bf662afb173f1ca6bbc98b8a5130eccc63d6e4759706e3a442dde81a1102",
+          "app\\processing.py": "f89b1537b160841a98898663578dc9eac50839c54d76fc42cbad653cf261fe32",
+          "app\\release.py": "dfe8e8840dadef8df937f2e315196ac5a35c3b9bb377de09d47d6db82a984dbc",
+          "app\\sections.py": "d20b2ff43436240afe945089faa89d9f0a0ba9bdb6728d25c9126f81139821ae",
+          "app\\server.py": "1c990ea4462552a104e8b4a3e46eb51c067c65c55b06ee744d59d3700e036918",
+          "app\\service.py": "1ddf36f37bbcbe27f206c349e1d44b879a057e920c231ca38a66f720e8ea75fa",
+          "app\\text_units.py": "0b33c2d86f7952e1cdaee4d31ea207e741ffdc59aa8d4b0c9f6bc6f5c1681100",
+          "app\\validation.py": "e9c5d18b52e8a625ae6458146210a3580363d46472d375729bfe44ecdd75f5b1",
+          "app\\verify_corpus.py": "8f77f2c73868e29f638513ca2d680309f82752e0dd4c40fcc6366d6cc78e034d",
+          "configs\\findings-dictionary.yaml": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b"
+        },
+        "gold": "a89edc357a1e7f96b566066ec6d114c020fa72bd7e8cdf61c2034748328d9a33"
+      },
+      "integrity": {
+        "modelUnchangedDuringInference": true,
+        "goldUnchanged": true,
+        "independentCountsConfirmed": true,
+        "goldSha256": "a89edc357a1e7f96b566066ec6d114c020fa72bd7e8cdf61c2034748328d9a33"
+      }
+    },
+    {
+      "cycle": 5,
+      "gold": "ml/eval/v8/round5-gold.json",
+      "goldSha256": "701c4a8ec395ae58eba662e9cf3d4509443cd4868d4b6e95022e30cae8f5ef4f",
+      "documents": 48,
+      "expectedFindings": 71,
+      "studyCounts": {
+        "THYROID": 6,
+        "BREAST": 6,
+        "SOFT_TISSUE": 6,
+        "PROSTATE": 6,
+        "ABDOMEN": 6,
+        "PELVIS_FEMALE": 6,
+        "LOWER_LIMB_VESSELS": 6,
+        "KIDNEY": 6
+      },
+      "firstPass": {
+        "modelVersion": "dict-v2.1-extractor-7",
+        "goldSha256": "701c4a8ec395ae58eba662e9cf3d4509443cd4868d4b6e95022e30cae8f5ef4f",
+        "clinicalValidation": false,
+        "variants": {
+          "original": {
+            "documents": 48,
+            "entities": {
+              "tp": 70,
+              "fp": 4,
+              "fn": 1,
+              "precision": 0.9459459459459459,
+              "recall": 0.9859154929577465,
+              "f1": 0.9655172413793104
+            },
+            "fullFacts": {
+              "tp": 60,
+              "fp": 14,
+              "fn": 11,
+              "precision": 0.8108108108108109,
+              "recall": 0.8450704225352113,
+              "f1": 0.8275862068965517
+            },
+            "attributes": {
+              "correct": 207,
+              "total": 220,
+              "accuracy": 0.9409090909090909
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 2
+            },
+            "timingSeconds": {
+              "mean": 0.0692973208448772,
+              "max": 0.10715000005438924
+            }
+          },
+          "wrap35": {
+            "documents": 48,
+            "entities": {
+              "tp": 70,
+              "fp": 4,
+              "fn": 1,
+              "precision": 0.9459459459459459,
+              "recall": 0.9859154929577465,
+              "f1": 0.9655172413793104
+            },
+            "fullFacts": {
+              "tp": 60,
+              "fp": 14,
+              "fn": 11,
+              "precision": 0.8108108108108109,
+              "recall": 0.8450704225352113,
+              "f1": 0.8275862068965517
+            },
+            "attributes": {
+              "correct": 207,
+              "total": 220,
+              "accuracy": 0.9409090909090909
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 2
+            },
+            "timingSeconds": {
+              "mean": 0.06099366458268681,
+              "max": 0.11214310000650585
+            }
+          },
+          "upper_wrap55": {
+            "documents": 48,
+            "entities": {
+              "tp": 70,
+              "fp": 4,
+              "fn": 1,
+              "precision": 0.9459459459459459,
+              "recall": 0.9859154929577465,
+              "f1": 0.9655172413793104
+            },
+            "fullFacts": {
+              "tp": 60,
+              "fp": 14,
+              "fn": 11,
+              "precision": 0.8108108108108109,
+              "recall": 0.8450704225352113,
+              "f1": 0.8275862068965517
+            },
+            "attributes": {
+              "correct": 207,
+              "total": 220,
+              "accuracy": 0.9409090909090909
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 2
+            },
+            "timingSeconds": {
+              "mean": 0.05248050833809733,
+              "max": 0.11715060006827116
+            }
+          }
+        }
+      },
+      "sourceManifestAvailable": true,
+      "frozenInputs": {
+        "model": {
+          "app\\__init__.py": "814ef1ca6acc2685e4648365b5a8d83fd2dde8fdb63b7b28edddc69ce692b127",
+          "app\\__main__.py": "5e7672ea9596ee2a943c009ad934e23861f95a7fa818df234c8299c51e0e7850",
+          "app\\annotation.py": "db715371d9a71c768daa5c2742cc2bcb37e144b53c221bb69626ea00dd658627",
+          "app\\asgi.py": "7beb06c8b6276976aed47116eb9450c578bdb7af713cc0434ed584ec612d4bef",
+          "app\\attributes.py": "1cd96ac230c75c596d2da134689c7a3cdb364e5ae7a38d1180f4269f0ab84273",
+          "app\\backend.py": "341130094425857859f9486c36050da50248132f557fecb6fe9eabb6bfa07501",
+          "app\\benchmark_v2.py": "4532497da82b9f1c828383db22d123a71436e0539c72bcc7ad49e66de586928b",
+          "app\\check.py": "221b6e4f9e757ed94d961f04b2d33b9d9a034972993e9980899e27c0bea9c98c",
+          "app\\clinical.py": "b500f837ec882d058307af965ff14a3fd7b5c734b4bb43b14378015082ef1bc1",
+          "app\\clinical_v2.py": "b17ee62120f101927f0c208ababde53b02c4d3c71f0060466ed8691bf14ca6b8",
+          "app\\contracts.py": "5b06a53016d2ba86f3cfe47a170eae070c3579b24b26cbb8df10396a4cccb176",
+          "app\\corpus.py": "32cbad3782238971124d90932292ba1d8a9f062f7ec0a70d2f599d13d3c33a9a",
+          "app\\dataset.py": "4161a96ecdbbe0d81811c0c2de8473a5bbdbb45317583e68fa8a6fd8733d7231",
+          "app\\demo.py": "5d435981956569900d462a325560933ea23cf1937babb5c7c9c9313eaa752a26",
+          "app\\dictionary.py": "f5934e1bb95af653555bf1624c4cba0c60e3e79d6a5f3e558fdbdfd179383ab3",
+          "app\\evaluate.py": "8acb973ea6846c8b5181977f9f0220f8de98a2d430daf95c300ce326e30b9217",
+          "app\\extensions.py": "88351fb7e9b0448ec6dd95a5962988b0310da53b36ed03f0d67aa5202837f59d",
+          "app\\findings.py": "ad89be8860b3f39f8186677c89d233a1d56e106e04d88f906038d9a6d69c5081",
+          "app\\generalization.py": "5e2452742b86125c5dc1d102a33f2e58a649f4d7f7f6c0929c12279e0d2cbabe",
+          "app\\mis.py": "dc00340e73708223e1f1e88c547ba7f191b9a4007f0002583f5666035198e4cb",
+          "app\\parser.py": "6964bf662afb173f1ca6bbc98b8a5130eccc63d6e4759706e3a442dde81a1102",
+          "app\\processing.py": "f89b1537b160841a98898663578dc9eac50839c54d76fc42cbad653cf261fe32",
+          "app\\release.py": "dfe8e8840dadef8df937f2e315196ac5a35c3b9bb377de09d47d6db82a984dbc",
+          "app\\sections.py": "d20b2ff43436240afe945089faa89d9f0a0ba9bdb6728d25c9126f81139821ae",
+          "app\\server.py": "1c990ea4462552a104e8b4a3e46eb51c067c65c55b06ee744d59d3700e036918",
+          "app\\service.py": "1ddf36f37bbcbe27f206c349e1d44b879a057e920c231ca38a66f720e8ea75fa",
+          "app\\text_units.py": "0b33c2d86f7952e1cdaee4d31ea207e741ffdc59aa8d4b0c9f6bc6f5c1681100",
+          "app\\validation.py": "e9c5d18b52e8a625ae6458146210a3580363d46472d375729bfe44ecdd75f5b1",
+          "app\\verify_corpus.py": "8f77f2c73868e29f638513ca2d680309f82752e0dd4c40fcc6366d6cc78e034d",
+          "configs\\findings-dictionary.yaml": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b"
+        },
+        "gold": "701c4a8ec395ae58eba662e9cf3d4509443cd4868d4b6e95022e30cae8f5ef4f"
+      },
+      "integrity": {
+        "modelUnchangedDuringInference": true,
+        "goldUnchanged": true,
+        "independentCountsConfirmed": true,
+        "goldSha256": "701c4a8ec395ae58eba662e9cf3d4509443cd4868d4b6e95022e30cae8f5ef4f"
+      }
+    },
+    {
+      "cycle": 6,
+      "gold": "ml/eval/v8/round6-gold.json",
+      "goldSha256": "2df2efcf27e03a83897b1cba46b4735617c3e8981110c389b2ce09abae413639",
+      "documents": 40,
+      "expectedFindings": 60,
+      "studyCounts": {
+        "THYROID": 5,
+        "BREAST": 5,
+        "SOFT_TISSUE": 5,
+        "PROSTATE": 5,
+        "ABDOMEN": 5,
+        "PELVIS_FEMALE": 5,
+        "LOWER_LIMB_VESSELS": 5,
+        "KIDNEY": 5
+      },
+      "firstPass": {
+        "modelVersion": "dict-v2.1-extractor-7",
+        "goldSha256": "2df2efcf27e03a83897b1cba46b4735617c3e8981110c389b2ce09abae413639",
+        "clinicalValidation": false,
+        "variants": {
+          "original": {
+            "documents": 40,
+            "entities": {
+              "tp": 59,
+              "fp": 1,
+              "fn": 1,
+              "precision": 0.9833333333333333,
+              "recall": 0.9833333333333333,
+              "f1": 0.9833333333333333
+            },
+            "fullFacts": {
+              "tp": 55,
+              "fp": 5,
+              "fn": 5,
+              "precision": 0.9166666666666666,
+              "recall": 0.9166666666666666,
+              "f1": 0.9166666666666666
+            },
+            "attributes": {
+              "correct": 182,
+              "total": 190,
+              "accuracy": 0.9578947368421052
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 0
+            },
+            "timingSeconds": {
+              "mean": 0.06933437999396119,
+              "max": 0.15061120002064854
+            }
+          },
+          "wrap35": {
+            "documents": 40,
+            "entities": {
+              "tp": 59,
+              "fp": 1,
+              "fn": 1,
+              "precision": 0.9833333333333333,
+              "recall": 0.9833333333333333,
+              "f1": 0.9833333333333333
+            },
+            "fullFacts": {
+              "tp": 55,
+              "fp": 5,
+              "fn": 5,
+              "precision": 0.9166666666666666,
+              "recall": 0.9166666666666666,
+              "f1": 0.9166666666666666
+            },
+            "attributes": {
+              "correct": 182,
+              "total": 190,
+              "accuracy": 0.9578947368421052
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 0
+            },
+            "timingSeconds": {
+              "mean": 0.06691964751225896,
+              "max": 0.13830900005996227
+            }
+          },
+          "upper_wrap55": {
+            "documents": 40,
+            "entities": {
+              "tp": 59,
+              "fp": 2,
+              "fn": 1,
+              "precision": 0.9672131147540983,
+              "recall": 0.9833333333333333,
+              "f1": 0.9752066115702479
+            },
+            "fullFacts": {
+              "tp": 55,
+              "fp": 6,
+              "fn": 5,
+              "precision": 0.9016393442622951,
+              "recall": 0.9166666666666666,
+              "f1": 0.9090909090909091
+            },
+            "attributes": {
+              "correct": 182,
+              "total": 190,
+              "accuracy": 0.9578947368421052
+            },
+            "failedDocuments": [],
+            "negativeCases": {
+              "total": 8,
+              "withFalseFindings": 1
+            },
+            "timingSeconds": {
+              "mean": 0.06563443000195548,
+              "max": 0.1504308000439778
+            }
+          }
+        }
+      },
+      "sourceManifestAvailable": true,
+      "frozenInputs": {
+        "model": {
+          "app\\__init__.py": "814ef1ca6acc2685e4648365b5a8d83fd2dde8fdb63b7b28edddc69ce692b127",
+          "app\\__main__.py": "5e7672ea9596ee2a943c009ad934e23861f95a7fa818df234c8299c51e0e7850",
+          "app\\annotation.py": "db715371d9a71c768daa5c2742cc2bcb37e144b53c221bb69626ea00dd658627",
+          "app\\asgi.py": "7beb06c8b6276976aed47116eb9450c578bdb7af713cc0434ed584ec612d4bef",
+          "app\\attributes.py": "1cd96ac230c75c596d2da134689c7a3cdb364e5ae7a38d1180f4269f0ab84273",
+          "app\\backend.py": "341130094425857859f9486c36050da50248132f557fecb6fe9eabb6bfa07501",
+          "app\\benchmark_v2.py": "4532497da82b9f1c828383db22d123a71436e0539c72bcc7ad49e66de586928b",
+          "app\\check.py": "221b6e4f9e757ed94d961f04b2d33b9d9a034972993e9980899e27c0bea9c98c",
+          "app\\clinical.py": "6dffb2b8931e27626bfcf5fdc7bd2d9bf3272ad078db746a9ee527fdb31f018b",
+          "app\\clinical_v2.py": "4ae86a153207d7537b5cee18f336999a8c7a2d1f7647cd64630cc84a700e88fd",
+          "app\\contracts.py": "5b06a53016d2ba86f3cfe47a170eae070c3579b24b26cbb8df10396a4cccb176",
+          "app\\corpus.py": "32cbad3782238971124d90932292ba1d8a9f062f7ec0a70d2f599d13d3c33a9a",
+          "app\\dataset.py": "4161a96ecdbbe0d81811c0c2de8473a5bbdbb45317583e68fa8a6fd8733d7231",
+          "app\\demo.py": "5d435981956569900d462a325560933ea23cf1937babb5c7c9c9313eaa752a26",
+          "app\\dictionary.py": "f5934e1bb95af653555bf1624c4cba0c60e3e79d6a5f3e558fdbdfd179383ab3",
+          "app\\evaluate.py": "8acb973ea6846c8b5181977f9f0220f8de98a2d430daf95c300ce326e30b9217",
+          "app\\extensions.py": "88351fb7e9b0448ec6dd95a5962988b0310da53b36ed03f0d67aa5202837f59d",
+          "app\\findings.py": "ad89be8860b3f39f8186677c89d233a1d56e106e04d88f906038d9a6d69c5081",
+          "app\\generalization.py": "5e2452742b86125c5dc1d102a33f2e58a649f4d7f7f6c0929c12279e0d2cbabe",
+          "app\\mis.py": "dc00340e73708223e1f1e88c547ba7f191b9a4007f0002583f5666035198e4cb",
+          "app\\parser.py": "6964bf662afb173f1ca6bbc98b8a5130eccc63d6e4759706e3a442dde81a1102",
+          "app\\processing.py": "f89b1537b160841a98898663578dc9eac50839c54d76fc42cbad653cf261fe32",
+          "app\\release.py": "dfe8e8840dadef8df937f2e315196ac5a35c3b9bb377de09d47d6db82a984dbc",
+          "app\\sections.py": "d20b2ff43436240afe945089faa89d9f0a0ba9bdb6728d25c9126f81139821ae",
+          "app\\server.py": "1c990ea4462552a104e8b4a3e46eb51c067c65c55b06ee744d59d3700e036918",
+          "app\\service.py": "1ddf36f37bbcbe27f206c349e1d44b879a057e920c231ca38a66f720e8ea75fa",
+          "app\\text_units.py": "0b33c2d86f7952e1cdaee4d31ea207e741ffdc59aa8d4b0c9f6bc6f5c1681100",
+          "app\\validation.py": "e9c5d18b52e8a625ae6458146210a3580363d46472d375729bfe44ecdd75f5b1",
+          "app\\verify_corpus.py": "8f77f2c73868e29f638513ca2d680309f82752e0dd4c40fcc6366d6cc78e034d",
+          "configs\\findings-dictionary.yaml": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b"
+        },
+        "gold": "2df2efcf27e03a83897b1cba46b4735617c3e8981110c389b2ce09abae413639"
+      },
+      "integrity": {
+        "modelUnchangedDuringInference": true,
+        "goldUnchanged": true,
+        "independentCountsConfirmed": true,
+        "goldSha256": "2df2efcf27e03a83897b1cba46b4735617c3e8981110c389b2ce09abae413639"
+      }
+    }
+  ],
+  "finalSyntheticChecks": {
+    "round6": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "2df2efcf27e03a83897b1cba46b4735617c3e8981110c389b2ce09abae413639",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9833333333333333,
+            "recall": 0.9833333333333333,
+            "f1": 0.9833333333333333
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 5,
+            "fn": 5,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "f1": 0.9166666666666666
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05451472249988001,
+            "max": 0.11392809997778386
+          }
+        },
+        "wrap35": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9833333333333333,
+            "recall": 0.9833333333333333,
+            "f1": 0.9833333333333333
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 5,
+            "fn": 5,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "f1": 0.9166666666666666
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.050401292491005736,
+            "max": 0.08559250005055219
+          }
+        },
+        "wrap55": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9833333333333333,
+            "recall": 0.9833333333333333,
+            "f1": 0.9833333333333333
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 5,
+            "fn": 5,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "f1": 0.9166666666666666
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.04903945500554983,
+            "max": 0.10162590001709759
+          }
+        },
+        "upper": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 2,
+            "fn": 1,
+            "precision": 0.9672131147540983,
+            "recall": 0.9833333333333333,
+            "f1": 0.9752066115702479
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 6,
+            "fn": 5,
+            "precision": 0.9016393442622951,
+            "recall": 0.9166666666666666,
+            "f1": 0.9090909090909091
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 1
+          },
+          "timingSeconds": {
+            "mean": 0.061668812506832184,
+            "max": 0.12763470003847033
+          }
+        },
+        "upper_wrap55": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 2,
+            "fn": 1,
+            "precision": 0.9672131147540983,
+            "recall": 0.9833333333333333,
+            "f1": 0.9752066115702479
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 6,
+            "fn": 5,
+            "precision": 0.9016393442622951,
+            "recall": 0.9166666666666666,
+            "f1": 0.9090909090909091
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 1
+          },
+          "timingSeconds": {
+            "mean": 0.06586221499601379,
+            "max": 0.12819249997846782
+          }
+        },
+        "nbsp": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9833333333333333,
+            "recall": 0.9833333333333333,
+            "f1": 0.9833333333333333
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 5,
+            "fn": 5,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "f1": 0.9166666666666666
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05460375751135871,
+            "max": 0.10321730002760887
+          }
+        },
+        "decimal_dot": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9833333333333333,
+            "recall": 0.9833333333333333,
+            "f1": 0.9833333333333333
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 5,
+            "fn": 5,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "f1": 0.9166666666666666
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05940631249395665,
+            "max": 0.12019769998732954
+          }
+        },
+        "multiplication": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9833333333333333,
+            "recall": 0.9833333333333333,
+            "f1": 0.9833333333333333
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 5,
+            "fn": 5,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "f1": 0.9166666666666666
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05068688751198351,
+            "max": 0.0890522999688983
+          }
+        },
+        "headers": {
+          "documents": 40,
+          "entities": {
+            "tp": 59,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9833333333333333,
+            "recall": 0.9833333333333333,
+            "f1": 0.9833333333333333
+          },
+          "fullFacts": {
+            "tp": 55,
+            "fp": 5,
+            "fn": 5,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "f1": 0.9166666666666666
+          },
+          "attributes": {
+            "correct": 182,
+            "total": 190,
+            "accuracy": 0.9578947368421052
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.049591622498701325,
+            "max": 0.09468860004562885
+          }
+        }
+      }
+    },
+    "previous96": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "a9dd8c0708d4c65bdf203c2532f05ac5c208e849503a882368e3663678ddb6d7",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.046956885413237615,
+            "max": 0.09235459996853024
+          }
+        },
+        "wrap35": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05999582604272291,
+            "max": 0.09624380001332611
+          }
+        },
+        "wrap55": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06248727187388189,
+            "max": 0.11806739994790405
+          }
+        },
+        "upper": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05395333749887262,
+            "max": 0.12074340006802231
+          }
+        },
+        "upper_wrap55": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05739506145255291,
+            "max": 0.0975791000528261
+          }
+        },
+        "nbsp": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06493961250331874,
+            "max": 0.1275867000222206
+          }
+        },
+        "decimal_dot": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06438519687678006,
+            "max": 0.1015854999423027
+          }
+        },
+        "multiplication": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.0575318083416884,
+            "max": 0.12416720006149262
+          }
+        },
+        "headers": {
+          "documents": 96,
+          "entities": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 84,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 241,
+            "total": 241,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 26,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06222852812788915,
+            "max": 0.13781260000541806
+          }
+        }
+      }
+    },
+    "previous64": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "2d3d7599fa34c1f75b546a336544c4cb75ac948a676e8920fac3b2b2fc2f3e0d",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06627272029800224,
+            "max": 0.11795149999670684
+          }
+        },
+        "wrap35": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05801424374294584,
+            "max": 0.11652310006320477
+          }
+        },
+        "wrap55": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05297679844989034,
+            "max": 0.107397900079377
+          }
+        },
+        "upper": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05455586874995788,
+            "max": 0.14380880002863705
+          }
+        },
+        "upper_wrap55": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05945396249262558,
+            "max": 0.11390919995028526
+          }
+        },
+        "nbsp": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06608714219873946,
+            "max": 0.15219880000222474
+          }
+        },
+        "decimal_dot": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.0577349562481686,
+            "max": 0.0890404999954626
+          }
+        },
+        "multiplication": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06241665469133295,
+            "max": 0.14546340005472302
+          }
+        },
+        "headers": {
+          "documents": 64,
+          "entities": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 91,
+            "total": 91,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 18,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06451515312801348,
+            "max": 0.11277050001081079
+          }
+        }
+      }
+    },
+    "previous72": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "bf897b1870cea8b24d519ac3aaa3ddd4e9ca9169cb096721c68ea3defc0e1fb9",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05981693333079521,
+            "max": 0.11216400004923344
+          }
+        },
+        "wrap35": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05235982223045236,
+            "max": 0.09538429998792708
+          }
+        },
+        "wrap55": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05270816388171321,
+            "max": 0.08687899995129555
+          }
+        },
+        "upper": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05038173332771597,
+            "max": 0.10777729994151741
+          }
+        },
+        "upper_wrap55": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.0491070805518474,
+            "max": 0.0940542999887839
+          }
+        },
+        "nbsp": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.049155899999378666,
+            "max": 0.08374030003324151
+          }
+        },
+        "decimal_dot": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05331720277253124,
+            "max": 0.13550010009203106
+          }
+        },
+        "multiplication": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05298513889364484,
+            "max": 0.09482570004183799
+          }
+        },
+        "headers": {
+          "documents": 72,
+          "entities": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 56,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 125,
+            "total": 125,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 21,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.05797593333570856,
+            "max": 0.1292915999656543
+          }
+        }
+      }
+    },
+    "round1": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "d7e89e29ca9b40f2d2a235e5315caa9de36702d8736c5485ff212dc7e6890868",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 48,
+          "entities": {
+            "tp": 62,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 61,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9838709677419355,
+            "recall": 0.9838709677419355,
+            "f1": 0.9838709677419355
+          },
+          "attributes": {
+            "correct": 191,
+            "total": 192,
+            "accuracy": 0.9947916666666666
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06021307500001664,
+            "max": 0.11924150004051626
+          }
+        },
+        "upper_wrap55": {
+          "documents": 48,
+          "entities": {
+            "tp": 62,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 61,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9838709677419355,
+            "recall": 0.9838709677419355,
+            "f1": 0.9838709677419355
+          },
+          "attributes": {
+            "correct": 191,
+            "total": 192,
+            "accuracy": 0.9947916666666666
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06594813123956556,
+            "max": 0.1607997000683099
+          }
+        }
+      }
+    },
+    "round2": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "1f9284cac316dd951fab03ac99863c3788fac927f5b58918800812165f527b31",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 48,
+          "entities": {
+            "tp": 62,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 62,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 189,
+            "total": 189,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06552616667128557,
+            "max": 0.10707560006994754
+          }
+        },
+        "upper_wrap55": {
+          "documents": 48,
+          "entities": {
+            "tp": 62,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.9841269841269841,
+            "recall": 1.0,
+            "f1": 0.992
+          },
+          "fullFacts": {
+            "tp": 62,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.9841269841269841,
+            "recall": 1.0,
+            "f1": 0.992
+          },
+          "attributes": {
+            "correct": 189,
+            "total": 189,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 1
+          },
+          "timingSeconds": {
+            "mean": 0.05688403958629351,
+            "max": 0.12102660001255572
+          }
+        }
+      }
+    },
+    "round3": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "5ccc2b6079fceedfcd433f004ea08b0eae8e7961f5a8b57d77e28a67168ad32f",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 48,
+          "entities": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 211,
+            "total": 211,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.055271987490414176,
+            "max": 0.10776799998711795
+          }
+        },
+        "upper_wrap55": {
+          "documents": 48,
+          "entities": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 211,
+            "total": 211,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.0569194166600937,
+            "max": 0.09689699998125434
+          }
+        }
+      }
+    },
+    "round4": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "a89edc357a1e7f96b566066ec6d114c020fa72bd7e8cdf61c2034748328d9a33",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 48,
+          "entities": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 217,
+            "total": 217,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06586348124498424,
+            "max": 0.13652850000653416
+          }
+        },
+        "upper_wrap55": {
+          "documents": 48,
+          "entities": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 217,
+            "total": 217,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.057916731253499165,
+            "max": 0.09790709998924285
+          }
+        }
+      }
+    },
+    "round5": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "goldSha256": "701c4a8ec395ae58eba662e9cf3d4509443cd4868d4b6e95022e30cae8f5ef4f",
+      "clinicalValidation": false,
+      "variants": {
+        "original": {
+          "documents": 48,
+          "entities": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 220,
+            "total": 220,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.057905245843964316,
+            "max": 0.10644009988754988
+          }
+        },
+        "upper_wrap55": {
+          "documents": 48,
+          "entities": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "fullFacts": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "attributes": {
+            "correct": 220,
+            "total": 220,
+            "accuracy": 1.0
+          },
+          "failedDocuments": [],
+          "negativeCases": {
+            "total": 8,
+            "withFalseFindings": 0
+          },
+          "timingSeconds": {
+            "mean": 0.06632581667023867,
+            "max": 0.11630159988999367
+          }
+        }
+      }
+    }
+  },
+  "priorCorpusChecks": {
+    "fresh": {
+      "documents": 35,
+      "fullFacts": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entities": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "failedDocuments": [],
+      "attributes": {
+        "correct": 47,
+        "total": 47,
+        "accuracy": 1.0
+      }
+    },
+    "real": {
+      "documents": 89,
+      "fullFacts": {
+        "tp": 143,
+        "fp": 24,
+        "fn": 6,
+        "precision": 0.8562874251497006,
+        "recall": 0.959731543624161,
+        "f1": 0.9050632911392406
+      },
+      "entities": {
+        "tp": 149,
+        "fp": 18,
+        "fn": 0,
+        "precision": 0.8922155688622755,
+        "recall": 1.0,
+        "f1": 0.9430379746835443
+      },
+      "failedDocuments": [],
+      "attributes": {
+        "correct": 248,
+        "total": 254,
+        "accuracy": 0.9763779527559056
+      }
+    },
+    "synthetic": {
+      "documents": 33,
+      "fullFacts": {
+        "tp": 47,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9791666666666666,
+        "recall": 1.0,
+        "f1": 0.9894736842105263
+      },
+      "entities": {
+        "tp": 47,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9791666666666666,
+        "recall": 1.0,
+        "f1": 0.9894736842105263
+      },
+      "failedDocuments": [],
+      "attributes": {
+        "correct": 154,
+        "total": 154,
+        "accuracy": 1.0
+      }
+    },
+    "real-line_wrap": {
+      "documents": 89,
+      "fullFacts": {
+        "tp": 143,
+        "fp": 24,
+        "fn": 6,
+        "precision": 0.8562874251497006,
+        "recall": 0.959731543624161,
+        "f1": 0.9050632911392406
+      },
+      "entities": {
+        "tp": 149,
+        "fp": 18,
+        "fn": 0,
+        "precision": 0.8922155688622755,
+        "recall": 1.0,
+        "f1": 0.9430379746835443
+      },
+      "failedDocuments": [],
+      "attributes": {
+        "correct": 248,
+        "total": 254,
+        "accuracy": 0.9763779527559056
+      }
+    },
+    "synthetic-line_wrap": {
+      "documents": 33,
+      "fullFacts": {
+        "tp": 47,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9791666666666666,
+        "recall": 1.0,
+        "f1": 0.9894736842105263
+      },
+      "entities": {
+        "tp": 47,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9791666666666666,
+        "recall": 1.0,
+        "f1": 0.9894736842105263
+      },
+      "failedDocuments": [],
+      "attributes": {
+        "correct": 154,
+        "total": 154,
+        "accuracy": 1.0
+      }
+    },
+    "real-header_variants": {
+      "documents": 89,
+      "fullFacts": {
+        "tp": 143,
+        "fp": 24,
+        "fn": 6,
+        "precision": 0.8562874251497006,
+        "recall": 0.959731543624161,
+        "f1": 0.9050632911392406
+      },
+      "entities": {
+        "tp": 149,
+        "fp": 18,
+        "fn": 0,
+        "precision": 0.8922155688622755,
+        "recall": 1.0,
+        "f1": 0.9430379746835443
+      },
+      "failedDocuments": [],
+      "attributes": {
+        "correct": 248,
+        "total": 254,
+        "accuracy": 0.9763779527559056
+      }
+    },
+    "synthetic-header_variants": {
+      "documents": 33,
+      "fullFacts": {
+        "tp": 47,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9791666666666666,
+        "recall": 1.0,
+        "f1": 0.9894736842105263
+      },
+      "entities": {
+        "tp": 47,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9791666666666666,
+        "recall": 1.0,
+        "f1": 0.9894736842105263
+      },
+      "failedDocuments": [],
+      "attributes": {
+        "correct": 154,
+        "total": 154,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "regressionNote": "Real-89: TP143/FN6 unchanged vs v7; FP23 to FP24 due to a separately described true cyst missing from the coarse gold. Gold retained unchanged.",
+  "knownGoldIssue": "round1 cycle1-012: ambiguous Cyrillic BI-RADS 4В with invalid uppercase expected biradsSub B; retained unchanged and included in all metrics.",
+  "limitations": [
+    "single author for synthetic texts, labels and fixes",
+    "adaptive sequential testing and stopping after successful set",
+    "not an independent clinical evaluation",
+    "unlabeled attributes excluded from full-fact metric",
+    "strict default gate F1>=0.95 and zero negative-case false positives is not passed on round6"
+  ],
+  "finalSourceSha256": {
+    "ml\\app\\__init__.py": "814ef1ca6acc2685e4648365b5a8d83fd2dde8fdb63b7b28edddc69ce692b127",
+    "ml\\app\\__main__.py": "5e7672ea9596ee2a943c009ad934e23861f95a7fa818df234c8299c51e0e7850",
+    "ml\\app\\annotation.py": "db715371d9a71c768daa5c2742cc2bcb37e144b53c221bb69626ea00dd658627",
+    "ml\\app\\asgi.py": "7beb06c8b6276976aed47116eb9450c578bdb7af713cc0434ed584ec612d4bef",
+    "ml\\app\\attributes.py": "1cd96ac230c75c596d2da134689c7a3cdb364e5ae7a38d1180f4269f0ab84273",
+    "ml\\app\\backend.py": "341130094425857859f9486c36050da50248132f557fecb6fe9eabb6bfa07501",
+    "ml\\app\\benchmark_v2.py": "4532497da82b9f1c828383db22d123a71436e0539c72bcc7ad49e66de586928b",
+    "ml\\app\\check.py": "221b6e4f9e757ed94d961f04b2d33b9d9a034972993e9980899e27c0bea9c98c",
+    "ml\\app\\clinical.py": "0f2b75fd9bc1c35a0f4ae6d135ff09a5e75ec8492c9fb35e0e4beb4027750e10",
+    "ml\\app\\clinical_v2.py": "829e6c017429f1e120de9e60ddc9bc4ca6ed3dff5f2172351d37092aa585981c",
+    "ml\\app\\contracts.py": "e30737f8a599f95394172795eb4fcf1f68855703b7a831491d0194db8d6d1162",
+    "ml\\app\\corpus.py": "32cbad3782238971124d90932292ba1d8a9f062f7ec0a70d2f599d13d3c33a9a",
+    "ml\\app\\dataset.py": "4161a96ecdbbe0d81811c0c2de8473a5bbdbb45317583e68fa8a6fd8733d7231",
+    "ml\\app\\demo.py": "5d435981956569900d462a325560933ea23cf1937babb5c7c9c9313eaa752a26",
+    "ml\\app\\dictionary.py": "f5934e1bb95af653555bf1624c4cba0c60e3e79d6a5f3e558fdbdfd179383ab3",
+    "ml\\app\\evaluate.py": "8acb973ea6846c8b5181977f9f0220f8de98a2d430daf95c300ce326e30b9217",
+    "ml\\app\\extensions.py": "88351fb7e9b0448ec6dd95a5962988b0310da53b36ed03f0d67aa5202837f59d",
+    "ml\\app\\findings.py": "ad89be8860b3f39f8186677c89d233a1d56e106e04d88f906038d9a6d69c5081",
+    "ml\\app\\generalization.py": "5e2452742b86125c5dc1d102a33f2e58a649f4d7f7f6c0929c12279e0d2cbabe",
+    "ml\\app\\mis.py": "dc00340e73708223e1f1e88c547ba7f191b9a4007f0002583f5666035198e4cb",
+    "ml\\app\\parser.py": "6964bf662afb173f1ca6bbc98b8a5130eccc63d6e4759706e3a442dde81a1102",
+    "ml\\app\\processing.py": "f89b1537b160841a98898663578dc9eac50839c54d76fc42cbad653cf261fe32",
+    "ml\\app\\release.py": "dfe8e8840dadef8df937f2e315196ac5a35c3b9bb377de09d47d6db82a984dbc",
+    "ml\\app\\sections.py": "d20b2ff43436240afe945089faa89d9f0a0ba9bdb6728d25c9126f81139821ae",
+    "ml\\app\\server.py": "1c990ea4462552a104e8b4a3e46eb51c067c65c55b06ee744d59d3700e036918",
+    "ml\\app\\service.py": "1ddf36f37bbcbe27f206c349e1d44b879a057e920c231ca38a66f720e8ea75fa",
+    "ml\\app\\text_units.py": "127e4aa9d677ca68d1508d6e819205e1bbb80c5732e2dee60e81a18d6a1ea7a5",
+    "ml\\app\\validation.py": "e9c5d18b52e8a625ae6458146210a3580363d46472d375729bfe44ecdd75f5b1",
+    "ml\\app\\verify_corpus.py": "8f77f2c73868e29f638513ca2d680309f82752e0dd4c40fcc6366d6cc78e034d",
+    "ml\\configs\\findings-dictionary.yaml": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b"
+  },
+  "verification": {
+    "mlUnit": {
+      "tests": 325,
+      "failures": 0,
+      "errors": 0
+    },
+    "javaUnit": {
+      "tests": 45,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "createdAt": "2026-10-04T23:20:10.887966+00:00",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "coverage": {
+        "backend": {
+          "covered": [
+            "DELETE /api/findings/{findingId}",
+            "GET /api/auth/csrf",
+            "GET /api/auth/me",
+            "GET /api/dictionary/findings",
+            "GET /api/integration/events/status",
+            "GET /api/patients",
+            "GET /api/patients/{patientId}",
+            "GET /api/patients/{patientId}/findings",
+            "GET /api/ping",
+            "GET /api/protocols/{protocolId}",
+            "PATCH /api/findings/{findingId}",
+            "POST /api/auth/login",
+            "POST /api/auth/logout",
+            "POST /api/integration/events",
+            "POST /api/integration/events/retry",
+            "POST /api/integration/ml/results",
+            "POST /api/integration/protocols",
+            "POST /api/patients/{patientId}/findings",
+            "POST /api/patients/{patientId}/findings/confirm"
+          ],
+          "uncovered": [],
+          "total": 19
+        },
+        "ml": {
+          "covered": [
+            "GET /api/mis/events/{event_id}",
+            "GET /health",
+            "POST /api/mis/events",
+            "POST /api/mis/events/{event_id}/retry"
+          ],
+          "uncovered": [],
+          "total": 4
+        }
+      }
+    },
+    "dictionaryCopiesIdentical": true,
+    "goldHashesPreserved": true,
+    "independentFinalMatchingConfirmed": true,
+    "localDocker": {
+      "modelVersion": "dict-v2.1-extractor-8",
+      "changedSourcesMatchTestedCode": true,
+      "allFourServicesHealthy": true,
+      "backendHealth": "UP",
+      "mlHealth": "UP",
+      "frontendHttpStatus": 200,
+      "verificationStackStopped": true,
+      "dataVolumesPreserved": true
+    }
+  }
+}

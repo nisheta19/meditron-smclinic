@@ -13,6 +13,8 @@ from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'ml'))
+sys.path.insert(0, str(ROOT / 'scripts'))
+from backend_session import authenticate
 import httpx
 from app.demo import docx
 
@@ -26,6 +28,7 @@ def main():
     work = ROOT / '.local' / run
     work.mkdir(parents=True)
     client = httpx.Client(base_url=args.frontend, timeout=40, trust_env=False)
+    authenticate(client)
 
     def request(method, path, **kwargs):
         response = client.request(method, path, **kwargs)

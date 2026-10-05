@@ -1,0 +1,21 @@
+.doctor-menu { position: relative; height: 36px; }
+.doctor-menu-trigger, .doctor-menu-identity { border: 0; background: none; text-align: left; }
+.doctor-menu.is-open .doctor-menu-trigger { visibility: hidden; }
+/* The closed footer remains 72px high; the popup covers its collapse control. */
+.doctor-menu-card { position: absolute; left: 0; top: -6px; z-index: 12; width: 190px; height: 86px; border-radius: 16px; background: #fff; transform: translateZ(0); }
+/* Reuse the closed profile's layout so neither the avatar nor its text jumps. */
+.doctor-menu-card .doctor-menu-identity { position: absolute; left: 0; top: 6px; width: 190px; height: 36px; padding: 0 10px 0 11px; transition: none; }
+.doctor-menu-card .nav-user-text { opacity: 1; transition: none; }
+.doctor-menu-logout { position: absolute; left: 0; top: 48px; width: 190px; height: 36px; padding: 0; border: 0; border-radius: 12px; background: none; color: #ff3636; text-align: left; }
+.doctor-menu-logout svg { position: absolute; left: 11px; top: 10px; }
+.doctor-menu-logout span { position: absolute; left: 34px; top: 9px; font: 400 14px/17px 'Auth Inter', 'Inter Variable', sans-serif; }
+.nav-bottom.profile-open > .nav-item.faint { visibility: hidden; }
+.sidebar:has(.doctor-menu.is-open) { overflow: visible; }
+.collapsed .doctor-menu-card .nav-user { width: 190px; padding-left: 11px; }
+.collapsed .doctor-menu-card { left: -9px; }
+@media (min-width: 721px) and (max-width: 1000px) {
+  /* There is no collapse row here: put logout above the stationary profile. */
+  .doctor-menu-card { top: -44px; }
+  .doctor-menu-card .doctor-menu-identity { top: 44px; }
+  .doctor-menu-logout { top: 2px; }
+}
