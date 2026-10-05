@@ -18,7 +18,8 @@ export default function Dropdown({ value, onChange, options, all, label, ariaLab
   const place = () => {
     const r = btn.current.getBoundingClientRect();
     const up = innerHeight - r.bottom < 260 && r.top > innerHeight - r.bottom;
-    setPos({ left: r.left, width: Math.max(r.width, 200), ...(up ? { bottom: innerHeight - r.top + 6 } : { top: r.bottom + 6 }) });
+    const pad = parseFloat(getComputedStyle(btn.current).paddingLeft) - 6;
+    setPos({ left: r.left, width: Math.max(r.width, 200), '--dd-pad': `${Math.max(pad, 6)}px`, ...(up ? { bottom: innerHeight - r.top + 6 } : { top: r.bottom + 6 }) });
   };
   const show = () => { place(); setActive(Math.max(0, items.findIndex(([v]) => v === value))); setOpen(true); };
   const pick = (v) => { onChange(v); setOpen(false); btn.current.focus(); };

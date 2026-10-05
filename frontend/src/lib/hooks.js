@@ -26,14 +26,17 @@ export function useDebounced(value, ms = 300) {
   return v;
 }
 
-/** Сортировка по колонке: cols = [{ key, get }] */
+/**
+ * Сортировка по колонке: cols = [{ key, get }]. initial — порядок по умолчанию; пока пользователь сам не нажал
+ * на заголовок (touched = false), ни одна стрелка не подсвечивается
+ */
 export function useSort(rows, cols, initial) {
-  const [sort, setSort] = useState(initial);
+  const [sort, setSort] = useState({ ...initial, touched: false });
   const sorted = useMemo(() => {
     const col = cols.find((c) => c.key === sort.key);
     return col ? [...(rows ?? [])].sort((a, b) => cmp(col.get(a), col.get(b)) * sort.dir) : rows ?? [];
   }, [rows, cols, sort]);
-  const toggle = (key) => setSort((s) => ({ key, dir: s.key === key ? -s.dir : 1 }));
+  const toggle = (key) => setSort((s) => ({ key, dir: s.touched && s.key === key ? -s.dir : 1, touched: true }));
   return { sorted, sort, toggle };
 }
 

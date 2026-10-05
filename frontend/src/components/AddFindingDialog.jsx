@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { api } from '../api';
 import { STUDY } from '../lib/format';
 import { useAsync } from '../lib/hooks';
-import { Dialog } from './ui';
+import { Dialog, DialogActions, Field, TextArea } from './ui';
 import Dropdown from './Dropdown';
 
 /** Врач добавляет находку вручную: тип из словаря + атрибуты */
@@ -23,12 +23,12 @@ export default function AddFindingDialog({ studyType, onSubmit, onClose }) {
   const set = (k) => (e) => setAttrs((a) => ({ ...a, [k]: e.target.value }));
 
   return (
-    <Dialog title="Добавить находку" wide onClose={onClose} actions={<>
-      <button className="btn ghost" onClick={onClose}>Отмена</button>
-      <button className="btn primary" disabled={!code || busy} onClick={submit}>Добавить находку</button>
-    </>}>
+    <Dialog title="Добавить находку" wide onClose={onClose} actions={
+      <DialogActions onCancel={onClose}>
+        <button className="btn-main" disabled={!code || busy} onClick={submit}>Добавить находку</button>
+      </DialogActions>}>
       <div className="row">
-        <label className="field grow"><span>Поиск в словаре</span><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Название или синоним" autoFocus /></label>
+        <Field label="Поиск в словаре" grow><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Название или синоним" autoFocus /></Field>
         {studyType && <label className="check-label"><input type="checkbox" checked={onlyStudy} onChange={(e) => setOnlyStudy(e.target.checked)} />Только {STUDY[studyType]}</label>}
       </div>
       <div className="pick-list" role="listbox" aria-label="Тип находки">
@@ -40,12 +40,12 @@ export default function AddFindingDialog({ studyType, onSubmit, onClose }) {
         {entries && !entries.length && <p className="muted">В словаре нет подходящих типов.</p>}
       </div>
       <div className="row">
-        <label className="field"><span>Размер, мм</span><input type="number" min="0" step="0.1" value={attrs.sizeMm} onChange={set('sizeMm')} /></label>
+        <Field label="Размер, мм"><input type="number" min="0" step="0.1" value={attrs.sizeMm} onChange={set('sizeMm')} /></Field>
         <Dropdown label="Сторона" value={attrs.side} onChange={(v) => setAttrs((a) => ({ ...a, side: v }))}
           all="Не указана" options={{ left: 'Слева', right: 'Справа', both: 'С обеих сторон' }} />
-        <label className="field grow"><span>Категория</span><input value={attrs.category} onChange={set('category')} placeholder="Например, BI-RADS 4" /></label>
+        <Field label="Категория" grow><input value={attrs.category} onChange={set('category')} placeholder="Например, BI-RADS 4" /></Field>
       </div>
-      <label className="field"><span>Комментарий</span><textarea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} /></label>
+      <Field label="Комментарий"><TextArea value={comment} onChange={setComment} /></Field>
     </Dialog>
   );
 }

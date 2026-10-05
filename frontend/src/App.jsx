@@ -77,7 +77,8 @@ export default function App() {
     : section === 'inbox' ? <Patients key="inbox" preset="inbox" />
     : section === 'archive' ? <Patients key="archive" preset="archive" />
     : section === 'settings' ? <Dictionary /> : section === 'dashboard' ? <Dashboard /> : <Findings />;
-  const current = ['patients', 'push'].includes(section) ? 'findings' : section;   // карточка открывается из «Находок»
+  // Карточка пациента — раздел «Картотека», карточка уведомлений (push) открывается из «Находок»
+  const current = section === 'patients' ? 'archive' : section === 'push' ? 'findings' : section;
 
   return (
     <Toast.Provider value={toast}>
@@ -125,11 +126,11 @@ function UserMenu({ onLogout, mobile }) {
   const who = <><span className="nav-avatar" aria-hidden="true">{initials}</span><span className="nav-user-text"><span>{CURRENT_DOCTOR}</span><small>Врач</small></span></>;
   return (
     <div className={`user-menu${open ? ' open' : ''}${mobile ? ' mobile' : ''}${mobile && USE_MOCK ? ' with-demo' : ''}`} ref={ref}>
-      <button className="nav-user" aria-haspopup="menu" aria-expanded={open} title={CURRENT_DOCTOR} onClick={() => setOpen((v) => !v)}>{who}</button>
+      <button className="nav-user" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>{who}</button>
       {open && (
         <div className="user-pop" role="menu">
           <button className="nav-user" onClick={() => setOpen(false)} aria-label="Закрыть меню профиля">{who}</button>
-          <button role="menuitem" className="nav-item logout" onClick={onLogout}><LogOut size={16} /><span>Выйти</span></button>
+          <button role="menuitem" className="nav-item logout" onClick={onLogout}><LogOut size={16} className="flip" /><span>Выйти</span></button>
         </div>
       )}
     </div>

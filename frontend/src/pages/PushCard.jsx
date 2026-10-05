@@ -5,9 +5,9 @@
 import { useMemo, useState } from 'react';
 import { api, caps } from '../api';
 import { LEVEL, STEP, fmtStamp, now, stepLabel } from '../lib/format';
-import { go, useAsync } from '../lib/hooks';
-import { ArrowDown, Chevron, CloseLg } from '../components/Icons';
-import { SearchBar } from '../components/kit';
+import { go, useAsync, useSort } from '../lib/hooks';
+import { Chevron, CloseLg } from '../components/Icons';
+import { SearchBar, SortHead } from '../components/kit';
 import { ErrorBox } from '../components/ui';
 import NotifyDialog from '../components/NotifyDialog';
 import { History, MoreDialog, ORGAN, PatientInfo } from './PatientCard';
@@ -101,26 +101,9 @@ export default function PushCard({ id, routeId }) {
   );
 }
 
-function SortHead({ cols, sort, setSort }) {
-  return (
-    <div className="pt-head">
-      {cols.map((c) => (c.get ? (
-        <button key={c.key} className={`col-head${sort.key === c.key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key: c.key, dir: s.key === c.key ? -s.dir : 1 }))}>
-          {c.label}<ArrowDown size={12} className={sort.key === c.key && sort.dir > 0 ? 'asc' : undefined} />
-        </button>
-      ) : <span key={c.key} />))}
-    </div>
-  );
-}
-const sortRows = (rows, cols, sort) => {
-  const col = cols.find((c) => c.key === sort.key);
-  return [...rows].sort((a, b) => { const x = col.get(a), y = col.get(b); return (typeof x === 'string' ? x.localeCompare(y, 'ru') : x - y) * sort.dir; });
-};
-
 /** Маршруты: строка на маршрут, по стрелке раскрывается подробная карточка */
 function RoutesTable({ routes, views, findings, notes, focus }) {
   const [open, setOpen] = useState(() => new Set(focus ? [focus] : []));
-  const [sort, setSort] = useState({ key: 'due', dir: 1 });
   const cols = [
     { key: 'spec', label: 'Специалист и тип', get: (r) => views[r.id].spec },
     { key: 'stage', label: 'Этап', get: (r) => views[r.id].stage },
@@ -128,11 +111,12 @@ function RoutesTable({ routes, views, findings, notes, focus }) {
     { key: 'visit', label: 'Дата посещения', get: (r) => views[r.id].visited ?? '' },
     { key: 'more', label: '' },
   ];
+  const { sorted, sort, toggle: onSort } = useSort(routes, cols, { key: 'due', dir: 1 });
   const toggle = (id) => setOpen((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   return (
     <div className="pt pt-routes">
-      <SortHead cols={cols} sort={sort} setSort={setSort} />
-      {sortRows(routes, cols, sort).map((r) => {
+      <SortHead className="pt-head" cols={cols} sort={sort} onSort={onSort} />
+      {sorted.map((r) => {
         const v = views[r.id], isOpen = open.has(r.id);
         const history = [
           [r.createdAt, 'Маршрут создан'],
@@ -167,7 +151,6 @@ function RoutesTable({ routes, views, findings, notes, focus }) {
 
 /** Уведомления по всем маршрутам пациента */
 function NotesTable({ notes, routes, views, loading }) {
-  const [sort, setSort] = useState({ key: 'sent', dir: -1 });
   const byRoute = Object.fromEntries(routes.map((r) => [r.id, r]));
   // «Запись»: после последнего уведомления по маршруту пациент записался на консультацию
   const lastByRoute = {};
@@ -184,10 +167,10 @@ function NotesTable({ notes, routes, views, loading }) {
     { key: 'read', label: 'Прочитано', get: (n) => read(n) || '' },
     { key: 'booked', label: 'Запись', get: (n) => +booked(n) },
   ];
-  const rows = sortRows(notes, cols, sort);
+  const { sorted: rows, sort, toggle } = useSort(notes, cols, { key: 'sent', dir: -1 });
   return (
     <div className="pt pt-notes">
-      <SortHead cols={cols} sort={sort} setSort={setSort} />
+      <SortHead className="pt-head" cols={cols} sort={sort} onSort={toggle} />
       {rows.map((n) => {
         const r = read(n);
         return (
@@ -209,20 +192,10 @@ function NotesTable({ notes, routes, views, loading }) {
 
 /** Таблица макета: заголовки со стрелками сортировки и серые строки 52 px */
 function SortTable({ cols, rows, initial, rowKey, className, empty }) {
-  const [sort, setSort] = useState(initial);
-  const sorted = useMemo(() => {
-    const col = cols.find((c) => c.key === sort.key);
-    return [...rows].sort((a, b) => { const x = col.get(a), y = col.get(b); return (typeof x === 'string' ? x.localeCompare(y, 'ru') : x - y) * sort.dir; });
-  }, [rows, cols, sort]);
+  const { sorted, sort, toggle } = useSort(rows, cols, initial);
   return (
     <div className={`pt ${className}`}>
-      <div className="pt-head">
-        {cols.map((c) => (
-          <button key={c.key} className={`col-head${sort.key === c.key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key: c.key, dir: s.key === c.key ? -s.dir : 1 }))}>
-            {c.label}<ArrowDown size={12} className={sort.key === c.key && sort.dir > 0 ? 'asc' : undefined} />
-          </button>
-        ))}
-      </div>
+      <SortHead className="pt-head" cols={cols} sort={sort} onSort={toggle} />
       {sorted.map((r) => <div key={rowKey(r)} className="pt-row">{cols.map((c) => <span key={c.key} className={`pt-${c.key}`}>{c.cell(r)}</span>)}</div>)}
       {!rows.length && <p className="pc-empty">{empty}</p>}
     </div>

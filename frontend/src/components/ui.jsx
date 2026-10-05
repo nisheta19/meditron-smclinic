@@ -1,5 +1,6 @@
 import Dropdown from './Dropdown';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { CloseLg } from './Icons';
 
 export const Badge = ({ tone = 'neutral', children, title }) => <span className={`badge ${tone}`} title={title}>{children}</span>;
 
@@ -14,18 +15,46 @@ export function useEsc(fn) {
   }, [fn]);
 }
 
+/**
+ * Модальное окно по макету pushes.fig: заголовок, круглая кнопка закрытия, поля, кнопки внизу
+ * (главное действие первым, «Отмена» — второй). На телефоне — шторка снизу.
+ */
 export function Dialog({ title, onClose, children, actions, wide }) {
   useEsc(onClose);
   return (
     <div className="overlay" onMouseDown={onClose}>
       <div className={`dialog${wide ? ' wide' : ''}`} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()}>
-        <header><h2>{title}</h2><button className="icon" aria-label="Закрыть" onClick={onClose}>×</button></header>
+        <h2>{title}</h2>
+        <button className="dialog-close" aria-label="Закрыть" onClick={onClose}><CloseLg size={22} /></button>
         <div className="dialog-body">{children}</div>
-        {actions && <footer className="actions">{actions}</footer>}
+        {actions && <footer className="dialog-actions">{actions}</footer>}
       </div>
     </div>
   );
 }
+
+/** Поле с подписью сверху и необязательной подсказкой снизу. as="div" — когда внутри не один контрол (радио, Dropdown) */
+export const Field = ({ label, hint, grow, as: Tag = 'label', className = '', children, ...rest }) => (
+  <Tag className={`field${grow ? ' grow' : ''} ${className}`.trim()} {...rest}>
+    <span>{label}</span>{children}{hint && <small>{hint}</small>}
+  </Tag>
+);
+
+/** Многострочное поле, растёт по тексту: весь текст виден с одинаковыми отступами сверху и снизу */
+export function TextArea({ value, onChange, ...rest }) {
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [value]);
+  return <textarea ref={ref} rows={2} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />;
+}
+
+/** Кнопки диалога: главное действие + «Отмена» */
+export const DialogActions = ({ onCancel, cancel = 'Отмена', children }) => (
+  <>{children}<button className="chip" onClick={onCancel}>{cancel}</button></>
+);
 
 /** Диалог с причиной: отклонить находку, удалить, отменить маршрут */
 export function ReasonDialog({ title, label = 'Причина', action, danger, onSubmit, onClose }) {
@@ -33,11 +62,11 @@ export function ReasonDialog({ title, label = 'Причина', action, danger, 
   const [busy, setBusy] = useState(false);
   const submit = async () => { setBusy(true); try { await onSubmit(text.trim()); onClose(); } catch { setBusy(false); } };
   return (
-    <Dialog title={title} onClose={onClose} actions={<>
-      <button className="btn ghost" onClick={onClose}>Отмена</button>
-      <button className={`btn ${danger ? 'danger' : 'primary'}`} disabled={busy} onClick={submit}>{action}</button>
-    </>}>
-      <label className="field"><span>{label}</span><textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} autoFocus /></label>
+    <Dialog title={title} onClose={onClose} actions={
+      <DialogActions onCancel={onClose}>
+        <button className={danger ? 'btn danger' : 'btn-main'} disabled={busy} onClick={submit}>{action}</button>
+      </DialogActions>}>
+      <Field label={label}><TextArea value={text} onChange={setText} autoFocus /></Field>
     </Dialog>
   );
 }

@@ -29,7 +29,7 @@ const COLS = [
   { key: 'routes', label: 'Маршруты', width: 'minmax(0, 187fr)', sort: (p) => p.activeRoutes,
     cell: (p) => <Stack main={p.activeRoutes ? nWord(p.activeRoutes, ['активный', 'активных', 'активных']) : 'Нет активных'} /> },
   { key: 'review', label: 'Проверка', width: 'minmax(0, 132fr)', sort: (p) => ['ATTENTION', 'PENDING', 'OK'].indexOf(p.reviewState),
-    cell: (p) => <Stack main={REVIEW[p.reviewState][0]} sub={REVIEW_TEXT[p.reviewState]} warn={p.reviewState !== 'OK'} /> },
+    cell: (p) => <Stack main={REVIEW[p.reviewState][0]} sub={REVIEW_TEXT[p.reviewState]} />   /* красный — только для экстренных */ },
 ];
 
 export default function Patients({ preset }) {

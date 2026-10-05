@@ -233,6 +233,24 @@ function topOf(pid, cur) {
   };
 }
 
+// Прошлые приёмы для «Истории приёмов» (только демо, в контракте backend их нет): у каждого пациента 12 записей,
+// чтобы было видно 10 первых и раскрытие по «Подробнее». Набор и даты детерминированы по id пациента
+const PAST = [
+  ['Терапевт', 'Плановый осмотр'], ['Анализы крови', 'Общий и биохимический анализ'], ['ЭКГ', 'Ритм синусовый'],
+  ['Офтальмолог', 'Без особенностей'], ['Флюорография', 'Без патологии'], ['Невролог', 'Консультация'],
+  ['Стоматолог', 'Санация'], ['Терапевт', 'Диспансеризация'], ['Кардиолог', 'Контроль давления'],
+  ['Анализы мочи', 'Норма'], ['Оториноларинголог', 'Без особенностей'], ['Вакцинация', 'Грипп, сезонная'],
+];
+function pastVisits(p, before) {
+  const seed = [...p.id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 997, 7);
+  let t = Date.parse(before ?? iso());
+  return PAST.map((_, i) => {
+    const [title, text] = PAST[(seed + i * 5) % PAST.length];
+    t -= (20 + ((seed + i * 13) % 50)) * 864e5;
+    return { id: `${p.id}-v${i}`, at: iso(t), title, text };
+  });
+}
+
 function patientCard(pid) {
   const p = byId(db.patients, pid, 'PATIENT');
   const all = protocolsOf(pid), cur = all.find((x) => x.status !== 'ANNULLED') ?? all[0];
@@ -247,6 +265,7 @@ function patientCard(pid) {
       protocols: all.filter((x) => x !== cur).map(protocolShort),
       findings: fs.filter((f) => f.protocolId && f.protocolId !== cur?.id),
       routes: rts.filter((r) => !OPEN.includes(r.status)),
+      visits: pastVisits(p, all.at(-1)?.receivedAt),
     },
   };
 }

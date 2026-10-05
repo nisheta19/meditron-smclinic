@@ -3,11 +3,11 @@
 // (контакты, СНИЛС, рост, вес и т. д.), показываются, если backend их пришлёт, иначе — «нет данных».
 import { useMemo, useState } from 'react';
 import { api, caps } from '../api';
-import { CANCEL_REASON, NOT_TRIGGERED, PROCESSING, REVIEW, ROUTE, STEP, STUDY, ATTR, attrValue, fmtDate, fmtDateTime, fmtStamp, now, stepLabel, LEVEL, flagLabel } from '../lib/format';
-import { go, useAction, useAsync, useToast } from '../lib/hooks';
+import { CANCEL_REASON, PROCESSING, REVIEW, ROUTE, STEP, STUDY, ATTR, attrValue, fmtDate, fmtDateTime, fmtStamp, now, stepLabel, LEVEL, flagLabel } from '../lib/format';
+import { go, useAction, useAsync, useSort, useToast } from '../lib/hooks';
 import { CURRENT_DOCTOR } from '../config';
-import { ArrowDown, ArrowLeft, CheckMark, Chevron, Close, CloseLg, Copy, FileIcon, Mail, Phone } from '../components/Icons';
-import { SearchBar } from '../components/kit';
+import { ArrowLeft, CheckMark, Chevron, Close, CloseLg, Copy, FileIcon, Mail, Phone } from '../components/Icons';
+import { SearchBar, SortHead } from '../components/kit';
 import { Dialog, ErrorBox, ReasonDialog } from '../components/ui';
 import ProtocolText, { focusEvidence } from '../components/ProtocolText';
 import AddFindingDialog from '../components/AddFindingDialog';
@@ -95,20 +95,10 @@ export default function PatientCard({ id }) {
               </button>
             )}
           </>}
-          {p?.notTriggered?.length > 0 && (
-            <details className="pc-nt">
-              <summary>Почему не стало находкой ({p.notTriggered.length})</summary>
-              <ul>{p.notTriggered.map((n, i) => (
-                <li key={i}><button className="quote" onClick={() => focusEvidence(`nt-${i}`)}>«{n.evidence.text}»</button>
-                  <span>{n.name ?? names[n.code] ?? n.code}: {NOT_TRIGGERED[n.reason] ?? n.reason}</span></li>
-              ))}</ul>
-            </details>
-          )}
 
           <h2 className="pc-subtitle">Маршрут</h2>
           {c.routes.map((r) => (
-            <RouteBlock key={r.id} route={r} findings={allFindings} onChanged={card.reload}
-              onNotify={() => setDialog({ type: 'notify', r })} onCancel={() => setDialog({ type: 'cancel', r })} />
+            <RouteBlock key={r.id} route={r} findings={allFindings} onChanged={card.reload} onNotify={() => setDialog({ type: 'notify', r })} />
           ))}
           {!caps.routes
             ? <p className="pc-add disabled">Маршруты пока не поддерживаются сервером</p>
@@ -130,8 +120,6 @@ export default function PatientCard({ id }) {
         label={dialog.f.routeId ? 'Причина (маршрут по находке будет отменён)' : 'Причина'}
         onSubmit={(reason) => act(() => api.removeFinding(dialog.f.id, reason || undefined), 'Находка удалена', true)} />}
       {dialog?.type === 'notify' && <NotifyDialog routeIds={[dialog.r.id]} onClose={() => setDialog(null)} onDone={card.reload} />}
-      {dialog?.type === 'cancel' && <ReasonDialog title="Отменить маршрут" action="Отменить маршрут" danger onClose={() => setDialog(null)}
-        onSubmit={(reason) => act(() => api.cancelRoute(dialog.r.id, reason || undefined), 'Маршрут отменён', true)} />}
     </>
   );
 }
@@ -159,7 +147,7 @@ export function PatientInfo({ c, onMore }) {
   return (
     <div className="pc-info">
       <div className="pc-person">
-        <h3>{c.fullName}</h3>
+        <h3>{String(c.fullName ?? '').split(/\s+/).filter(Boolean).map((w, i) => <span key={i}>{w}</span>)}</h3>
         <ul className="pc-contacts">
           <li><Mail size={12} />{c.email ?? <span className="pc-none">почта не указана</span>}</li>
           <li><Phone size={12} />{c.phone ?? <span className="pc-none">телефон не указан</span>}</li>
@@ -205,22 +193,16 @@ export function MoreDialog({ c, onClose }) {
 
 /* ---------- Находки ---------- */
 function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm, onReject, onRemove }) {
-  const [sort, setSort] = useState({ key: 'organ', dir: 1 });
   const [open, setOpen] = useState(null);
   const organ = (f) => ORGAN[protoById[f.protocolId]?.studyType ?? fallbackStudy] ?? 'Не указан';
   const RANK = { EMERGENCY: 0, URGENT: 1, PLANNED: 2 };
-  const key = { organ: (f) => organ(f), name: (f) => f.name, level: (f) => RANK[f.level] ?? 3 }[sort.key];
-  const rows = [...findings].sort((a, b) => { const x = key(a), y = key(b); return (typeof x === 'string' ? x.localeCompare(y, 'ru') : x - y) * sort.dir; });
-  const head = (key, label) => (
-    <button className={`col-head${sort.key === key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key, dir: s.key === key ? -s.dir : 1 }))}>
-      {label}<ArrowDown size={12} className={sort.key === key && sort.dir > 0 ? undefined : 'asc'} />
-    </button>
-  );
+  const cols = [{ key: 'organ', label: 'Орган', get: organ }, { key: 'name', label: 'Находка', get: (f) => f.name }, { key: 'level', label: 'Статус', get: (f) => RANK[f.level] ?? 3 }];
+  const { sorted: rows, sort, toggle } = useSort(findings, cols, { key: 'organ', dir: 1 });
   if (!findings.length) return <p className="pc-empty">Значимых находок нет. Если вы видите находку в тексте протокола, добавьте её вручную.</p>;
 
   return (
     <div className="pc-table">
-      <div className="pc-thead f-cols">{head('organ', 'Орган')}{head('name', 'Находка')}{head('level', 'Статус')}</div>
+      <SortHead className="pc-thead f-cols" cols={cols} sort={sort} onSort={toggle} />
       {rows.map((f) => {
         const isOpen = open === f.id;
         const attrs = Object.entries(f.attributes ?? {}).filter(([k]) => k !== 'level');
@@ -272,37 +254,23 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm
 /* ---------- Маршрут ---------- */
 const NEXT = { BOOKED: 'Записан', COMPLETED: 'Выполнен', NO_SHOW: 'Неявка', SKIPPED: 'Пропустить' };
 
-function RouteBlock({ route: r, findings, onChanged, onNotify, onCancel }) {
+function RouteBlock({ route: r, findings, onChanged, onNotify }) {
   const run = useAction();
-  const [sort, setSort] = useState({ key: 'n', dir: 1 });
-  const [log, setLog] = useState(false);
   const cur = r.steps.find((s) => s.id === r.currentStepId);
   const urgent = cur?.type === 'ESCALATION';
   const today = new Date(now()).toISOString().slice(0, 10);
-  const steps = r.steps.map((s, i) => ({ ...s, n: i + 1 }));
-  const get = { n: (s) => s.n, name: (s) => s.name, date: (s) => s.dueDate };
-  steps.sort((a, b) => String(get[sort.key](a)).localeCompare(String(get[sort.key](b)), 'ru', { numeric: true }) * sort.dir);
-  const head = (key, label) => (
-    <button className={`col-head${sort.key === key ? ' active' : ''}`} onClick={() => setSort((s) => ({ key, dir: s.key === key ? -s.dir : 1 }))}>
-      {label}<ArrowDown size={12} className={sort.key === key && sort.dir > 0 ? undefined : 'asc'} />
-    </button>
-  );
+  const cols = [{ key: 'n', label: '№', get: (s) => s.n }, { key: 'name', label: 'Специалист', get: (s) => stepLabel(s.name) }, { key: 'date', label: 'Дата посещения', get: (s) => s.completedAt ?? s.dueDate }];
+  const { sorted: steps, sort, toggle } = useSort(r.steps.map((s, i) => ({ ...s, n: i + 1 })), cols, { key: 'n', dir: 1 });
   const setStep = (status) => run(() => api.updateStep(r.id, cur.id, { status }), 'Статус этапа обновлён').then(onChanged);
 
   return (
     <div className="pc-route">
       <div className="pc-route-head">
         <span><b>{r.findingIds.map((id) => findings[id]?.name ?? 'Находка').join(', ')}</b> · {ROUTE[r.status]?.[0]}</span>
-        <span className="pc-route-actions">
-          {!urgent && <button className="chip sm" onClick={onNotify}>Уведомить пациента</button>}
-          <button className="chip sm" onClick={() => setLog((v) => !v)} aria-expanded={log}>Уведомления</button>
-          <button className="link danger-link" onClick={onCancel}>Отменить</button>
-        </span>
+        {!urgent && <button className="chip sm" onClick={onNotify}>Уведомить пациента</button>}
       </div>
-      {urgent && <p className="callout red pc-note">Экстренная находка: пациенту сообщения не отправляются, задача передана дежурному врачу.</p>}
-      {log && <NotificationLog routeId={r.id} />}
       <div className="pc-table">
-        <div className="pc-thead r-cols">{head('n', '№')}{head('name', 'Специалист')}{head('date', 'Дата посещения')}</div>
+        <SortHead className="pc-thead r-cols" cols={cols} sort={sort} onSort={toggle} />
         {steps.map((s) => {
           const isCur = s.id === r.currentStepId;
           const overdue = isCur && s.dueDate < today && !['BOOKED', 'COMPLETED'].includes(s.status);
@@ -332,22 +300,8 @@ function RouteBlock({ route: r, findings, onChanged, onNotify, onCancel }) {
   );
 }
 
-function NotificationLog({ routeId }) {
-  const { data, error } = useAsync(() => api.notifications(routeId), [routeId]);
-  if (error) return <p className="error">Не удалось загрузить уведомления: {error.message}</p>;
-  if (!data) return <p className="muted pc-note">Загружаем…</p>;
-  if (!data.length) return <p className="muted pc-note">Уведомлений ещё не было.</p>;
-  return (
-    <ul className="pc-log">
-      {[...data].reverse().map((n) => (
-        <li key={n.id}><time>{fmtDateTime(n.sentAt)}</time><span>{n.text}<small>{n.sentBy === 'SYSTEM' ? 'автоматически' : n.sentBy}</small></span></li>
-      ))}
-    </ul>
-  );
-}
-
 /* ---------- История приёмов ---------- */
-const HISTORY_LIMIT = 8;
+const HISTORY_LIMIT = 10;   // макет: 10 записей, остальные — под «Подробнее»
 
 export function History({ c, protocols, findings, onOpenProtocol }) {
   const [all, setAll] = useState(false);
@@ -360,6 +314,8 @@ export function History({ c, protocols, findings, onOpenProtocol }) {
     ...routes.flatMap((r) => r.steps.filter((s) => s.completedAt || s.status === 'NO_SHOW').map((s) => ({
       key: s.id, at: s.completedAt ?? r.createdAt, title: stepLabel(s.name),
       text: s.status === 'COMPLETED' ? null : STEP[s.status][0], hint: findings[r.findingIds[0]]?.name }))),
+    // Прошлые приёмы (демо-режим; backend по контракту их не отдаёт)
+    ...(c.history.visits ?? []).map((v) => ({ key: v.id, at: v.at, title: v.title, text: v.text })),
     ...c.history.routes.filter((r) => r.status === 'CANCELLED').map((r) => ({
       key: `c-${r.id}`, at: r.createdAt, title: 'Маршрут отменён', text: CANCEL_REASON[r.cancelReason] ?? r.cancelReason })),
   ].sort((a, b) => String(b.at).localeCompare(String(a.at)));

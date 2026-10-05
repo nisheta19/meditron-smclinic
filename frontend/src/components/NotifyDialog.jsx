@@ -3,8 +3,7 @@
 // на мобильную страницу записи /next-step/<routeId>. Сервер сам защищает от спама (429) и экстренных находок (409).
 import { useState } from 'react';
 import { api, caps } from '../api';
-import { useEsc } from './ui';
-import { CloseLg } from './Icons';
+import { Dialog, DialogActions, Field, TextArea } from './ui';
 import Dropdown from './Dropdown';
 
 export const PUSH_TEMPLATES = [
@@ -32,7 +31,6 @@ export default function NotifyDialog({ targets: given, routeIds = [], recent = 0
   const [text, setText] = useState(PUSH_TEMPLATES[0].text);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
-  useEsc(onClose);
 
   const chosen = many ? targets : targets.filter((t) => t.routeId === routeId);
   const preview = many ? text : fill(text, chosen[0] ?? {});
@@ -48,56 +46,43 @@ export default function NotifyDialog({ targets: given, routeIds = [], recent = 0
     setResult(res); setBusy(false); onDone?.(res);
   };
 
+  if (result) return (
+    <Dialog title={result.sent ? 'Уведомление отправлено' : 'Уведомление не отправлено'} onClose={onClose}
+      actions={<button className="btn-main" onClick={onClose}>Готово</button>}>
+      <ul className="push-result">
+        <li>Отправлено: <b>{result.sent}</b></li>
+        {result.tooFrequent > 0 && <li>Пропущено, уже уведомлены за 24 ч: <b>{result.tooFrequent}</b></li>}
+        {[...new Set(result.errors)].map((m) => <li key={m}>Не отправлено ({result.errors.filter((x) => x === m).length}): {m}</li>)}
+      </ul>
+    </Dialog>
+  );
+
   return (
-    <div className="overlay" onMouseDown={onClose}>
-      <div className="push-dialog" role="dialog" aria-modal="true" aria-label="Отправить уведомление" onMouseDown={(e) => e.stopPropagation()}>
-        <h2>{result ? (result.sent ? 'Уведомление отправлено' : 'Уведомление не отправлено') : 'Отправить уведомление'}</h2>
-        <button className="push-close" aria-label="Закрыть" onClick={onClose}><CloseLg size={22} /></button>
+    <Dialog title="Отправить уведомление" onClose={onClose} actions={
+      <DialogActions onCancel={onClose}>
+        <button className="btn-main" disabled={busy || !chosen.length || !text.trim()} onClick={send}>{busy ? 'Отправляем…' : 'Отправить уведомление'}</button>
+      </DialogActions>}>
+      {!caps.notifications && <p className="callout">Сервер пока не сообщил, что принимает уведомления. Попробуем отправить — в итоге будет видно, что не ушло.</p>}
+      {recent > 0 && <p className="callout">Уже получили сообщение за последние 24 ч: {recent}. Сервер их пропустит.</p>}
 
-        {result ? (
-          <>
-            <ul className="push-result">
-              <li>Отправлено: <b>{result.sent}</b></li>
-              {result.tooFrequent > 0 && <li>Пропущено, уже уведомлены за 24 ч: <b>{result.tooFrequent}</b></li>}
-              {[...new Set(result.errors)].map((m) => <li key={m}>Не отправлено ({result.errors.filter((x) => x === m).length}): {m}</li>)}
-            </ul>
-            <div className="push-actions"><button className="btn-main" onClick={onClose}>Готово</button></div>
-          </>
-        ) : (
-          <>
-            {!caps.notifications && <p className="callout">Сервер пока не сообщил, что принимает уведомления. Попробуем отправить — в итоге будет видно, что не ушло.</p>}
-            {recent > 0 && <p className="callout">Уже получили сообщение за последние 24 ч: {recent}. Сервер их пропустит.</p>}
+      <Field as="div" label="Маршрут">
+        {many
+          ? <div className="push-box">Выбрано маршрутов: {targets.length}</div>
+          : <Dropdown ariaLabel="Маршрут" value={routeId} onChange={setRouteId} options={targets.map((t) => [t.routeId, t.label ?? t.specialist ?? 'Маршрут'])} />}
+      </Field>
 
-            <div className="push-field">
-              <span>Маршрут</span>
-              {many
-                ? <div className="push-box">Выбрано маршрутов: {targets.length}</div>
-                : <Dropdown ariaLabel="Маршрут" value={routeId} onChange={setRouteId} options={targets.map((t) => [t.routeId, t.label ?? t.specialist ?? 'Маршрут'])} />}
-            </div>
+      <Field as="div" label="Шаблон" role="radiogroup" aria-label="Шаблон">
+        {PUSH_TEMPLATES.map((t) => (
+          <label key={t.id} className={`push-radio${tpl === t.id ? ' on' : ''}`}>
+            <input type="radio" name="push-tpl" checked={tpl === t.id} onChange={() => pick(t.id)} />
+            <i aria-hidden="true" />{t.title}
+          </label>
+        ))}
+      </Field>
 
-            <div className="push-field" role="radiogroup" aria-label="Шаблон">
-              <span>Шаблон</span>
-              {PUSH_TEMPLATES.map((t) => (
-                <label key={t.id} className={`push-radio${tpl === t.id ? ' on' : ''}`}>
-                  <input type="radio" name="push-tpl" checked={tpl === t.id} onChange={() => pick(t.id)} />
-                  <i aria-hidden="true" />{t.title}
-                </label>
-              ))}
-            </div>
-
-            <label className="push-field">
-              <span>Сообщение</span>
-              <textarea rows={3} value={many ? text : preview} onChange={(e) => setText(e.target.value)} />
-              {many && <small>{'{специалист}'} и {'{ссылка}'} подставятся для каждого пациента</small>}
-            </label>
-
-            <div className="push-actions">
-              <button className="btn-main" disabled={busy || !chosen.length || !text.trim()} onClick={send}>{busy ? 'Отправляем…' : 'Отправить уведомление'}</button>
-              <button className="chip" onClick={onClose}>Отмена</button>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+      <Field label="Сообщение" hint={many && <>{'{специалист}'} и {'{ссылка}'} подставятся для каждого пациента</>}>
+        <TextArea value={many ? text : preview} onChange={setText} />
+      </Field>
+    </Dialog>
   );
 }

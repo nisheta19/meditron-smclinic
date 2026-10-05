@@ -64,6 +64,26 @@ export function ChipRow({ items, value, onChange, selectAll, extra }) {
 }
 
 /**
+ * Заголовок колонки с сортировкой (sort из useSort). Стрелка вниз — серая, пока пользователь не выбрал сортировку;
+ * у выбранной колонки темнее: вверх — по возрастанию, вниз — по убыванию
+ */
+export function ColHead({ k, label, sort, onSort }) {
+  const active = sort.touched && sort.key === k;
+  return (
+    <button className={`col-head${active ? ' active' : ''}`} onClick={() => onSort(k)} aria-sort={active ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'}>
+      {label}<ArrowDown size={12} className={active && sort.dir > 0 ? 'asc' : undefined} />
+    </button>
+  );
+}
+
+/** Строка заголовков таблицы: колонки с get сортируются, без get — пустое место под колонку */
+export const SortHead = ({ cols, sort, onSort, className }) => (
+  <div className={className}>
+    {cols.map((c) => (c.get ? <ColHead key={c.key} k={c.key} label={c.label} sort={sort} onSort={onSort} /> : <span key={c.key} />))}
+  </div>
+);
+
+/**
  * Список карточек-строк с заголовками колонок.
  * cols: [{ key, label, sort?: (row) => value, cell: (row) => node, width }]
  */
@@ -73,15 +93,9 @@ export function RowList({ cols, rows, rowKey, sort, onSort, selection, onRow, em
   return (
     <div className={`rowlist${selection ? '' : ' plain'}`} style={{ '--cols': template }}>
       <div className="rowlist-head" role="row">
-        {cols.map((c) => {
-          const active = sort.key === c.key;
-          return c.sort ? (
-            <button key={c.key} className={`col-head${active ? ' active' : ''}`} onClick={() => onSort(c.key)}
-              aria-sort={active ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'}>
-              {c.label}<ArrowDown size={12} className={active && sort.dir > 0 ? 'asc' : undefined} />
-            </button>
-          ) : <span key={c.key} className="col-head">{c.label}</span>;
-        })}
+        {cols.map((c) => (c.sort
+          ? <ColHead key={c.key} k={c.key} label={c.label} sort={sort} onSort={onSort} />
+          : <span key={c.key} className="col-head">{c.label}</span>))}
       </div>
       <div className="mobile-sort">
         <span>Сортировка</span>

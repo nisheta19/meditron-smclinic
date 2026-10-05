@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { api, caps } from '../api';
 import { LEVEL, STUDY } from '../lib/format';
 import { useAction, useAsync, useSort } from '../lib/hooks';
-import { Dialog, ErrorBox, Select } from '../components/ui';
+import { Dialog, DialogActions, ErrorBox, Field, Select } from '../components/ui';
 import { ChipRow, RowList, SearchBar, Stack } from '../components/kit';
 import Dropdown from '../components/Dropdown';
 
@@ -55,7 +55,7 @@ function EntryDialog({ entry, templates, onClose, onSaved }) {
     studyTypes: [], urgent: false, active: true, ...entry, synonyms: (entry.synonyms ?? []).join(', '), conditions: JSON.stringify(entry.conditions ?? {}) });
   const [busy, setBusy] = useState(false);
   const set = (k, v) => setE((s) => ({ ...s, [k]: v }));
-  const input = (k, label, props) => <label className="field"><span>{label}</span><input value={e[k]} onChange={(ev) => set(k, ev.target.value)} {...props} /></label>;
+  const input = (k, label, props) => <Field label={label}><input value={e[k]} onChange={(ev) => set(k, ev.target.value)} {...props} /></Field>;
   let conditions = null;
   try { conditions = JSON.parse(e.conditions || '{}'); } catch { /* покажем ошибку ниже */ }
   const valid = e.code && e.name && e.targetSpecialty && conditions;
@@ -74,10 +74,10 @@ function EntryDialog({ entry, templates, onClose, onSaved }) {
   };
 
   return (
-    <Dialog title={isNew ? 'Новый тип находки' : e.name} wide onClose={onClose} actions={<>
-      <button className="btn ghost" onClick={onClose}>Отмена</button>
-      <button className="btn primary" disabled={!valid || busy} onClick={save}>{isNew ? 'Добавить' : 'Сохранить'}</button>
-    </>}>
+    <Dialog title={isNew ? 'Новый тип находки' : e.name} wide onClose={onClose} actions={
+      <DialogActions onCancel={onClose}>
+        <button className="btn-main" disabled={!valid || busy} onClick={save}>{isNew ? 'Добавить' : 'Сохранить'}</button>
+      </DialogActions>}>
       <div className="form-grid">
         {input('code', 'Код', { disabled: !isNew, placeholder: 'GALLBLADDER_POLYP' })}
         {input('name', 'Название', { placeholder: 'Полип желчного пузыря' })}
@@ -87,18 +87,17 @@ function EntryDialog({ entry, templates, onClose, onSaved }) {
         {input('targetDays', 'Срок до консультации, дн.', { type: 'number', min: 0 })}
         {input('synonyms', 'Синонимы через запятую')}
       </div>
-      <fieldset>
-        <legend>Исследования</legend>
+      <Field as="div" label="Исследования">
         <div className="chips wrap">
           {Object.entries(STUDY).map(([k, l]) => (
             <label key={k} className="chip"><input type="checkbox" checked={e.studyTypes.includes(k)}
               onChange={() => set('studyTypes', e.studyTypes.includes(k) ? e.studyTypes.filter((s) => s !== k) : [...e.studyTypes, k])} />{l}</label>
           ))}
         </div>
-      </fieldset>
-      <label className="field"><span>Порог срабатывания (JSON): minSizeMm, minLevel, minStenosisPct…</span>
+      </Field>
+      <Field label="Порог срабатывания (JSON): minSizeMm, minLevel, minStenosisPct…">
         <input className="mono" value={e.conditions} onChange={(ev) => set('conditions', ev.target.value)} placeholder='{"minSizeMm": 10}' aria-invalid={!conditions} />
-      </label>
+      </Field>
       {!conditions && <p className="error">Порог должен быть корректным JSON-объектом.</p>}
       <div className="chips wrap">
         <label className="chip"><input type="checkbox" checked={e.urgent} onChange={(ev) => set('urgent', ev.target.checked)} />Экстренная: только эскалация персоналу</label>
