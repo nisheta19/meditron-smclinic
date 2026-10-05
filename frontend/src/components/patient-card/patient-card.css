@@ -1,0 +1,213 @@
+@font-face { font-family: 'Patient Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url('./assets/inter-latin.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Patient Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url('./assets/inter-cyrillic.woff2') format('woff2'); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+@font-face { font-family: 'Patient Manrope'; font-style: normal; font-weight: 200 800; font-display: swap; src: url('./assets/manrope-latin.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Patient Manrope'; font-style: normal; font-weight: 200 800; font-display: swap; src: url('./assets/manrope-cyrillic.woff2') format('woff2'); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+
+:where(.npc-page, .npc-card, .npc-search) { --npc-bg:#f5f5f5; --npc-green:#13ab7b; --npc-muted:#818181; --npc-faint:#bbb; font-family:'Patient Inter',sans-serif; font-size:14px; font-weight:400; line-height:17px; color:#000; font-synthesis:none; font-optical-sizing:none; }
+:where(.npc-page, .npc-card, .npc-search) *, :where(.npc-page, .npc-card, .npc-search) *::before, :where(.npc-page, .npc-card, .npc-search) *::after { box-sizing:border-box; }
+:where(.npc-page, .npc-card, .npc-search) :is(h1,h2,h3,p,ul,dl,dd) { margin:0; padding:0; }
+:where(.npc-page, .npc-card, .npc-search) button { font:inherit; color:inherit; border:0; margin:0; padding:0; background:none; text-align:left; cursor:pointer; }
+:where(.npc-page, .npc-card, .npc-search) button:disabled { opacity:1; cursor:default; }
+:where(.npc-page, .npc-card, .npc-search) button:focus-visible { outline:2px solid var(--npc-green); outline-offset:4px; }
+:where(.npc-page, .npc-card, .npc-search) svg { flex:none; display:block; }
+.npc-search { height:64px; border-radius:24px; background:#fff; display:flex; align-items:center; gap:24px; padding:11px 11px 11px 24px; }
+.npc-search input { flex:1; min-width:0; border:0; outline:none; padding:0; background:transparent; color:#000; font:400 16px/19px 'Patient Inter',sans-serif; }
+.npc-search input::placeholder { color:#cfcfcf; opacity:1; }
+.npc-search .npc-search-filters { color:#535353; margin-right:2px; }
+.npc-search .npc-search-submit { display:flex; justify-content:center; align-items:center; gap:8px; width:86px; height:42px; padding:8px 14px 8px 16px; border-radius:16px; background:var(--npc-green); color:#fff; font-size:12px; line-height:15px; }
+.npc-toolbar { height:80px; display:flex; justify-content:flex-end; padding:20px 12px 16px; }
+.npc-toolbar .npc-close { display:grid; place-items:center; width:44px; height:44px; border-radius:50%; background:#fff; color:#535353; }
+.npc-card { display:grid; grid-template-columns:minmax(0,1fr) 284px; align-items:start; background:#fff; border-radius:36px; min-height:1431px; }
+.npc-main { padding:32.5px 16px 33px 13px; min-width:0; }
+.npc-card h1,.npc-card h2 { font:600 20px/27px 'Patient Manrope',sans-serif; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-card h2 { height:14px; }
+.npc-card h2 { margin-left:21px; }
+.npc-info { display:grid; grid-template-columns:235px minmax(0,1fr); gap:40px; margin-left:21px; min-height:234.5px; }
+.npc-person h1 { height:68px; }
+.npc-person h1 span { display:block; }
+.npc-contacts { list-style:none; display:flex; flex-direction:column; gap:14px; margin-top:21.5px !important; color:var(--npc-muted); }
+.npc-contacts li { display:flex; align-items:center; gap:6px; min-height:12px; }
+.npc-contacts svg { color:var(--npc-faint); }
+.npc-contacts span { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-contacts li:first-child { align-items:flex-start; }
+.npc-contacts li:first-child span { margin-top:0; }
+.npc-person .npc-id { height:28px; width:119px; max-width:100%; border:1px solid #818181; border-radius:12px; display:flex; align-items:center; gap:8px; padding:8px 10px; margin-top:20px; color:#818181; font-size:12px; line-height:15px; }
+.npc-id span { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-stats { display:grid; grid-template-columns:106px 86px 100px; gap:48px; padding-top:1.5px; }
+.npc-stats dl { display:flex; flex-direction:column; gap:32px; }
+.npc-stat { display:flex; flex-direction:column; gap:12px; height:34px; }
+.npc-stat dt { color:var(--npc-muted); white-space:nowrap; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-stat dd { font-size:16px; line-height:19px; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-stats .npc-more { display:flex; align-items:center; gap:4px; color:var(--npc-green); margin-top:32px; height:16px; }
+.npc-more span { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-arrow-right { transform:rotate(180deg); }
+.npc-arrow-up { transform:rotate(180deg); }
+.npc-colhead { display:flex; align-items:center; gap:2px; color:var(--npc-muted) !important; white-space:nowrap; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-colhead svg { color:var(--npc-faint); }
+.npc-colhead > span { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-route-cols { display:grid; grid-template-columns:198fr 237fr 116fr 145fr; padding-left:20px; padding-right:23px; }
+.npc-route-head { margin-top:20px; height:12px; margin-bottom:16px; }
+.npc-route-list { display:flex; flex-direction:column; gap:6px; }
+.npc-route-row { position:relative; width:100%; height:78px; background:var(--npc-bg) !important; border-radius:20px !important; padding-top:23px !important; padding-left:20px !important; padding-right:23px !important; align-content:start; }
+.npc-route-row > span { text-box-trim:trim-both; text-box-edge:cap alphabetic; white-space:nowrap; }
+.npc-route-specialist { display:flex; flex-direction:column; gap:12px; }
+.npc-route-specialist > span,.npc-route-specialist small { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-route-specialist small { color:var(--npc-muted); font:inherit; }
+.npc-chevron { color:#535353; }
+.npc-route-row > .npc-chevron { position:absolute; right:22px; top:32px; }
+.npc-chevron--down { transform:rotate(90deg); }
+.npc-route-details { height:231px; margin-top:1px; border-radius:22px; background:var(--npc-bg); display:grid; grid-template-columns:296px minmax(0,1fr); grid-template-rows:144px auto; padding:28px 20px; }
+.npc-route-details h3 { font:inherit; color:var(--npc-muted); text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-route-details p { text-box-trim:trim-both; text-box-edge:cap alphabetic; margin-top:12px; white-space:nowrap; }
+.npc-route-details p span { display:block; }
+.npc-route-stages p { margin-top:11px; }
+.npc-route-conclusion p { margin-top:11px; }
+.npc-route-task { margin-top:-3px; }
+.npc-route-task p { margin-top:14px; }
+.npc-danger { color:#ff3636 !important; }
+.npc-notifications { margin-top:35px; }
+.npc-notification-cols { display:grid; grid-template-columns:minmax(0,230fr) minmax(0,152fr) minmax(0,149fr) minmax(0,112fr) minmax(0,63fr); padding-left:20px; padding-right:13px; }
+.npc-notification-head { margin-top:21px; margin-bottom:16px; height:12px; }
+.npc-notification-list { display:flex; flex-direction:column; gap:8px; }
+.npc-notification-row { height:79px; padding-top:27px; border-radius:20px; background:var(--npc-bg); align-content:start; }
+.npc-notification-row > span { text-box-trim:trim-both; text-box-edge:cap alphabetic; white-space:nowrap; }
+.npc-notification-row > span:first-child { white-space:normal; padding-right:20px; }
+.npc-notification-row > span:nth-child(2) { white-space:pre-line; padding-right:12px; }
+.npc-booked { padding-left:35px; color:var(--npc-green); padding-top:1px; }
+.npc-notifications .npc-notify { height:48px; width:200px; display:flex; align-items:center; justify-content:center; padding:8px 14px 8px 16px; border-radius:18px; background:var(--npc-green); color:#fff; margin:12px 0 0 2px; white-space:nowrap; }
+.npc-notify span { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-findings { margin-top:36px; }
+.npc-finding-cols { display:grid; grid-template-columns:255fr 256fr 203fr; padding-left:25px; }
+.npc-finding-head { margin-top:21px; height:12px; margin-bottom:12px; }
+.npc-finding-list { display:flex; flex-direction:column; gap:8px; }
+.npc-finding-row { height:52px; width:100%; background:var(--npc-bg) !important; border-radius:20px !important; padding-left:25px !important; align-items:center; }
+.npc-finding-row > span { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-finding-row > span:first-child { color:#535353; }
+.npc-finding-row:nth-child(1) > span:last-child { transform:translateX(-1px); }
+.npc-finding-row:nth-child(2) > span:last-child { transform:translateX(.62px); }
+.npc-finding-row:nth-child(3) > span:last-child { transform:translateX(2px); }
+.npc-history { position:relative; min-width:0; margin-top:33px; padding:2px 0 0 25px; }
+.npc-history::before { content:''; position:absolute; left:0; top:0; width:1px; height:899px; background:#d7d7d7; }
+.npc-history h2 { margin-left:9px; }
+.npc-events { display:flex; flex-direction:column; gap:12px; margin-top:22px; margin-left:1px; }
+.npc-history .npc-event { position:relative; display:flex; flex-direction:column; gap:8px; padding:10px; width:100%; }
+.npc-event:nth-child(5) { margin-top:1px; }
+.npc-event time { height:9px; }
+.npc-event-title { height:12px; }
+.npc-event-subtitle { height:10px; }
+.npc-event time { font-size:12px; line-height:15px; color:var(--npc-muted); text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-event-title { font-size:16px; line-height:19px; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-event-subtitle { color:#535353; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.npc-event .npc-chevron { position:absolute; left:216px; top:27px; }
+.npc-event:not(:has(.npc-event-subtitle)) .npc-chevron { top:18px; }
+.npc-history .npc-history-more { display:flex; align-items:center; gap:14px; margin:14px 0 0 70px; color:var(--npc-faint); }
+.npc-history-more .npc-chevron { color:var(--npc-faint); }
+.npc-sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.npc-empty { margin:20px !important; color:#818181; }
+
+/* The desktop frame is exact at 1280px. Narrow screens keep readable text. */
+@media (max-width:1190px) {
+  .npc-card { grid-template-columns:minmax(0,1fr); }
+  .npc-history { border-top:1px solid #d7d7d7; margin:24px 20px; padding:24px 0; }
+  .npc-history::before { display:none; }
+  .npc-events { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .npc-stats { gap:24px; }
+  .npc-info { gap:20px; }
+}
+@media (max-width:1000px) {
+  .npc-card { min-height:0; border-radius:24px; }
+  .npc-main { padding:24px 12px; }
+  .npc-info { grid-template-columns:1fr; margin-left:8px; gap:28px; padding-bottom:34px; }
+  .npc-stats { grid-template-columns:106px 86px 100px; gap:12px; padding:0; }
+  .npc-stats dl { gap:24px; }
+  .npc-card h2 { margin-left:8px; }
+  .npc-routes,.npc-notifications,.npc-findings { overflow-x:auto; padding-bottom:4px; }
+  .npc-route-head,.npc-route-list,.npc-notification-head,.npc-notification-list { min-width:739px; }
+  .npc-finding-head,.npc-finding-list { min-width:600px; }
+  .npc-events { grid-template-columns:1fr; }
+  .npc-search { gap:12px; padding-left:16px; }
+  .npc-history { margin-top:0; }
+}
+
+/* Live values can be longer than the reference fixture. Preserve the minimum geometry. */
+.npc-person h1 { min-height:68px; height:auto; overflow-wrap:anywhere; }
+.npc-contacts span { overflow-wrap:anywhere; min-width:0; }
+.npc-person .npc-id { width:max-content; }
+.npc-id span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.npc-route-row { min-height:78px; height:auto; padding-bottom:22px !important; }
+.npc-route-row > span { min-width:0; white-space:normal; overflow-wrap:anywhere; padding-right:8px; }
+.npc-route-row > span:nth-child(4) { padding-right:16px; }
+.npc-route-details { min-height:231px; height:auto; grid-template-rows:minmax(144px,auto) auto; padding-bottom:27px; }
+.npc-route-details p { white-space:pre-line; overflow-wrap:anywhere; }
+.npc-route-details > div { min-width:0; }
+.npc-notification-row { min-height:79px; height:auto; padding-bottom:20px; }
+.npc-notification-row .npc-message { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.npc-notification-row > span { min-width:0; overflow-wrap:anywhere; }
+.npc-finding-row { min-height:52px; height:auto; padding-top:12px !important; padding-bottom:12px !important; }
+.npc-finding-row > span { min-width:0; overflow-wrap:anywhere; padding-right:12px; }
+.npc-event-title { min-height:12px; height:auto; padding-right:22px; overflow-wrap:anywhere; }
+.npc-event .npc-chevron { left:216px; }
+.npc-card-detail { --npc-bg:#f5f5f5; --npc-muted:#818181; }
+.npc-card-detail .npc-route-details { grid-template-columns:1fr 1fr; gap:20px; }
+.patient-view .main { padding-bottom:25px; }
+.dialog .pc-protocol { margin:0; padding:20px; border-radius:20px; }
+.dialog .pc-table { min-width:0; }
+:where(.npc-page, .npc-card, .npc-search) button:focus-visible { outline:1px solid #818181; outline-offset:2px; }
+.npc-search input:focus { box-shadow:none; }
+
+/* Review sheet from the supplied protocol / findings / route frame. */
+.npc-review-sheet { min-height:1504px; align-items:stretch; grid-template-columns:minmax(0,1fr) 281px; }
+.npc-review-sheet .npc-main { padding:32.5px 16px 35px; }
+.npc-review-sheet .npc-info { min-height:241.5px; }
+.npc-review-sheet .npc-history::before { height:100%; }
+.npc-review-sheet .npc-history { margin-bottom:35px; }
+.review-protocol-heading { display:flex; align-items:center; flex-wrap:wrap; gap:8px; min-height:26px; }
+.review-date { background:#f5f5f5; color:#818181; border-radius:12px; padding:5px 10px; line-height:16px; }
+.protocol-review .pc-protocol { margin:16px 0 0; padding:23px 34px 25px; border-radius:22px; background:#f5f5f5; }
+.protocol-review .protocol-text { font:400 14px/20px 'Patient Inter',sans-serif; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.protocol-review .review-findings-heading { margin-top:32px; }
+.protocol-review .pc-table { margin-top:20px; }
+.protocol-review .f-cols { display:grid; grid-template-columns:minmax(0,255fr) minmax(0,184fr) minmax(0,199fr) 58px; gap:0; }
+.protocol-review .pc-thead { padding:0 14px 12px 25px; }
+.protocol-review .pc-row { margin:0 0 8px; background:#f5f5f5; color:#000; }
+.protocol-review .pc-row-main { padding:9px 14px 9px 25px; min-height:52px; }
+.protocol-review .pc-row-main > span:first-child { color:#818181; }
+.protocol-review .pc-actions { display:flex; gap:10px; justify-self:end; }
+.protocol-review .pc-actions .sq { width:24px; height:24px; border-radius:7px; display:grid; place-items:center; padding:0; }
+.protocol-review .pc-actions .sq svg { width:18px; height:18px; }
+.protocol-review .sq.ok { background:#13ab7b; color:#fff; }
+.protocol-review .sq.no { background:#ff8336; color:#fff; }
+.protocol-review .pc-add { border:2px dotted #d7d7d7; min-height:52px; border-radius:20px; color:#bbb; display:grid; place-items:center; width:100%; }
+.protocol-review .review-pill { display:inline-flex; align-items:center; justify-content:space-between; gap:8px; border:0; background:#fff; border-radius:13px; padding:8px 14px; font:inherit; line-height:16px; max-width:100%; min-width:0; }
+.review-pill > span { min-width:0; overflow-wrap:anywhere; }
+.review-pill svg { color:#818181; }
+.review-level { padding-right:10px; }
+.review-routes { margin-top:32px; }
+.review-route-head { display:grid; grid-template-columns:237fr 291fr 169fr; color:#818181; margin:24px 20px 10px; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.review-route-head > span { text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.review-route { display:grid; grid-template-columns:minmax(0,224fr) minmax(0,263fr) minmax(0,150fr) 52px; gap:6px; align-items:start; padding:14px; border-radius:20px; background:#f5f5f5; margin-bottom:6px; min-height:98px; }
+.review-route > .review-pill { padding-left:12px; padding-right:12px; gap:4px; }
+.review-route-specialty { display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:0; }
+.review-route-date { display:flex; align-items:center; gap:5px; }
+.review-route-date > span { color:#535353; }
+.review-route .pc-actions { padding-top:5px; }
+.protocol-review .review-save { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:12px 16px; border-radius:18px; background:#13ab7b; color:#fff; margin-top:12px; }
+.protocol-review .review-error { margin:12px 20px; color:#d63b30; }
+.protocol-review .pc-detail { padding:16px 25px; }
+@media(max-width:1190px) {
+  .npc-review-sheet { grid-template-columns:minmax(0,1fr); }
+  .npc-stats { grid-template-columns:minmax(80px,1fr) minmax(60px,.8fr) minmax(90px,1fr); }
+}
+@media(max-width:1000px) {
+  .npc-review-sheet .npc-info { min-height:0; }
+  .protocol-review .pc-protocol { padding:20px; }
+  .protocol-review .f-cols { grid-template-columns:minmax(110px,1fr) minmax(120px,1fr) 110px 58px; }
+  .protocol-review .pc-table,.review-routes { overflow-x:auto; }
+  .protocol-review .pc-row,.protocol-review .pc-thead { min-width:530px; }
+  .review-route,.review-route-head { min-width:690px; }
+}
+@media(max-width:720px) {
+  .npc-review-sheet { min-height:0; }
+  .protocol-review .pc-thead { display:grid; }
+  .protocol-review .pc-row-main > span:first-child { grid-column:auto; font-size:inherit; }
+}

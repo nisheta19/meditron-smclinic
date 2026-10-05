@@ -15,6 +15,7 @@ import re
 import sys
 import time
 import unittest
+from route_cases import RouteIntegrationMixin
 from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -99,7 +100,8 @@ def card(meta):
     return call('GET', '/api/patients/' + patients[0]['id'])
 
 
-class Integration(unittest.TestCase):
+class Integration(RouteIntegrationMixin, unittest.TestCase):
+    route_api = globals()
     def setUp(self):
         CLIENT.cookies.clear()
         CLIENT.headers.pop('X-CSRF-TOKEN', None)

@@ -1,0 +1,30 @@
+.overlay.clinical-notify-overlay { background:rgb(0 0 0 / .15); }
+.clinical-notify.dialog { width:621px; max-width:100%; border-radius:48px; font:400 14px/17px 'Patient Inter','Inter Variable',sans-serif; color:#000; }
+.clinical-notify > header { position:relative; padding:34px 76px 30px 42px; min-height:85px; }
+.clinical-notify h2 { font:600 20px/27px 'Patient Manrope','Manrope Variable',sans-serif; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.clinical-notify > header .icon { position:absolute; right:23px; top:22px; display:grid; place-items:center; width:44px; height:44px; border-radius:50%; background:#eee; color:#818181; font:300 28px/1 sans-serif; }
+.clinical-notify > header .icon { font-size:0; }
+.clinical-notify > header .icon::before,.clinical-notify > header .icon::after { content:''; position:absolute; width:16px; height:1.2px; background:#979797; transform:rotate(45deg); }
+.clinical-notify > header .icon::after { transform:rotate(-45deg); }
+.clinical-notify .dialog-body { padding:2px 30px 0; gap:24px; }
+.clinical-notify .field > span,.clinical-notify legend,.notify-preview > span { display:block; font-size:14px; line-height:17px; color:#818181; margin:0 0 12px 16px; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.clinical-notify .field select { width:100%; height:52px; padding:0 40px 0 19px; border:1px solid transparent; border-radius:20px; background-color:#f5f5f5; box-shadow:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath d='m2 2 6 6 6-6' fill='none' stroke='%23535353' stroke-width='1.2'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 24px center; }
+.clinical-notify .field select:focus { border-color:#818181; outline:0; box-shadow:none; }
+.notify-templates > div { display:grid; gap:4px; max-height:164px; overflow:auto; border-radius:20px; }
+.notify-template { display:flex; align-items:center; gap:10px; min-height:52px; padding:12px 18px; border-radius:20px; background:#f5f5f5; cursor:pointer; }
+.notify-template input { appearance:none; flex:none; width:18px; height:18px; margin:0; border:2px solid #bbb; border-radius:50%; background:none; }
+.notify-template input:checked { border-color:#13ab7b; background:radial-gradient(circle,#13ab7b 0 5px,transparent 5.5px); }
+.notify-preview > p { margin:0; min-height:81px; padding:19px 22px; background:#f5f5f5; border-radius:20px; white-space:pre-wrap; overflow-wrap:anywhere; text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+.clinical-notify .actions { padding:24px 30px 28.25px; gap:16px; }
+.clinical-notify .actions .btn { height:48px; font-size:14px; font-weight:400; border-radius:18px; }
+.clinical-notify .actions .primary { min-width:200px; }
+.clinical-notify .actions .ghost { border:1px solid #818181; border-radius:64px; color:#818181; background:#fff; padding:0 16px; }
+.clinical-notify :focus-visible { outline:1px solid #818181; outline-offset:2px; }
+@media(min-height:1200px) { .clinical-notify.dialog { transform:translateY(-46.5px); } }
+@media (max-width:720px) {
+  .clinical-notify.dialog { border-radius:30px; }
+  .clinical-notify > header { padding:24px 65px 22px 24px; }
+  .clinical-notify .dialog-body { padding:0 18px; }
+  .clinical-notify .actions { padding:20px 18px; gap:8px; flex-wrap:wrap; }
+  .clinical-notify .actions .primary { min-width:0; }
+}

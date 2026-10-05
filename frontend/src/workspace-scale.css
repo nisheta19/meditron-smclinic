@@ -1,0 +1,8 @@
+/* Keep the 1280px reference's proportions on a larger desktop instead of
+   stretching rows while leaving labels, controls and the sidebar tiny. */
+@media (min-width:1281px) {
+  .layout { --workspace-scale:calc(100vw / 1280px); zoom:var(--workspace-scale); min-height:calc(100dvh / var(--workspace-scale)); }
+  .layout .dialog { max-height:calc(92dvh / var(--workspace-scale)); }
+  .layout .npc-card { grid-template-columns:minmax(0,1fr) 284px; }
+  .layout .npc-review-sheet { grid-template-columns:minmax(0,1fr) 281px; }
+}

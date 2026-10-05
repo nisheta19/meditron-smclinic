@@ -357,6 +357,9 @@ export const mockApi = {
   updateStep: (rid, sid, body) => reply(() => updateStep(rid, sid, body)),
 
   notifications: (rid) => reply(() => db.notifications.filter((n) => n.routeId === rid).sort((a, b) => a.sentAt.localeCompare(b.sentAt))),
+  patientNotifications: (pid) => reply(() => db.notifications.filter(n => db.routes.some(r => r.id === n.routeId && r.patientId === pid))),
+  notificationTemplates: () => reply(() => []),
+  notificationPreview: () => Promise.reject(new Error('Предпросмотр сообщений доступен при подключении к бэкенду')),
   notify: (rid, body) => reply(() => notify(rid, body)),
 };
 

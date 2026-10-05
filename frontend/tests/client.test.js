@@ -17,10 +17,13 @@ test('both queue filter values reach the backend', async () => {
 });
 test('nested patient and protocol DTOs preserve fields and flags', async () => {
   globalThis.fetch = async (url) => new Response(JSON.stringify(url.includes('/patients/')
-    ? { patient: { id: 'p', maxLevel: 'EMERGENCY' }, currentProtocol: { id: 'r' }, history: { protocols: [] } }
+    ? { patient: { id: 'p', maxLevel: 'EMERGENCY' }, currentProtocol: { id: 'r' }, clinicalRoutes:[{id:'clinical'}], banner:'Срок истёк', history: { protocols: [], clinicalRoutes:[{id:'closed'}] } }
     : { protocol: { id: 'r', status: 'DONE', conclusionFound: false, flags: [{ code: 'NO_CONCLUSION' }] }, text: 'Описание', notTriggered: [] }),
   { headers: { 'Content-Type': 'application/json' } });
   assert.equal((await httpApi.patient('p')).maxLevel, 'EMERGENCY');
+  assert.deepEqual((await httpApi.patient('p')).clinicalRoutes,[{id:'clinical'}]);
+  assert.deepEqual((await httpApi.patient('p')).history.clinicalRoutes,[{id:'closed'}]);
+  assert.equal((await httpApi.patient('p')).banner,'Срок истёк');
   const protocol = await httpApi.protocol('r');
   assert.equal(protocol.conclusionFound, false);
   assert.equal(protocol.flags[0].code, 'NO_CONCLUSION');

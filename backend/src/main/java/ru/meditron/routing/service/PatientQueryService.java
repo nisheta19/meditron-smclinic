@@ -23,16 +23,22 @@ import ru.meditron.routing.repository.ProtocolRepository;
 public class PatientQueryService {
 
     private final PatientRepository patients;
+    @org.springframework.beans.factory.annotation.Value("${routes.enabled:true}")
+    private boolean routesEnabled;
     private final ProtocolRepository protocols;
     private final FindingRepository findings;
     private final DtoMapper mapper;
+    /** Чтение маршрутов; наполнение карточки включается настройкой routes.enabled. */
+    private final org.springframework.beans.factory.ObjectProvider<ru.meditron.routing.route.service.RouteQueryService> routeQuery;
 
     public PatientQueryService(PatientRepository patients, ProtocolRepository protocols,
-                               FindingRepository findings, DtoMapper mapper) {
+                               FindingRepository findings, DtoMapper mapper,
+                               org.springframework.beans.factory.ObjectProvider<ru.meditron.routing.route.service.RouteQueryService> routeQuery) {
         this.patients = patients;
         this.protocols = protocols;
         this.findings = findings;
         this.mapper = mapper;
+        this.routeQuery = routeQuery;
     }
 
     /** Данные одного пациента, из которых собираются и строка инбокса, и карточка. */
@@ -77,11 +83,16 @@ public class PatientQueryService {
                 maxLevel(s),
                 c == null ? null : c.getReceivedAt(),
                 pending,
-                0,
+                activeRoutes(p.getId()),
                 c == null ? null : c.getStudyDate(),
                 c == null ? null : c.getStudyType(),
                 active(s).size(),
                 active(s).stream().limit(TOP_FINDINGS).map(this::top).toList());
+    }
+
+    private int activeRoutes(UUID id) {
+        var q = routeQuery.getIfAvailable();
+        return routesEnabled && q != null ? q.activeRouteCount(id) : 0;
     }
 
     private static final int TOP_FINDINGS = 2;
@@ -175,12 +186,23 @@ public class PatientQueryService {
                 .map(x -> mapper.protocolShort(x, countFindings(s, x)))
                 .toList();
 
+        List<ru.meditron.routing.route.dto.RouteDtos.RouteDto> openRoutes = new ArrayList<>();
+        List<ru.meditron.routing.route.dto.RouteDtos.RouteDto> closedRoutes = new ArrayList<>();
+        String banner = null;
+        var rq = routeQuery.getIfAvailable();
+        if (routesEnabled && rq != null) {
+            for (var r : rq.patientRoutes(p.getId())) {
+                (r.open() ? openRoutes : closedRoutes).add(r);
+            }
+            banner = rq.banner(p.getId());
+        }
         return new PatientCardDto(
                 shortDto(s),
                 s.current() == null ? null : mapper.protocolShort(s.current(), countFindings(s, s.current())),
                 current,
                 List.of(),
-                new PatientCardDto.History(pastProtocols, pastFindings, List.of()));
+                new PatientCardDto.History(pastProtocols, pastFindings, List.of(), closedRoutes),
+                banner, openRoutes);
     }
 
     public ProtocolDto protocol(String protocolId) {

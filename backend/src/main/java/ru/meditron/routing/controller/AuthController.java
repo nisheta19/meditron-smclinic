@@ -25,7 +25,7 @@ import ru.meditron.routing.config.SecurityConfig;
 /** Единственный демонстрационный аккаунт; UI входа подключается отдельно. */
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Auth", description = "Единственный тестовый аккаунт, cookie-сессия и CSRF; формы входа пока нет")
+@Tag(name = "Auth", description = "Единственный тестовый аккаунт, cookie-сессия и CSRF; вход и выход через cookie-сессию")
 public class AuthController {
     private final AuthenticationManager manager;
     private final HttpSessionSecurityContextRepository contexts;

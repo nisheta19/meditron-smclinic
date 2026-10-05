@@ -50,3 +50,11 @@ management:
 # Демо-данные: при пустой базе загружаются результаты ML из resources/demo
 demo:
   seed: ${DEMO_SEED:false}
+
+# Модуль маршрутов (ROUTES-REQUIREMENTS v1.1): настройки — routing/route-config.yaml,
+# routes.tick-ms — как часто исполнять таймеры в реальном времени (в демо время двигают /api/sim/clock/advance).
+routes:
+  enabled: ${ROUTES_ENABLED:true}
+  sim-enabled: ${ROUTES_SIM_ENABLED:false}
+  config: ${ROUTES_CONFIG:classpath:routing/route-config.yaml}
+  tick-ms: ${ROUTES_TICK_MS:15000}

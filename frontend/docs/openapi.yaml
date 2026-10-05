@@ -4,20 +4,387 @@ info:
   description: Выявление клинически значимых находок и маршрутизация пациента
   version: 0.0.1
 servers:
-- url: http://127.0.0.1:18081
-  description: Generated server url
+- url: /
+  description: Текущий backend или nginx; /api/sim/* доступен только при ROUTES_SIM_ENABLED=true
 tags:
-- name: Auth
-  description: Единственный тестовый аккаунт, cookie-сессия и CSRF; формы входа пока нет
 - name: Dictionary
   description: Словарь находок (findings-dictionary.yaml)
+- name: Демо
+  description: Модельное время, заглушка CRM, сценарии
 - name: Integration
   description: Вход от ML (не для фронта)
+- name: Координатор
+  description: Задачи, экстренная эскалация, журнал, дашборд
 - name: Patients
   description: Инбокс, карточка пациента, находки пациента
+- name: Auth
+  description: Единственный тестовый аккаунт, cookie-сессия и CSRF; вход и выход через
+    cookie-сессию
+- name: Маршруты
+  description: 'Маршрут пациента: создаётся автоматически, этапы меняются событиями
+    МИС'
+- name: Интеграция маршрутов
+  description: МИС → события маршрута, CRM → статусы и ответы, расписание
 - name: MIS
   description: Бэкенд отправляет протоколы в ML и получает результат асинхронно
 paths:
+  /api/tasks/{taskId}/done:
+    post:
+      tags:
+      - Координатор
+      summary: Задача выполнена
+      operationId: done
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskDoneRequest'
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TaskDto'
+  /api/sim/scenarios/{runId}/next:
+    post:
+      tags:
+      - Демо
+      operationId: next
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScenarioRunDto'
+  /api/sim/scenarios/{name}/start:
+    post:
+      tags:
+      - Демо
+      summary: 'Запустить сценарий: сам с паузой stepDelaySeconds или manual=true
+        — по шагу через /next'
+      operationId: start
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioStartRequest'
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScenarioRunDto'
+  /api/sim/clock/reset:
+    post:
+      tags:
+      - Демо
+      operationId: reset
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ClockDto'
+  /api/sim/clock/advance:
+    post:
+      tags:
+      - Демо
+      summary: Продвинуть модельное время (минуты) и сразу исполнить наступившие таймеры
+      operationId: advance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvanceRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/schedule/bookings:
+    post:
+      tags:
+      - Интеграция маршрутов
+      summary: 'Записаться в слот: создаёт событие BOOKED'
+      operationId: book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/routes/{routeId}/notifications:
+    get:
+      tags:
+      - Маршруты
+      summary: 'Уведомления маршрута: отправка, прочтение, запись'
+      operationId: routeNotifications
+      parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationDto'
+    post:
+      tags:
+      - Маршруты
+      summary: Ручная отправка по шаблону. Без confirm при сообщении за сутки — 409
+        CONFIRM_REQUIRED
+      operationId: send
+      parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManualNotificationRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotificationDto'
   /api/patients/{patientId}/findings:
     get:
       tags:
@@ -171,6 +538,51 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FindingDto'
+  /api/integration/route-events:
+    post:
+      tags:
+      - Интеграция маршрутов
+      summary: 'Событие маршрута от МИС: BOOKED, NO_SHOW, VISIT_COMPLETED, TACTIC_SELECTED,
+        …; повтор eventId — 200 без изменений'
+      operationId: routeEvent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteEvent'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
   /api/integration/protocols:
     post:
       tags:
@@ -225,7 +637,8 @@ paths:
     post:
       tags:
       - Integration
-      summary: Результат ML по одному протоколу. Повтор того же resultId — 202 без изменений
+      summary: Результат ML по одному протоколу. Повтор того же resultId — 202 без
+        изменений
       operationId: mlResult
       requestBody:
         content:
@@ -346,6 +759,196 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/integration/crm/callbacks:
+    post:
+      tags:
+      - Интеграция маршрутов
+      summary: 'CRM: статус доставки (messageId+status) или ответ пациента (routeId+reply)'
+      operationId: crm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrmCallback'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/escalations/{id}/contacted:
+    post:
+      tags:
+      - Координатор
+      summary: «Связался с пациентом»
+      operationId: contacted
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationActionRequest'
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EscalationDto'
+  /api/escalations/{id}/close:
+    post:
+      tags:
+      - Координатор
+      summary: 'Закрыть с исходом: HOSPITALIZED, AMBULANCE, COMING_TODAY, PATIENT_REFUSED,
+        FINDING_NOT_CONFIRMED'
+      operationId: close
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationActionRequest'
+        required: true
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EscalationDto'
+  /api/escalations/{id}/accept:
+    post:
+      tags:
+      - Координатор
+      summary: «Принял в работу»
+      operationId: accept
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationActionRequest'
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EscalationDto'
   /api/auth/logout:
     post:
       tags:
@@ -512,6 +1115,421 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/FindingDto'
+  /api/tasks:
+    get:
+      tags:
+      - Координатор
+      summary: 'Задачи персонала (фильтры: роль, статус OPEN/DONE/CANCELLED, пациент)'
+      operationId: tasks
+      parameters:
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: patientId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskDto'
+  /api/sim/scenarios:
+    get:
+      tags:
+      - Демо
+      operationId: scenarios
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: {}
+  /api/sim/scenarios/runs/{runId}:
+    get:
+      tags:
+      - Демо
+      operationId: status
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScenarioRunDto'
+  /api/sim/crm/outbox:
+    get:
+      tags:
+      - Демо
+      summary: Все сообщения, переданные в заглушку CRM
+      operationId: outbox
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationDto'
+  /api/sim/clock:
+    get:
+      tags:
+      - Демо
+      operationId: clock
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ClockDto'
+  /api/schedule/slots:
+    get:
+      tags:
+      - Интеграция маршрутов
+      summary: 'Ближайшие свободные слоты: по специальности или по маршруту (routeId)'
+      operationId: slots
+      parameters:
+      - name: specialty
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: kind
+        in: query
+        required: false
+        schema:
+          type: string
+          default: CONSULTATION
+      - name: routeId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 12
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SlotDto'
+  /api/routes:
+    get:
+      tags:
+      - Маршруты
+      summary: Список маршрутов с фильтрами
+      operationId: routes
+      parameters:
+      - name: stage
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: specialty
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: overdue
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: open
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RouteDto'
+  /api/routes/{routeId}:
+    get:
+      tags:
+      - Маршруты
+      summary: 'Маршрут подробно: этап, срок, дата посещения или просрочка, находки,
+        история этапов'
+      operationId: route
+      parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RouteDto'
+  /api/route-templates:
+    get:
+      tags:
+      - Маршруты
+      summary: Шаблоны маршрутов из словаря (только чтение)
+      operationId: routeTemplates
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
   /api/protocols/{protocolId}:
     get:
       tags:
@@ -597,7 +1615,8 @@ paths:
     get:
       tags:
       - Patients
-      summary: 'Пациенты: needsRouteReview=true — входящие без определённого направления; false — остальные'
+      summary: 'Пациенты: needsRouteReview=true — входящие без определённого направления;
+        false — остальные'
       operationId: list
       parameters:
       - name: search
@@ -754,12 +1773,303 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/PatientCardDto'
+  /api/patients/{patientId}/routes:
+    get:
+      tags:
+      - Маршруты
+      summary: 'Маршруты пациента: сначала открытые'
+      operationId: patientRoutes
+      parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RouteDto'
+  /api/patients/{patientId}/notifications:
+    get:
+      tags:
+      - Маршруты
+      summary: Все уведомления пациента
+      operationId: patientNotifications
+      parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationDto'
+  /api/patients/{patientId}/journal:
+    get:
+      tags:
+      - Координатор
+      summary: Журнал по пациенту
+      operationId: patientJournal
+      parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: action
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 500
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JournalDto'
+  /api/routes/{routeId}/notification-preview:
+    get:
+      tags:
+      - Маршруты
+      summary: Предпросмотр сообщения по шаблону без отправки и сохранения
+      operationId: preview
+      parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: templateCode
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotificationPreviewDto'
+  /api/notification-templates:
+    get:
+      tags:
+      - Маршруты
+      summary: Шаблоны сообщений; manual=true — доступны для ручной отправки
+      operationId: templates
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemplateDto'
+  /api/journal:
+    get:
+      tags:
+      - Координатор
+      summary: Общий журнал
+      operationId: journal
+      parameters:
+      - name: patientId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: action
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 500
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JournalDto'
   /api/integration/events/status:
     get:
       tags:
       - MIS
       summary: Статус обработки и доставки callback; успех доставки — delivery=delivered
-      operationId: status
+      operationId: status_1
       parameters:
       - name: eventId
         in: query
@@ -797,12 +2107,62 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/escalations:
+    get:
+      tags:
+      - Координатор
+      summary: Экстренные эскалации
+      operationId: escalations
+      parameters:
+      - name: patientId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: open
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EscalationDto'
   /api/dictionary/findings:
     get:
       tags:
       - Dictionary
-      summary: 'Словарь: краткий вид для фронта; full=true — полные записи для ML (атрибуты, правила извлечения,
-        ловушки)'
+      summary: 'Словарь: краткий вид для фронта; full=true — полные записи для ML
+        (атрибуты, правила извлечения, ловушки)'
       operationId: findings_1
       parameters:
       - name: studyType
@@ -852,6 +2212,256 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/dashboard/patients:
+    get:
+      tags:
+      - Координатор
+      summary: 'Переход к пациентам: step — шаг воронки, loss — вид потерь'
+      operationId: patients
+      parameters:
+      - name: step
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: loss
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: studyType
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: routeType
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: {}
+  /api/dashboard/losses:
+    get:
+      tags:
+      - Координатор
+      summary: Где теряем
+      operationId: losses
+      parameters:
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: studyType
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: routeType
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: {}
+  /api/dashboard/funnel:
+    get:
+      tags:
+      - Координатор
+      summary: 'Воронка: проценты от предыдущего шага'
+      operationId: funnel
+      parameters:
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: studyType
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: routeType
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: {}
+  /api/dashboard/escalations:
+    get:
+      tags:
+      - Координатор
+      summary: 'Метрики экстренных: время реакции, нормативы, исходы'
+      operationId: escalationMetrics
+      parameters:
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
   /api/auth/me:
     get:
       tags:
@@ -932,6 +2542,170 @@ components:
         code:
           type: string
         message:
+          type: string
+    TaskDoneRequest:
+      type: object
+      properties:
+        doctor:
+          type: string
+        comment:
+          type: string
+    TaskDto:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        role:
+          type: string
+        patientId:
+          type: string
+        routeId:
+          type: string
+        escalationId:
+          type: string
+        text:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        dueAt:
+          type: string
+          format: date-time
+        overdue:
+          type: boolean
+        status:
+          type: string
+        doneBy:
+          type: string
+        doneAt:
+          type: string
+          format: date-time
+        comment:
+          type: string
+    ScenarioRunDto:
+      type: object
+      properties:
+        runId:
+          type: string
+        scenario:
+          type: string
+        title:
+          type: string
+        step:
+          type: integer
+          format: int32
+        totalSteps:
+          type: integer
+          format: int32
+        lastStep:
+          type: string
+        finished:
+          type: boolean
+        error:
+          type: string
+        log:
+          type: array
+          items:
+            type: string
+    ScenarioStartRequest:
+      type: object
+      properties:
+        stepDelaySeconds:
+          type: integer
+          format: int32
+        manual:
+          type: boolean
+    ClockDto:
+      type: object
+      properties:
+        now:
+          type: string
+          format: date-time
+        offsetMinutes:
+          type: integer
+          format: int64
+    AdvanceRequest:
+      type: object
+      properties:
+        minutes:
+          type: integer
+          format: int64
+    BookingRequest:
+      type: object
+      properties:
+        routeId:
+          type: string
+          minLength: 1
+        slotId:
+          type: string
+          minLength: 1
+      required:
+      - routeId
+      - slotId
+    ManualNotificationRequest:
+      type: object
+      properties:
+        templateCode:
+          type: string
+          minLength: 1
+        confirm:
+          type: boolean
+        doctor:
+          type: string
+      required:
+      - templateCode
+    NotificationDto:
+      type: object
+      properties:
+        id:
+          type: string
+        routeId:
+          type: string
+        specialty:
+          type: string
+        templateCode:
+          type: string
+        templateTitle:
+          type: string
+        fullText:
+          type: string
+        shortText:
+          type: string
+        links:
+          type: object
+          additionalProperties:
+            type: string
+        buttons:
+          type: array
+          items:
+            type: string
+        manual:
+          type: boolean
+        sentBy:
+          type: string
+        sentAt:
+          type: string
+          format: date-time
+        delivery:
+          type: string
+        deliveredAt:
+          type: string
+          format: date-time
+        readAt:
+          type: string
+          format: date-time
+        failedAt:
+          type: string
+          format: date-time
+        bookedAfter:
+          type: boolean
+        patientId:
+          type: string
+        patientExternalId:
+          type: string
+        preferredChannel:
           type: string
     FindingCreateRequest:
       type: object
@@ -1043,6 +2817,65 @@ components:
           type: string
       required:
       - findingIds
+    RouteEvent:
+      type: object
+      properties:
+        eventId:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          minLength: 1
+        occurredAt:
+          type: string
+          format: date-time
+        patientExternalId:
+          type: string
+        routeId:
+          type: string
+          minLength: 1
+        slotId:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+        location:
+          type: string
+        online:
+          type: boolean
+        doctorName:
+          type: string
+        tactic:
+          type: string
+        subtype:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        controlDate:
+          type: string
+          format: date-time
+        newSpecialty:
+          type: string
+        comment:
+          type: string
+        clinic:
+          type: string
+        date:
+          type: string
+        reason:
+          type: string
+        serviceCode:
+          type: string
+        controlVisitBooked:
+          type: boolean
+        controlDateTime:
+          type: string
+          format: date-time
+      required:
+      - eventId
+      - routeId
+      - type
     JsonNode: {}
     MlError:
       type: object
@@ -1209,6 +3042,90 @@ components:
       - externalId
       - studyDate
       - studyType
+    CrmCallback:
+      type: object
+      properties:
+        eventId:
+          type: string
+          minLength: 1
+        messageId:
+          type: string
+        status:
+          type: string
+        at:
+          type: string
+          format: date-time
+        routeId:
+          type: string
+        reply:
+          type: string
+      required:
+      - eventId
+    EscalationActionRequest:
+      type: object
+      properties:
+        role:
+          type: string
+        doctor:
+          type: string
+        outcome:
+          type: string
+        comment:
+          type: string
+    EscalationDto:
+      type: object
+      properties:
+        id:
+          type: string
+        patientId:
+          type: string
+        protocolId:
+          type: string
+        findingId:
+          type: string
+        findingName:
+          type: string
+        dutySpecialty:
+          type: string
+        step:
+          type: string
+        currentRole:
+          type: string
+        deadline:
+          type: string
+          format: date-time
+        confirmTimedOut:
+          type: boolean
+        startedAt:
+          type: string
+          format: date-time
+        confirmedAt:
+          type: string
+          format: date-time
+        acceptedAt:
+          type: string
+          format: date-time
+        acceptedBy:
+          type: string
+        contactedAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+        outcome:
+          type: string
+        outcomeComment:
+          type: string
+        closeNote:
+          type: string
+        routeId:
+          type: string
+        history:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
     Login:
       type: object
       properties:
@@ -1250,6 +3167,127 @@ components:
         comment:
           type: string
         doctor:
+          type: string
+    SlotDto:
+      type: object
+      properties:
+        id:
+          type: string
+        specialty:
+          type: string
+        kind:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+        location:
+          type: string
+        online:
+          type: boolean
+        doctorName:
+          type: string
+    AppointmentDto:
+      type: object
+      properties:
+        id:
+          type: string
+        purpose:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+        location:
+          type: string
+        online:
+          type: boolean
+        doctorName:
+          type: string
+        status:
+          type: string
+    FindingRef:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+    RouteDto:
+      type: object
+      properties:
+        id:
+          type: string
+        patientId:
+          type: string
+        protocolId:
+          type: string
+        specialty:
+          type: string
+        routeType:
+          type: string
+        chainType:
+          type: string
+        stage:
+          type: string
+        stageTitle:
+          type: string
+        pendingVisit:
+          type: string
+        open:
+          type: boolean
+        closeReason:
+          type: string
+        dueAt:
+          type: string
+          format: date-time
+        controlAt:
+          type: string
+          format: date-time
+        visitAt:
+          type: string
+          format: date-time
+        overdueDays:
+          type: integer
+          format: int32
+        slaOverdue:
+          type: boolean
+        noShowCount:
+          type: integer
+          format: int32
+        tactic:
+          type: string
+        tacticSubtype:
+          type: string
+        tacticComment:
+          type: string
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindingRef'
+        stageHistory:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        openTasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskDto'
+        appointment:
+          $ref: '#/components/schemas/AppointmentDto'
+        createdAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+        hospitalizationDate:
+          type: string
+          format: date
+        hospitalizationClinic:
           type: string
     ProtocolDto:
       type: object
@@ -1449,6 +3487,10 @@ components:
         routes:
           type: array
           items: {}
+        clinicalRoutes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteDto'
     PatientCardDto:
       type: object
       properties:
@@ -1465,6 +3507,59 @@ components:
           items: {}
         history:
           $ref: '#/components/schemas/History'
+        unfinishedRouteBanner:
+          type: string
+        clinicalRoutes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteDto'
+    JournalDto:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+          format: date-time
+        actor:
+          type: string
+        actorName:
+          type: string
+        action:
+          type: string
+        basis:
+          type: string
+        patientId:
+          type: string
+        routeId:
+          type: string
+        findingId:
+          type: string
+        taskId:
+          type: string
+        escalationId:
+          type: string
+        details:
+          type: object
+          additionalProperties: {}
+    NotificationPreviewDto:
+      type: object
+      properties:
+        templateCode:
+          type: string
+        fullText:
+          type: string
+        shortText:
+          type: string
+    TemplateDto:
+      type: object
+      properties:
+        code:
+          type: string
+        title:
+          type: string
+        manual:
+          type: boolean
     Csrf:
       type: object
       properties:

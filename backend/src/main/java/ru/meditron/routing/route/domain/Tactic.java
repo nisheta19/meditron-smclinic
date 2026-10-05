@@ -1,0 +1,6 @@
+package ru.meditron.routing.route.domain;
+
+/** См. ROUTES-REQUIREMENTS v1.1. */
+public enum Tactic {
+    SURGERY_INDICATED, ADDITIONAL_EXAM, OBSERVATION, SURGERY_NOT_INDICATED, PATIENT_REFUSED, OTHER_PROFILE
+}

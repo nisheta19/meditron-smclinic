@@ -1,5 +1,6 @@
 package ru.meditron.routing.service;
 
+import ru.meditron.routing.time.ModelTime;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -22,7 +23,14 @@ import ru.meditron.routing.repository.ProtocolRepository;
 /** Действия врача с находками: подтвердить, отклонить, поправить, добавить, удалить. */
 @Service
 public class FindingService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private ru.meditron.routing.route.service.RouteWriteLock writeLock;
 
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private ru.meditron.routing.route.service.JournalService journal;
+    @org.springframework.beans.factory.annotation.Value("${routes.enabled:true}")
+    private boolean routesEnabled;
     private final FindingRepository findings;
     private final PatientRepository patients;
     private final ProtocolRepository protocols;
@@ -31,10 +39,12 @@ public class FindingService {
     private final RuleEngine rules;
     private final RoutingAdjustments adjustments;
     private final MlResultValidator validator;
+    private final org.springframework.context.ApplicationEventPublisher events;
 
     public FindingService(FindingRepository findings, PatientRepository patients, ProtocolRepository protocols,
                           DictionaryService dictionary, DtoMapper mapper, RuleEngine rules,
-                          RoutingAdjustments adjustments, MlResultValidator validator) {
+                          RoutingAdjustments adjustments, MlResultValidator validator,
+                          org.springframework.context.ApplicationEventPublisher events) {
         this.findings = findings;
         this.patients = patients;
         this.protocols = protocols;
@@ -43,6 +53,7 @@ public class FindingService {
         this.rules = rules;
         this.adjustments = adjustments;
         this.validator = validator;
+        this.events = events;
     }
 
     @Transactional(readOnly = true)
@@ -56,6 +67,7 @@ public class FindingService {
 
     @Transactional
     public FindingDto create(String patientId, FindingCreateRequest req) {
+        writeLock.acquire();
         Patient patient = patient(patientId);
         JsonNode entry = entry(req.code());
 
@@ -75,13 +87,17 @@ public class FindingService {
         f.setAttributes(req.attributes() == null ? new LinkedHashMap<>() : new LinkedHashMap<>(req.attributes()));
         f.setComment(req.comment());
         f.setReviewedBy(req.doctor());
-        f.setReviewedAt(Instant.now());
+        f.setReviewedAt(ModelTime.now());
         applyDictionary(f, entry, "MANUAL");
-        return mapper.finding(findings.save(f));
+        Finding saved = findings.save(f);
+        audit(saved, "FINDING_CREATED", req.doctor());
+        changed(patient.getId());
+        return mapper.finding(saved);
     }
 
     @Transactional
     public List<FindingDto> confirm(String patientId, ConfirmFindingsRequest req) {
+        writeLock.acquire();
         UUID pid = patient(patientId).getId();
         List<FindingDto> result = new ArrayList<>();
         for (String id : req.findingIds()) {
@@ -95,14 +111,17 @@ public class FindingService {
             requireCurrentProtocol(f);
             f.setStatus(FindingStatus.CONFIRMED);
             f.setReviewedBy(req.doctor());
-            f.setReviewedAt(Instant.now());
+            f.setReviewedAt(ModelTime.now());
+            audit(f, "FINDING_CONFIRMED", req.doctor());
             result.add(mapper.finding(f));
         }
+        changed(pid);
         return result;
     }
 
     @Transactional
     public FindingDto update(String findingId, FindingUpdateRequest req) {
+        writeLock.acquire();
         Finding f = finding(findingId);
         if (f.getStatus() == FindingStatus.REMOVED) {
             throw new BadRequestException("FINDING_REMOVED", "Находка удалена");
@@ -114,7 +133,7 @@ public class FindingService {
             }
             f.setStatus(req.status());
             f.setReviewedBy(req.doctor());
-            f.setReviewedAt(Instant.now());
+            f.setReviewedAt(ModelTime.now());
         }
         if (req.attributes() != null) {
             f.setAttributes(new LinkedHashMap<>(req.attributes()));
@@ -122,20 +141,38 @@ public class FindingService {
         if (req.code() != null || req.attributes() != null) {
             applyDictionary(f, entry(req.code() == null ? f.getCode() : req.code()), "MANUAL_EDIT");
             f.setReviewedBy(req.doctor());
-            f.setReviewedAt(Instant.now());
+            f.setReviewedAt(ModelTime.now());
         }
         if (req.comment() != null) {
             f.setComment(req.comment());
         }
+        audit(f, req.status() == FindingStatus.REJECTED ? "FINDING_REJECTED" : "FINDING_UPDATED", req.doctor());
+        changed(f.getPatient().getId());
         return mapper.finding(f);
     }
 
     @Transactional
     public void delete(String findingId, String reason) {
+        writeLock.acquire();
         Finding f = finding(findingId);
         f.setStatus(FindingStatus.REMOVED);
         f.setComment(reason);
-        f.setReviewedAt(Instant.now());
+        f.setReviewedAt(ModelTime.now());
+        audit(f, "FINDING_REMOVED", null);
+        changed(f.getPatient().getId());
+    }
+
+    private void audit(Finding f, String action, String doctor) {
+        if (!routesEnabled) return;
+        journal.entry("COORDINATOR", action).by(doctor).patient(f.getPatient().getId()).finding(f.getId())
+                .basis("Решение врача; словарь " + dictionary.version()).detail("code", f.getCode())
+                .detail("status", f.getStatus()).detail("rule", f.getMatchedRule()).detail("comment", f.getComment()).save();
+    }
+
+    /** Сообщить модулю маршрутов, что находки пациента изменились (раздел 4.4 ТЗ маршрутов). */
+    private void changed(UUID patientId) {
+        findings.flush();
+        events.publishEvent(new ru.meditron.routing.event.RoutingEvents.FindingsChanged(patientId));
     }
 
     /** Re-evaluate route when a doctor changes code or attributes. */

@@ -1,5 +1,6 @@
 package ru.meditron.routing.domain;
 
+import ru.meditron.routing.time.ModelTime;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,5 +43,5 @@ public class Patient {
     private Sex sex;
 
     @Column(nullable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = ModelTime.now();
 }

@@ -1,5 +1,6 @@
 package ru.meditron.routing.domain;
 
+import ru.meditron.routing.time.ModelTime;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -77,5 +78,5 @@ public class Protocol {
     private boolean superseded;
 
     @Column(nullable = false)
-    private Instant receivedAt = Instant.now();
+    private Instant receivedAt = ModelTime.now();
 }

@@ -1,5 +1,6 @@
 package ru.meditron.routing.service;
 
+import ru.meditron.routing.time.ModelTime;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
@@ -61,7 +62,7 @@ public class DtoMapper {
         if (p.getBirthDate() == null) {
             return null;
         }
-        LocalDate date = onDate != null ? onDate : LocalDate.now();
+        LocalDate date = onDate != null ? onDate : ModelTime.today();
         return Period.between(p.getBirthDate(), date).getYears();
     }
 }

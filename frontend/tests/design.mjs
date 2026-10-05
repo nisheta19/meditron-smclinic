@@ -16,12 +16,14 @@ await mkdir(resolve(root, '.local'), { recursive: true });
 page.on('pageerror', (e) => errors.push(e.message));
 await page.route('**/api/**', async (route) => {
   const req = route.request(), u = new URL(req.url());
+  if (!u.pathname.startsWith('/api/')) return route.continue();
   if (u.pathname === "/api/auth/me") return route.fulfill({ json: { login: "123", roles: ["DOCTOR"] } });
   let body;
   if (req.method() !== 'GET') { unexpected.push(`${req.method()} ${u.pathname}`); return route.abort(); }
   if (u.pathname === '/api/patients') {
     body = { items: patients.slice(0, Number(u.searchParams.get('size') || 50)), total: 4, page: 0, size: 50 };
-  } else if (u.pathname.startsWith('/api/patients/')) body = patientCard;
+  } else if (u.pathname.endsWith('/notifications')) body = [];
+  else if (u.pathname.startsWith('/api/patients/')) body = patientCard;
   else if (u.pathname.startsWith('/api/protocols/')) body = protocol;
   else if (u.pathname === '/api/dictionary/findings') body = [{ code: 'THYROID_NODULE', name: 'Узел щитовидной железы' }];
   else { unexpected.push(u.pathname); return route.abort(); }
@@ -53,31 +55,25 @@ try {
     await page.screenshot({ path: resolve(root, '.local/design-list.png'), fullPage: true });
     await chosen.focus(); await page.keyboard.press('Enter'); assert.ok(!page.url().includes('/patients/'));
   });
-  await test('patient sheet geometry and evidence', async () => {
-    await page.setViewportSize({ width: 1280, height: 1464 });
-    await page.goto(`${base}/#/patients/design-0`); await page.locator('.pc-protocol mark').first().waitFor(); await ready();
-    measurements.card = { search: await box('.searchbar'), sheet: await box('.pc-grid'), history: await box('.pc-history'), info: await box('.pc-info'), text: await box('.pc-protocol'), head: await box('.pc-head'), person: await box('.pc-person'), name: await box('.pc-person h3'), contacts: await box('.pc-contacts'), identifier: await box('.pc-id') };
-    near(measurements.card.sheet.x, 212, 'Sheet left'); near(measurements.card.sheet.y, 169, 'Sheet top');
-    near(measurements.card.sheet.width, 1052, 'Sheet width'); near(measurements.card.history.x, 980, 'History divider');
-    near(measurements.card.text.x, 225, 'Protocol left'); near(measurements.card.text.width, 727, 'Protocol width');
-    near(measurements.card.text.y, 485, 'Protocol top');
-    assert.equal(await page.locator('.pc-protocol .protocol-text').innerText(), protocol.text);
-    assert.equal(await page.locator('.pc-events > *').count(), 10);
-    await page.screenshot({ path: resolve(root, '.local/design-patient.png'), fullPage: true });
-  });
-  await test('route controls are inert, history and close work', async () => {
-    const buttons = page.locator('.route-placeholder button');
-    for (let i = 0; i < await buttons.count(); i++) assert.ok(await buttons.nth(i).isDisabled());
-    assert.equal(await page.getByRole('link', { name: 'Дашборд', exact: true }).getAttribute('href'), '#/dashboard');
-    await page.locator('.pc-history-more').click(); assert.equal(await page.locator('.pc-events > *').count(), 11);
-    await page.getByRole('button', { name: 'Закрыть карточку' }).click(); await page.locator('.row-card').first().waitFor();
-    assert.ok(page.url().endsWith('/findings'));
+  await test('prepared patient sheet geometry, history and protocol evidence', async () => {
+    await page.setViewportSize({width:1280,height:1625});
+    await page.goto(`${base}/#/patients/design-0`); await page.locator('.npc-card').waitFor(); await ready();
+    measurements.card={sheet:await box('.npc-card'),history:await box('.npc-history'),search:await box('.npc-search')};
+    near(measurements.card.sheet.x,212,'Sheet left'); near(measurements.card.sheet.y,169,'Sheet top');
+    near(measurements.card.sheet.width,1052,'Sheet width'); near(measurements.card.history.x,980,'History divider');
+    assert.equal(await page.locator('.npc-event').count(),10);
+    await page.locator('.npc-history-more').click(); assert.equal(await page.locator('.npc-event').count(),11);
+    await page.screenshot({path:resolve(root,'.local/design-patient.png'),fullPage:true});
+    await page.locator('.npc-event').first().click(); await page.locator('.pc-protocol mark').first().waitFor();
+    assert.equal(await page.locator('.pc-protocol .protocol-text').innerText(),protocol.text);
+    await page.getByRole('button',{name:'Закрыть карточку'}).click();
+    await page.getByRole('button',{name:'Закрыть карточку'}).click(); await page.locator('.row-card').first().waitFor();
   });
   await test('no horizontal overflow from phone to wide desktop', async () => {
     for (const width of [390, 768, 1024, 1280, 1920]) {
       await page.setViewportSize({ width, height: 900 });
       for (const path of ['findings', 'patients/design-0']) {
-        await page.goto(`${base}/#/${path}`); await page.locator(path === 'findings' ? '.row-card' : '.pc-protocol').first().waitFor(); await ready();
+        await page.goto(`${base}/#/${path}`); await page.locator(path === 'findings' ? '.row-card' : '.npc-card').first().waitFor(); await ready();
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} overflows at ${width}px`);
         if (width === 390) await page.screenshot({ path: resolve(root, `.local/design-${path === 'findings' ? 'list' : 'patient'}-mobile.png`), fullPage: true });
       }
@@ -113,20 +109,16 @@ try {
     protocol.flags = [{ code: 'INCOMPLETE', note: 'Синтетический флаг', setBy: 'ML' }];
     protocol.conclusionFound = false;
     protocol.notTriggered = [{ code: 'THYROID_NODULE', reason: 'BELOW_THRESHOLD', evidence: patientCard.currentFindings[0].evidence }];
-    for (const status of ['SUGGESTED', 'CONFIRMED', 'REJECTED']) {
-      patientCard.patient.maxLevel = 'URGENT';
-      patientCard.currentFindings.forEach((f) => Object.assign(f, { status, level: 'URGENT', source: 'MANUAL', flags: protocol.flags }));
-      await page.goto(`${base}/#/patients/design-0`); await page.reload(); await page.locator('.pc-protocol mark').first().waitFor(); await ready();
-      assert.equal(await page.locator('.pc-main .tag, .pc-main .lvl, .pc-main .pc-note, .pc-main .pc-all, .pc-main .pc-nt, .pc-main .pc-flags, .pc-main mark.nt').count(), 0);
-      assert.equal(await page.locator('.pc-head button').count(), 0);
-      assert.equal(await page.locator('.pc-main .urgency-badge').count(), 0);
-      assert.deepEqual(await page.locator('.pc-fname').allTextContents(), patientCard.currentFindings.map((f) => f.name));
-      assert.ok(!(await page.locator('.pc-main').innerText()).match(/экстренно|Срочно|ждёт проверки|добавлена врачом|Подтвердить все|текущий|Синтетический флаг/u));
+    for (const status of ['SUGGESTED','CONFIRMED','REJECTED']) {
+      patientCard.currentFindings.forEach(f => Object.assign(f,{status,level:'URGENT',source:'MANUAL',flags:protocol.flags}));
+      await page.goto(`${base}/#/patients/design-0`); await page.reload(); await page.locator('.npc-card').waitFor(); await ready();
+      assert.equal(await page.locator('.npc-main .pc-flags, .npc-main .urgency-badge').count(),0);
+      assert.ok(!(await page.locator('.npc-person').innerText()).match(/Срочно|Экстренно/));
     }
-    await page.locator('.pc-more').click();
-    assert.ok((await page.getByRole('dialog').innerText()).includes('Синтетический флаг'));
+    await page.locator('.npc-more').click();
+    await page.getByRole('dialog').getByText('Синтетический флаг').waitFor();
     assert.ok((await page.getByRole('dialog').innerText()).includes('не найдено заключение'));
-    assert.equal(await page.getByRole('dialog').locator('.pc-nt').count(), 1);
+    assert.equal(await page.getByRole('dialog').locator('.pc-nt').count(),1);
   });
   await test('no JavaScript errors or unsupported API requests', async () => { assert.deepEqual(errors, []); assert.deepEqual(unexpected, []); });
 } catch (e) {

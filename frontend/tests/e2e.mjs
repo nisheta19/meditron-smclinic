@@ -22,7 +22,9 @@ const until = async (fn) => { const end = Date.now() + 12000; while (true) { if 
 const test = async (name, fn) => { await fn(); results.push({ name, passed: true }); console.log(`PASS ${name}`); };
 const card = async (key) => {
   await page.goto(`${base}/#/patients/${fixture.cases[key].id}`);
-  await page.locator('.pc-info h3').waitFor();
+  await page.reload();
+  await page.locator('.npc-info h1').waitFor();
+  await page.locator('.npc-event').first().click();
   await until(async () => !(await page.locator('.pc-protocol').innerText()).includes('Загружаем'));
 };
 const search = async (text) => { await page.getByRole('searchbox').fill(text); await page.getByRole('button', { name: 'Найти', exact: true }).click(); };
@@ -44,7 +46,7 @@ try {
     await search(fixture.cases.positive.externalId);
     await until(async () => await page.locator('.row-card').count() === 1);
     await page.locator('.row-card').click();
-    await page.locator('.pc-info h3').waitFor();
+    await page.locator('.npc-info h1').waitFor();
     assert.ok(page.url().endsWith(fixture.cases.positive.id));
   });
   await test('new ML result appears without page reload', async () => {
@@ -60,12 +62,12 @@ try {
   });
   await test('structured names preserve compound parts and omit absent middle name', async () => {
     await card('positive');
-    assert.deepEqual((await page.locator('.pc-person h3 > span').allTextContents()).map((s) => s.trim()), ['Петрова-Водкина', 'Анна Мария', 'Ивановна']);
+    assert.deepEqual((await page.locator('.npc-person h1 > span').allTextContents()).map((s) => s.trim()), ['Петрова-Водкина', 'Анна Мария', 'Ивановна']);
     const full = (await api(`/api/patients/${fixture.cases.positive.id}`)).patient;
     assert.equal(full.shortName, 'Петрова-Водкина А. И.');
     assert.equal(full.firstName, 'Анна Мария');
     await card('normal');
-    assert.deepEqual((await page.locator('.pc-person h3 > span').allTextContents()).map((s) => s.trim()), ['Smith', 'Jane']);
+    assert.deepEqual((await page.locator('.npc-person h1 > span').allTextContents()).map((s) => s.trim()), ['Smith', 'Jane']);
     assert.equal((await api(`/api/patients/${fixture.cases.normal.id}`)).patient.middleName, null);
   });
   await test('Unicode quote highlighting and real routing deadline', async () => {
@@ -82,11 +84,12 @@ try {
     await page.getByRole('button', { name: /^Подтвердить:/ }).first().click();
     await until(async () => (await api(`/api/patients/${fixture.cases.positive.id}`)).currentFindings[0].status === 'CONFIRMED');
     await page.reload();
+    await page.locator('.npc-event').first().click();
     await page.locator('.pc-row.confirmed').waitFor();
   });
   await test('manual fields follow YAML, typed BI-RADS, remove finding', async () => {
     await card('breast');
-    await page.getByRole('button', { name: '+ Добавить', exact: true }).click();
+    await page.locator('.protocol-review > .pc-add').click();
     const dialog = page.getByRole('dialog', { name: 'Добавить находку', exact: true });
     await dialog.getByRole('option').filter({ hasText: 'BREAST_LESION' }).click();
     await dialog.getByLabel('BI-RADS', { exact: true }).fill('4');
@@ -116,27 +119,28 @@ try {
   await test('failed and annulled documents are not shown as normal', async () => {
     for (const key of ['failed', 'annulled']) {
       await card(key);
-      assert.ok(await page.getByRole('button', { name: '+ Добавить', exact: true }).isDisabled());
-      const text = await page.locator('.pc-main').innerText();
+      assert.ok(await page.locator('.protocol-review > .pc-add').isDisabled());
+      const text = await page.locator('.protocol-review').innerText();
       assert.ok(text.includes(key === 'failed' ? 'Извлечь находки не удалось' : 'Протокол аннулирован'));
       assert.ok(!text.includes('Значимых находок нет'));
     }
   });
   await test('missing conclusion warning and normal notTriggered', async () => {
-    await card('missing'); await page.locator('.pc-more').click();
-    assert.ok((await page.getByRole('dialog').innerText()).includes('не найдено заключение'));
-    await page.getByRole('dialog').getByRole('button', { name: 'Закрыть', exact: true }).first().click();
+    await card('missing');
+    assert.ok((await page.locator('.protocol-review').innerText()).includes('не найдено заключение'));
+    await page.getByRole('button',{name:'Закрыть карточку'}).click();
     await card('normal'); assert.equal(await page.locator('.findings-table .pc-row').count(), 0);
     assert.equal(await page.locator('.pc-main .pc-nt').count(), 0);
-    await page.locator('.pc-more').click(); assert.ok(await page.getByRole('dialog').locator('.pc-nt').count());
-    await page.getByRole('dialog').getByRole('button', { name: 'Закрыть', exact: true }).first().click();
+    assert.ok(await page.locator('.protocol-review .pc-nt').count());
+    await page.getByRole('button',{name:'Закрыть карточку'}).click();
   });
   await test('previous version read-only, independent old protocol editable', async () => {
     for (const key of ['versions', 'independent']) {
       await card(key);
-      await page.locator('.pc-event').last().click();
+      await page.getByRole('button',{name:'Закрыть карточку'}).click();
+      await page.locator('.npc-event').last().click();
       await until(async () => (await page.locator('.pc-protocol').innerText()).includes('8 мм'));
-      await until(async () => await page.getByRole('button', { name: '+ Добавить', exact: true }).isEnabled() === (key === 'independent'));
+      await until(async () => await page.locator('.protocol-review > .pc-add').isEnabled() === (key === 'independent'));
     }
   });
   await test('settings and archive are absent from navigation, dictionary still serves finding forms', async () => {
@@ -158,9 +162,9 @@ try {
     assert.equal(await page.locator('.cell-due .s-main').evaluate((el) => getComputedStyle(el).color), 'rgb(166, 106, 0)');
     assert.ok(!(await page.locator('.row-card').innerText()).match(/Срочно|Экстренно/u));
     await page.locator('.row-card').click();
-    await page.locator('.pc-row').first().waitFor();
+    await page.locator('.npc-finding-row').first().waitFor();
     assert.equal(await page.locator('.pc-main .urgency-badge').count(), 0);
-    assert.ok(!(await page.locator('.pc-person').innerText()).match(/Срочно|Экстренно/u));
+    assert.ok(!(await page.locator('.npc-person').innerText()).match(/Срочно|Экстренно/u));
   });
   await test('inbox only shows undetermined directions and updates after doctor confirmation', async () => {
     await page.goto(`${base}/#/inbox`);
@@ -169,6 +173,7 @@ try {
     await search(fixture.cases.missing.externalId);
     await page.locator('.row-card').waitFor();
     await page.locator('.row-card').click();
+    await page.locator('.npc-event').first().click();
     await page.getByRole('button', { name: /^Подтвердить:/ }).first().click();
     await until(async () => (await api(`/api/patients/${fixture.cases.missing.id}`)).patient.needsRouteReview === false);
     await page.goto(`${base}/#/inbox`);
@@ -182,7 +187,7 @@ try {
   });
   await test('emergency and attention filters', async () => {
     await page.goto(`${base}/#/findings`);
-    await search('');
+    await search(fixture.cases.emergency.externalId);
     await page.getByRole('tab', { name: /^Экстренные/ }).click();
     await until(async () => await page.locator('.row-card').count() > 0);
     await until(async () => await page.locator('.row-card:not(.emergency)').count() === 0);
@@ -201,8 +206,9 @@ try {
     const pattern = `**/api/protocols/${fixture.cases.positive.protocolId}`;
     await page.route(pattern, (route) => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Тестовый отказ' }) }));
     await page.goto(`${base}/#/patients/${fixture.cases.positive.id}`);
+    await page.locator('.npc-event').first().click();
     await page.locator('.pc-protocol .error-box').waitFor();
-    assert.ok(await page.getByRole('button', { name: '+ Добавить', exact: true }).isDisabled());
+    assert.ok(await page.locator('.protocol-review > .pc-add').isDisabled());
     await page.unroute(pattern);
     await page.getByRole('button', { name: 'Повторить', exact: true }).click();
     await page.locator('.pc-protocol mark').first().waitFor();
@@ -223,6 +229,7 @@ try {
   await test('mobile layout does not overflow', async () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await card('positive');
+    await page.getByRole('button',{name:'Закрыть карточку'}).click();
     await until(async () => await page.locator('main').evaluate((el) => el.getBoundingClientRect().x <= 13 && el.getBoundingClientRect().width >= 350));
     await page.screenshot({ path: resolve(root, '.local/frontend-patient-mobile.png'), fullPage: true });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));

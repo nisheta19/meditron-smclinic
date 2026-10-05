@@ -147,7 +147,11 @@ try {
     await page.getByTitle('Развернуть', { exact: true }).click();
     for (const width of [768, 1000, 1280, 1920]) {
       await page.setViewportSize({ width, height: 832 });
-      await page.waitForFunction(collapsed => document.querySelector('.sidebar').getBoundingClientRect().width === (collapsed ? 64 : 206), width <= 1000);
+      await page.waitForFunction(() => {
+        const scale = innerWidth > 1280 ? innerWidth / 1280 : 1;
+        const expected = (innerWidth <= 1000 ? 64 : 206) * scale;
+        return Math.abs(document.querySelector('.sidebar').getBoundingClientRect().width - expected) < 0.1;
+      });
       await settleSidebar();
       avatar = await page.locator('.doctor-menu-trigger .nav-avatar').boundingBox();
       await page.locator('.doctor-menu-trigger').click();

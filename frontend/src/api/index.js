@@ -8,8 +8,9 @@ export { demo } from './mock/server';
 export const api = USE_MOCK ? mockApi : httpApi;
 
 /**
- * Возможности текущего backend подтверждены его OpenAPI. Незавершённые функции
- * доступны только в явно выбранной автономной демонстрации.
+ * Устаревшие операции создания/изменения steps и массовая рассылка доступны
+ * только в автономном демо. Новая карточка отдельно использует clinicalRoutes
+ * и отправку по шаблонам реального backend; эти флаги к ней не относятся.
  */
 export const caps = { routes: USE_MOCK, notifications: USE_MOCK, dictionaryWrite: USE_MOCK };
 export const capsReady = Promise.resolve(caps);

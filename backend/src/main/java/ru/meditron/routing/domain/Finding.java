@@ -1,5 +1,6 @@
 package ru.meditron.routing.domain;
 
+import ru.meditron.routing.time.ModelTime;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -93,5 +94,5 @@ public class Finding {
     private String comment;
 
     @Column(nullable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = ModelTime.now();
 }

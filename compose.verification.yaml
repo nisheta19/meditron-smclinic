@@ -6,6 +6,9 @@ services:
     ports: !override
       - "127.0.0.1:15433:5432"
   backend:
+    environment:
+      ROUTES_ENABLED: "true"
+      ROUTES_SIM_ENABLED: "true"
     ports: !override
       - "127.0.0.1:18081:8080"
   ml:

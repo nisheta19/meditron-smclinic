@@ -51,7 +51,12 @@ public class SecurityConfig {
                 }))
                 .authorizeHttpRequests(a -> {
                     a.requestMatchers("/api/auth/me").authenticated();
-                    if (required) a.requestMatchers("/api/patients/**", "/api/findings/**", "/api/protocols/**").authenticated();
+                    if (required) a.requestMatchers("/api/patients/**", "/api/findings/**", "/api/protocols/**",
+                            // модуль маршрутов: адреса координатора (ТЗ маршрутов, 15.2)
+                            "/api/routes/**", "/api/tasks/**", "/api/escalations/**", "/api/journal/**",
+                            "/api/dashboard/**", "/api/notification-templates", "/api/route-templates",
+                            "/api/schedule/**", "/api/sim/**").authenticated();
+                    // Only machine integration callbacks bypass the clinician session. Simulation is opt-in and protected.
                     a.anyRequest().permitAll();
                 })
                 .exceptionHandling(e -> e
@@ -61,7 +66,8 @@ public class SecurityConfig {
     }
 
     private static boolean clinicianPath(String path) {
-        return path.matches("/api/(patients|findings|protocols)(/.*)?");
+        return path.matches("/api/(patients|findings|protocols|routes|tasks|escalations|journal|dashboard"
+                + "|notification-templates|route-templates|schedule|sim)(/.*)?");
     }
 
     public static void error(HttpServletResponse response, int status, String code, String message) throws java.io.IOException {

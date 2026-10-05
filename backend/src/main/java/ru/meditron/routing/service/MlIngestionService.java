@@ -1,5 +1,6 @@
 package ru.meditron.routing.service;
 
+import ru.meditron.routing.time.ModelTime;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -36,6 +37,9 @@ import ru.meditron.routing.repository.ProtocolRepository;
  */
 @Service
 public class MlIngestionService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private ru.meditron.routing.route.service.RouteWriteLock writeLock;
+
 
     private static final Logger log = LoggerFactory.getLogger(MlIngestionService.class);
 
@@ -54,7 +58,8 @@ public class MlIngestionService {
     public MlIngestionService(PatientRepository patients, ProtocolRepository protocols, FindingRepository findings,
                               MlResultLogRepository resultLog, DictionaryService dictionary, RuleEngine ruleEngine,
                               DtoMapper mapper, RoutingAdjustments adjustments, JdbcTemplate jdbc,
-                              MlResultValidator validator, ObjectMapper json) {
+                              MlResultValidator validator, ObjectMapper json,
+                              org.springframework.context.ApplicationEventPublisher events) {
         this.patients = patients;
         this.protocols = protocols;
         this.findings = findings;
@@ -65,11 +70,15 @@ public class MlIngestionService {
         this.adjustments = adjustments;
         this.jdbc = jdbc;
         this.validator = validator;
+        this.events = events;
         this.json = json.copy().enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
     }
 
+    private final org.springframework.context.ApplicationEventPublisher events;
+
     @Transactional
     public void ingest(MlResultRequest r) {
+        writeLock.acquire();
         // Transaction-scoped PostgreSQL lock also protects concurrent first insert/upsert.
         // Ingestion is intentionally serialized at this hackathon scale across backend instances.
         jdbc.execute("SELECT pg_advisory_xact_lock(761904210)");
@@ -147,6 +156,8 @@ public class MlIngestionService {
             p.setStatus(ProcessingStatus.ANNULLED);
             p.setSuperseded(p.getVersion() != r.protocol().version());
             removeActiveFindings(p, "PROTOCOL_ANNULLED");
+            events.publishEvent(new ru.meditron.routing.event.RoutingEvents.ProtocolClosed(
+                    patient.getId(), p.getId(), ru.meditron.routing.event.RoutingEvents.ProtocolClosed.Reason.ANNULLED));
         }
         if (r.protocol().version() > versions.get(0).getVersion()) {
             Protocol tombstone = newProtocol(r, patient);
@@ -167,6 +178,8 @@ public class MlIngestionService {
         if (latest != null) {
             latest.setSuperseded(true);
             removeActiveFindings(latest, "PROTOCOL_CORRECTED: заменён версией " + r.protocol().version());
+            events.publishEvent(new ru.meditron.routing.event.RoutingEvents.ProtocolClosed(
+                    patient.getId(), latest.getId(), ru.meditron.routing.event.RoutingEvents.ProtocolClosed.Reason.CORRECTED));
         }
 
         Protocol p = newProtocol(r, patient);
@@ -189,6 +202,7 @@ public class MlIngestionService {
 
         if (r.status() == ProcessingStatus.DONE) {
             applyFindings(r, patient, p);
+            events.publishEvent(new ru.meditron.routing.event.RoutingEvents.ProtocolAccepted(patient.getId(), p.getId()));
         }
         return p;
     }
@@ -302,7 +316,7 @@ public class MlIngestionService {
             if (f.getStatus() == FindingStatus.SUGGESTED || f.getStatus() == FindingStatus.CONFIRMED) {
                 f.setStatus(FindingStatus.REMOVED);
                 f.setComment(reason);
-                f.setReviewedAt(Instant.now());
+                f.setReviewedAt(ModelTime.now());
                 f.setReviewedBy("SYSTEM");
             }
         }

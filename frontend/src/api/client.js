@@ -47,6 +47,7 @@ async function request(method, path, { query, body } = {}) {
 // а Protocol как { protocol: {...}, text, ... }. Разворачиваем; ответы по контракту проходят без изменений.
 const flatCard = (d) => (d?.patient ? {
   ...d.patient, currentProtocol: d.currentProtocol ?? null, currentFindings: d.currentFindings ?? [], routes: d.routes ?? [],
+  clinicalRoutes: d.clinicalRoutes ?? [], banner: d.banner ?? null,
   history: { protocols: [], findings: [], routes: [], ...d.history },
 } : d);
 const flatProtocol = (d) => (d?.protocol ? {
@@ -83,5 +84,8 @@ export const httpApi = {
   updateStep: (routeId, stepId, body) => patch(`/api/routes/${routeId}/steps/${stepId}`, body),
   // Уведомления
   notifications: (routeId) => get(`/api/routes/${routeId}/notifications`),
+  patientNotifications: (patientId) => get(`/api/patients/${patientId}/notifications`),
+  notificationTemplates: () => get('/api/notification-templates'),
+  notificationPreview: (routeId, templateCode) => get(`/api/routes/${routeId}/notification-preview`, { templateCode }),
   notify: (routeId, body) => post(`/api/routes/${routeId}/notifications`, body),
 };

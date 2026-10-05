@@ -8,11 +8,15 @@ public record PatientCardDto(
         ProtocolShortDto currentProtocol,
         List<FindingDto> currentFindings,
         List<Object> routes,
-        History history) {
+        History history,
+        /** Баннер «Незавершённый клинический маршрут» (ТЗ маршрутов, 15.3); null — нет. */
+        String unfinishedRouteBanner,
+        List<ru.meditron.routing.route.dto.RouteDtos.RouteDto> clinicalRoutes) {
 
     public record History(
             List<ProtocolShortDto> protocols,
             List<FindingDto> findings,
-            List<Object> routes) {
+            List<Object> routes,
+            List<ru.meditron.routing.route.dto.RouteDtos.RouteDto> clinicalRoutes) {
     }
 }

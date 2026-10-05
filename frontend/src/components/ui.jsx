@@ -15,11 +15,11 @@ export function useEsc(fn) {
   }, [fn]);
 }
 
-export function Dialog({ title, onClose, children, actions, wide }) {
+export function Dialog({ title, onClose, children, actions, wide, className = '' }) {
   useEsc(onClose);
   return (
-    <div className="overlay" onMouseDown={onClose}>
-      <div className={`dialog${wide ? ' wide' : ''}`} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()}>
+    <div className={`overlay${className ? ` ${className}-overlay` : ''}`} onMouseDown={onClose}>
+      <div className={`dialog${wide ? ' wide' : ''} ${className}`} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()}>
         <header><h2>{title}</h2><button className="icon" aria-label="Закрыть" onClick={onClose}>×</button></header>
         <div className="dialog-body">{children}</div>
         {actions && <footer className="actions">{actions}</footer>}

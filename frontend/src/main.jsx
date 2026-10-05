@@ -6,6 +6,7 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/manrope';
 import './styles.css';
 import './design.css';
+import './workspace-scale.css';
 
 // Favicon из кода: знак СМ-Клиники собирается в Blob, без внешних файлов
 const icon = Object.assign(document.createElement('link'), {
