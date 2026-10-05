@@ -244,8 +244,8 @@ small { display: block; color: var(--gray-medium); font-size: 12px; }
 
 /* ---------- Панель массовых действий, тосты, демо ---------- */
 .bulkbar {
-  position: fixed; bottom: 20px; left: calc(50% + 103px); transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 16px;
-  padding: 11px 11px 11px 24px; background: var(--white); border-radius: 24px; box-shadow: 0 8px 32px rgb(0 0 0 / 0.12); animation: rise 0.18s ease-out;
+  position: fixed; bottom: 20px; left: calc(50% + 103px); transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 11px;
+  padding: 11px 11px 11px 16px;   /* промежутки между кнопками = отступу зелёной кнопки от края панели */ background: var(--white); border-radius: 24px; box-shadow: 0 8px 32px rgb(0 0 0 / 0.12); animation: rise 0.18s ease-out;
 }
 .toasts { position: fixed; right: 20px; top: 20px; z-index: 20; display: grid; gap: 8px; pointer-events: none; }
 .toast { padding: 14px 18px; max-width: 420px; background: var(--black); color: #fff; border-radius: 16px; font-size: 14px; animation: rise 0.18s ease-out; }
@@ -295,7 +295,7 @@ small { display: block; color: var(--gray-medium); font-size: 12px; }
 .dialog .field input, .dialog .field textarea, .dialog .dd-btn, .push-box {
   min-height: 52px; padding: 0 19px; border: 0; border-radius: 20px; background: var(--page); font-size: 14px;
 }
-.dialog .field textarea { display: block; min-height: 81px; max-height: 280px; padding: 19px; line-height: 1.45; resize: none; overflow-y: auto; }
+.dialog .field textarea { display: block; min-height: 81px; max-height: 280px; padding: 19px; line-height: 1.45; resize: none; overflow-y: hidden; }
 .dialog .field input:hover, .dialog .field textarea:hover, .dialog .dd-btn:hover { background: #efefef; }
 .dialog .field input:focus, .dialog .field textarea:focus, .dialog .dd-btn.open, .dialog .dd-btn:focus-visible { background: #ececec; }
 .push-box { display: flex; align-items: center; }
@@ -614,9 +614,28 @@ mark.flash { animation: flash 1.2s ease-out; }
 .pc-table { margin-top: 20px; }
 .pc-thead { padding: 0 14px 12px 25px; }
 .pc-thead .col-head { justify-self: start; }
-.f-cols { display: grid; grid-template-columns: 255px minmax(0, 185px) minmax(0, 1fr) auto; align-items: center; }
+.f-cols { display: grid; grid-template-columns: minmax(0, 36fr) minmax(0, 26fr) minmax(0, 28fr) 58px; align-items: center; }   /* пропорции колонок из макета «Эскалация» */
 .pc-fname { color: var(--black); padding-right: 12px; }
 .pc-level { color: var(--black); }
+.pc-level.emergency { color: #ff3636; }
+/* Статус предложенной находки — белая плашка со списком; «Экстренно» красным */
+.pc-lvl { justify-self: start; }
+.pc-lvl .dd { width: auto; }
+.pc-lvl .dd-btn { min-height: 36px; padding: 0 14px 0 16px; gap: 10px; border-radius: 14px; background: var(--white); font-size: 14px; }
+.pc-lvl .dd-btn:hover, .pc-lvl .dd-btn.open { background: #fafafa; }
+.pc-lvl.emergency .dd-btn span { color: #ff3636; }
+
+/* Меню «⋯» подтверждённой находки: Редактировать / Удалить */
+.act-menu { position: relative; display: inline-grid; }
+.act-btn { display: grid; place-items: center; width: 28px; height: 24px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--black); cursor: pointer; }
+.act-btn:hover, .act-btn[aria-expanded="true"] { background: rgb(0 0 0 / 0.05); }
+.act-pop {
+  position: absolute; right: -4px; top: calc(100% + 6px); z-index: 15; display: grid; gap: 2px; min-width: 190px; padding: 8px;
+  background: var(--white); border-radius: 16px; box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.22); animation: drop 0.12s ease-out;
+}
+.act-pop button { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border: 0; border-radius: 10px; background: none; color: var(--black); font-size: 14px; white-space: nowrap; text-align: left; cursor: pointer; }
+.act-pop button:hover { background: var(--page); }
+.act-pop .danger { color: #ff3636; }
 .pc-row { margin-bottom: 8px; background: var(--page); border-radius: 20px; color: var(--gray-dark); font-size: 14px; }
 .pc-row-main { min-height: 52px; padding: 8px 14px 8px 25px; cursor: pointer; border-radius: 20px; }
 .pc-fname { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
@@ -641,9 +660,10 @@ button.sq:active { background-image: linear-gradient(rgb(0 0 0 / 0.2), rgb(0 0 0
 .sq.static { cursor: default; }
 .pc-detail { padding: 0 25px 16px; }
 .pc-detail .quote { margin-top: 0; }
-.pc-add { display: grid; place-items: center; width: 100%; min-height: 52px; margin: 0; padding: 8px 16px; border: 0; border-radius: 20px; background: var(--page); color: var(--gray-light); font-size: 14px; text-align: center; }
-button.pc-add:hover { background: #efefef; color: var(--gray-medium); }
-button.pc-add:active { background: #ececec; }
+/* «+ Добавить» по макету «Эскалация»: пунктирная серая рамка без заливки */
+.pc-add { display: grid; place-items: center; width: 100%; min-height: 52px; margin: 0; padding: 8px 16px; border: 2px dashed var(--gray-accent); border-radius: 20px; background: none; color: var(--gray-light); font-size: 14px; text-align: center; }
+button.pc-add:hover { background: #fafafa; color: var(--gray-medium); }
+button.pc-add:active { background: var(--page); }
 .pc-add.disabled { cursor: default; }
 .pc-subtitle + .pc-add { margin-top: 20px; }
 .pc-all { display: block; margin: 10px 0 0 21px; font-size: 13px; }
@@ -733,7 +753,7 @@ div.pc-event .pc-event-arrow { opacity: 0.35; }
 .pc-main { padding: 35px 28px 29px 13px; background: none; border-radius: 0; }
 .pc-vline { background: var(--gray-accent); margin: 36px 0 28px; }
 .pc-history { align-self: start; margin-left: 5px; padding: 30px 5px 17px 15px; background: none; border-radius: 0; }
-.pc-main h2, .pc-history h2, .pc-person h3 { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 600; }
+.pc-main h2, .pc-history h2 { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 600; }   /* ФИО — обычным шрифтом (Inter 20, 400), как в макете */
 .pc-info { grid-template-columns: 235px minmax(0, 1fr); gap: 0 40px; margin-top: 0; }
 
 /* ---------- Дашборд ---------- */

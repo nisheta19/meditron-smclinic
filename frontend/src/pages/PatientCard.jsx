@@ -6,8 +6,8 @@ import { api, caps } from '../api';
 import { CANCEL_REASON, PROCESSING, REVIEW, ROUTE, STEP, STUDY, ATTR, attrValue, fmtDate, fmtDateTime, fmtStamp, now, stepLabel, LEVEL, flagLabel } from '../lib/format';
 import { go, useAction, useAsync, useSort, useToast } from '../lib/hooks';
 import { CURRENT_DOCTOR } from '../config';
-import { ArrowLeft, CheckMark, Chevron, Close, CloseLg, Copy, FileIcon, Mail, Phone } from '../components/Icons';
-import { SearchBar, SortHead } from '../components/kit';
+import { ArrowLeft, CheckMark, Gear, Trash, Chevron, Close, CloseLg, Copy, FileIcon, Mail, Phone } from '../components/Icons';
+import { ActionMenu, SearchBar, SortHead } from '../components/kit';
 import { Dialog, ErrorBox, ReasonDialog } from '../components/ui';
 import ProtocolText, { focusEvidence } from '../components/ProtocolText';
 import AddFindingDialog from '../components/AddFindingDialog';
@@ -86,7 +86,8 @@ export default function PatientCard({ id }) {
           <h2 className="pc-subtitle">Находки</h2>
           <FindingsTable findings={findings} protoById={protoById} fallbackStudy={p?.studyType} editable={isCurrent}
             onConfirm={(f) => act(() => api.updateFinding(f.id, { status: 'CONFIRMED', doctor: CURRENT_DOCTOR }), 'Находка подтверждена')}
-            onReject={(f) => setDialog({ type: 'reject', f })} onRemove={(f) => setDialog({ type: 'remove', f })} />
+            onReject={(f) => setDialog({ type: 'reject', f })} onRemove={(f) => setDialog({ type: 'remove', f })}
+            onLevel={(f, level) => act(() => api.updateFinding(f.id, { level, doctor: CURRENT_DOCTOR }), 'Статус находки изменён')} />
           {isCurrent && <>
             <button className="pc-add" onClick={() => setDialog({ type: 'add' })}>+ Добавить</button>
             {suggested.length > 1 && (
@@ -192,8 +193,16 @@ export function MoreDialog({ c, onClose }) {
 }
 
 /* ---------- Находки ---------- */
-function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm, onReject, onRemove }) {
+const LEVEL_OPTIONS = Object.fromEntries(Object.entries(LEVEL).map(([k, [label]]) => [k, label]));
+
+/**
+ * Находки (макет «Эскалация»): у предложенной находки статус меняется в списке, справа ✓ / ✕.
+ * Подтверждённая — завалидирована: статус текстом, справа меню «⋯» (Редактировать / Удалить);
+ * «Редактировать» возвращает список статуса и ✓ (сохранить) / ✕ (отменить правку)
+ */
+function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm, onReject, onRemove, onLevel }) {
   const [open, setOpen] = useState(null);
+  const [editing, setEditing] = useState(null);   // { id, level } — правка подтверждённой находки
   const organ = (f) => ORGAN[protoById[f.protocolId]?.studyType ?? fallbackStudy] ?? 'Не указан';
   const RANK = { EMERGENCY: 0, URGENT: 1, PLANNED: 2 };
   const cols = [{ key: 'organ', label: 'Орган', get: organ }, { key: 'name', label: 'Находка', get: (f) => f.name }, { key: 'level', label: 'Статус', get: (f) => RANK[f.level] ?? 3 }];
@@ -205,6 +214,8 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm
       <SortHead className="pc-thead f-cols" cols={cols} sort={sort} onSort={toggle} />
       {rows.map((f) => {
         const isOpen = open === f.id;
+        const isEditing = editing?.id === f.id;
+        const level = isEditing ? editing.level : f.level;
         const attrs = Object.entries(f.attributes ?? {}).filter(([k]) => k !== 'level');
         return (
           <div key={f.id} className={`pc-row ${f.status.toLowerCase()}${isOpen ? ' open' : ''}`}>
@@ -220,17 +231,26 @@ function FindingsTable({ findings, protoById, fallbackStudy, editable, onConfirm
                 {f.flags?.map((fl) => <em key={fl.code} className="tag warn" title={fl.note}>{flagLabel(fl).toLowerCase()}</em>)}
               </span>
               {/* Колонка «Статус» из макета: уровень срочности находки (level backend) */}
-              <span className={`pc-level ${f.level?.toLowerCase() ?? ''}`}>{f.level ? LEVEL[f.level][0] : '—'}</span>
+              {editable && (f.status === 'SUGGESTED' || isEditing)
+                ? <span className={`pc-lvl ${level?.toLowerCase() ?? ''}`} onClick={(e) => e.stopPropagation()}>
+                    <Dropdown compact ariaLabel={`Статус: ${f.name}`} value={level ?? ''} options={LEVEL_OPTIONS}
+                      onChange={(v) => (isEditing ? setEditing({ id: f.id, level: v }) : v !== f.level && onLevel(f, v))} />
+                  </span>
+                : <span className={`pc-level ${f.level?.toLowerCase() ?? ''}`}>{f.level ? LEVEL[f.level][0] : '—'}</span>}
               {editable && (
                 <span className="pc-actions" onClick={(e) => e.stopPropagation()}>
                   {f.status === 'SUGGESTED' && <>
                     <button className="sq ok" aria-label={`Подтвердить: ${f.name}`} title="Подтвердить" onClick={() => onConfirm(f)}><CheckMark size={24} /></button>
                     <button className="sq no" aria-label={`Отклонить: ${f.name}`} title="Отклонить" onClick={() => onReject(f)}><Close size={24} /></button>
                   </>}
-                  {f.status === 'CONFIRMED' && <>
-                    <span className="sq ok static" title="Подтверждена"><CheckMark size={24} /></span>
-                    <button className="sq no" aria-label={`Удалить: ${f.name}`} title="Удалить находку" onClick={() => onRemove(f)}><Close size={24} /></button>
-                  </>}
+                  {f.status === 'CONFIRMED' && (isEditing ? <>
+                    <button className="sq ok" aria-label="Сохранить" title="Сохранить"
+                      onClick={() => { if (editing.level !== f.level) onLevel(f, editing.level); setEditing(null); }}><CheckMark size={24} /></button>
+                    <button className="sq no" aria-label="Отменить правку" title="Отменить" onClick={() => setEditing(null)}><Close size={24} /></button>
+                  </> : <ActionMenu label={`Действия: ${f.name}`} items={[
+                    { label: 'Редактировать', icon: Gear, onClick: () => setEditing({ id: f.id, level: f.level }) },
+                    { label: 'Удалить', icon: Trash, danger: true, onClick: () => onRemove(f) },
+                  ]} />)}
                 </span>
               )}
             </div>

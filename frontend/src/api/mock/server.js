@@ -12,6 +12,7 @@ const COORDINATOR = 'Орлова Е. А., координатор';
 const DOCTOR = 'Петрова И. В., врач УЗД';
 const OPEN = ['ACTIVE', 'NOT_ENGAGED'];
 // Поля, которые реальный backend отдаёт сверх openapi: level, flags, maxLevel, topFindings…
+const LEVELS = ['EMERGENCY', 'URGENT', 'PLANNED'];
 const levelOf = (e) => (e.urgent ? 'EMERGENCY' : e.targetDays <= 5 ? 'URGENT' : 'PLANNED');
 const RANK = { EMERGENCY: 3, URGENT: 2, PLANNED: 1 };
 const DONE = ['COMPLETED', 'SKIPPED', 'CANCELLED'];
@@ -330,11 +331,12 @@ export const mockApi = {
   confirmFindings: (pid, { findingIds = [], doctor } = {}) => reply(() => db.findings
     .filter((f) => f.patientId === pid && findingIds.includes(f.id) && f.status === 'SUGGESTED')
     .map((f) => review(f, { status: 'CONFIRMED' }, doctor))),
-  updateFinding: (id, { status, code, attributes, comment, doctor } = {}) => reply(() => {
+  // level — правка статуса врачом (макет «Эскалация»); в контракте FindingUpdate его пока нет
+  updateFinding: (id, { status, code, attributes, comment, doctor, level } = {}) => reply(() => {
     const f = byId(db.findings, id, 'FINDING');
     const e = code ? dict(code) ?? fail(400, 'UNKNOWN_CODE', 'Такого типа находки нет в словаре') : null;
     return review(f, { ...(status && { status }), ...(e && { code, name: e.name, targetSpecialty: e.targetSpecialty }),
-      ...(attributes && { attributes }), ...(comment != null && { comment }) }, doctor);
+      ...(attributes && { attributes }), ...(comment != null && { comment }), ...(LEVELS.includes(level) && { level }) }, doctor);
   }),
   removeFinding: (id, reason) => reply(() => {
     const f = byId(db.findings, id, 'FINDING');

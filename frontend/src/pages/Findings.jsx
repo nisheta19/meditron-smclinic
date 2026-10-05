@@ -89,7 +89,7 @@ export default function Findings() {
 
       {sel.sel.size > 0 && (
         <div className="bulkbar" role="region" aria-label="Действия с выбранными">
-          <span>Выбрано: <b>{sel.sel.size}</b></span>
+          <span>Выбрано: {sel.sel.size}</span>
           <button className="chip" onClick={sel.clear}>Снять выделение</button>
           <button className="btn-main" onClick={() => setNotifyIds([...sel.sel])}>Отправить уведомление</button>
         </div>

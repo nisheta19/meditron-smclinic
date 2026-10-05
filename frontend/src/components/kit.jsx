@@ -1,6 +1,6 @@
 // Компоненты по макету Figma: чекбокс, строка поиска, чипы, список карточек-строк
-import { useEffect, useState } from 'react';
-import { ArrowDown, Check, Search, Sliders } from './Icons';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowDown, Check, Dots, Search, Sliders } from './Icons';
 import Dropdown from './Dropdown';
 
 export function Checkbox({ checked, mixed, onChange, label, size = 'row' }) {
@@ -60,6 +60,36 @@ export function ChipRow({ items, value, onChange, selectAll, extra }) {
       </div>
       {extra && <div className="chip-extra">{extra}</div>}
     </div>
+  );
+}
+
+/**
+ * Меню действий строки «⋯» (макет «Эскалация»): items = [{ label, icon, danger, onClick }].
+ * Закрывается по клику вне меню, Escape и после выбора пункта
+ */
+export function ActionMenu({ items, label = 'Действия' }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const away = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const esc = (e) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', away); addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', away); removeEventListener('keydown', esc); };
+  }, [open]);
+  return (
+    <span className="act-menu" ref={ref}>
+      <button className="act-btn" aria-label={label} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}><Dots size={16} /></button>
+      {open && (
+        <span className="act-pop" role="menu">
+          {items.map(({ label: l, icon: Icon, danger, onClick }) => (
+            <button key={l} role="menuitem" className={danger ? 'danger' : undefined} onClick={() => { setOpen(false); onClick(); }}>
+              {Icon && <Icon size={16} />}{l}
+            </button>
+          ))}
+        </span>
+      )}
+    </span>
   );
 }
 

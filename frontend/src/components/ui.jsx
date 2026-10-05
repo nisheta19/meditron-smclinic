@@ -40,13 +40,27 @@ export const Field = ({ label, hint, grow, as: Tag = 'label', className = '', ch
   </Tag>
 );
 
-/** Многострочное поле, растёт по тексту: весь текст виден с одинаковыми отступами сверху и снизу */
+/**
+ * Многострочное поле, растёт по тексту: весь текст виден, отступ снизу как сверху, без лишней прокрутки.
+ * Высота пересчитывается при вводе, при смене ширины (поворот, ресайз) и после загрузки шрифтов;
+ * прокрутка появляется, только если текст выше max-height
+ */
 export function TextArea({ value, onChange, ...rest }) {
   const ref = useRef(null);
   useLayoutEffect(() => {
     const el = ref.current;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
+    const fit = () => {
+      el.style.height = 'auto';
+      const h = Math.ceil(el.scrollHeight) + 1;   // +1: дробная высота строки (14 × 1.45) не даёт прокрутки
+      el.style.height = `${h}px`;
+      el.style.overflowY = h > parseFloat(getComputedStyle(el).maxHeight) ? 'auto' : 'hidden';
+    };
+    fit();
+    let width = el.clientWidth;
+    const ro = new ResizeObserver(() => { if (el.clientWidth !== width) { width = el.clientWidth; fit(); } });
+    ro.observe(el);
+    document.fonts?.ready.then(fit);
+    return () => ro.disconnect();
   }, [value]);
   return <textarea ref={ref} rows={2} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />;
 }
