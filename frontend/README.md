@@ -3,7 +3,8 @@
 
 
 ## Демо
-[https://0-o.gitverse.site/hackaton_sechenov_2026/](https://0-o.gitverse.site/hackaton_sechenov_2026/)
+[https://0-o.gitverse.site/hackaton_sechenov_2026/](https://0-o.gitverse.site/hackaton_sechenov_2026/)\
+[https://0-o.gitverse.site/hackaton_sechenov_2026/next_step.html](https://0-o.gitverse.site/hackaton_sechenov_2026/next_step.html)
 
 ## Figma
 -[План](https://www.figma.com/board/7SyLd8Nnc4H5fvO0uvdbCJ/%25D0%25A1%25D0%25B5%25D1%2587_%25D0%25A5%25D0%25B0%25D0%25BA%25D0%25B0%25D1%2582%25D0%25BE%25D0%25BD?node-id=0-1&t=f83aYeel98UNYtNl-0)\
