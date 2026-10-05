@@ -133,12 +133,7 @@ public class RouteQueryService {
                 .map(a -> new AppointmentDto(a.getId().toString(), a.getPurpose() == null ? null : a.getPurpose().name(),
                         a.getDateTime(), a.getLocation(), a.isOnline(), a.getDoctorName(), a.getStatus().name()))
                 .orElse(null);
-        String title = TITLES.get(r.getStage());
-        if (r.getStage() == RouteStage.CLOSED && r.getCloseReason() != null) {
-            title = "Закрыт: " + REASONS.get(r.getCloseReason());
-        } else if (r.getStage() == RouteStage.NO_SHOW) {
-            title = "Неявка №" + r.getNoShowCount();
-        }
+        String title = stageTitle(r);
         return new RouteDto(r.getId().toString(), r.getPatientId().toString(),
                 r.getProtocolId() == null ? null : r.getProtocolId().toString(), r.getSpecialty(),
                 config.routeType(r.getTemplateCode()), r.getChainType().name(), r.getStage().name(), title,
@@ -147,6 +142,16 @@ public class RouteQueryService {
                 r.getVisitAt(), overdueDays(r), r.isSlaOverdue(), r.getNoShowCount(),
                 r.getTactic() == null ? null : r.getTactic().name(), r.getTacticSubtype(), r.getTacticComment(),
                 refs, r.getStageHistory(), open, appt, r.getCreatedAt(), r.getClosedAt(), r.getHospitalizationDate(), r.getHospitalizationClinic());
+    }
+
+    public static String stageTitle(Route r) {
+        String title = TITLES.get(r.getStage());
+        if (r.getStage() == RouteStage.CLOSED && r.getCloseReason() != null) {
+            title = "Закрыт: " + REASONS.get(r.getCloseReason());
+        } else if (r.getStage() == RouteStage.NO_SHOW) {
+            title = "Неявка №" + r.getNoShowCount();
+        }
+        return title;
     }
 
     /** «Просрочен на N дней»: открыт, срок прошёл, пациент не записан. */

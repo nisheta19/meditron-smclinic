@@ -9,9 +9,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PatientSortTest {
     PatientShortDto patient(String id, String name, String finding, Integer days) {
+        return patient(id, name, finding, days, null);
+    }
+    PatientShortDto patient(String id, String name, String finding, Integer days, ru.meditron.routing.dto.PatientTrackingDto tracking) {
         return new PatientShortDto(id, id, name, name, null, null, name, null, null, null, null, null,
                 false, null, null, 0, 0, null, null, finding == null ? 0 : 1,
-                finding == null ? List.of() : List.of(new TopFindingDto(id, "TEST", finding, null, null, null, days)));
+                finding == null ? List.of() : List.of(new TopFindingDto(id, "TEST", finding, null, null, null, days)), tracking);
+    }
+
+    @Test void progressAndLastNotificationSortBeforePaginationWithUnknownLast() {
+        var early = java.time.Instant.parse("2026-10-01T00:00:00Z");
+        var later = java.time.Instant.parse("2026-10-04T00:00:00Z");
+        var a = patient("1","А","Узел",7,new ru.meditron.routing.dto.PatientTrackingDto("r","CREATED","Создан",10,early,1));
+        var b = patient("2","Б","Узел",7,new ru.meditron.routing.dto.PatientTrackingDto("s","BOOKED","Записан",40,later,2));
+        var c = patient("3","В","Узел",7);
+        for (String key : List.of("stage","notified")) {
+            assertEquals(List.of(a,b,c),List.of(c,b,a).stream().sorted(PatientSort.comparator(key,"asc")).toList());
+            assertEquals(List.of(b,a,c),List.of(a,c,b).stream().sorted(PatientSort.comparator(key,"desc")).toList());
+        }
     }
 
     @Test void russianNamesAndStableTies() {
@@ -32,7 +47,7 @@ class PatientSortTest {
     }
 
     @Test void rejectsUnknownAndUnavailableSorts() {
-        for (String key : List.of("stage", "notified", "oops"))
+        for (String key : List.of("oops"))
             assertThrows(BadRequestException.class, () -> PatientSort.comparator(key, "asc"));
         assertThrows(BadRequestException.class, () -> PatientSort.comparator("patient", "oops"));
     }

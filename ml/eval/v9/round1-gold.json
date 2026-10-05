@@ -1,0 +1,1107 @@
+{
+  "annotationStatus": "synthetic",
+  "clinicalValidation": false,
+  "author": "assistant",
+  "design": "48 new difficult fictional reports; 6 per study, 5 positive and 1 negative. Multiple entities, sides, historical distractors, separated attributes, negation and unit conversions. All labels authored before predictions.",
+  "protocols": [
+    {
+      "file": "v9-r1-001.docx",
+      "studyType": "THYROID",
+      "text": "Описание: В правой доле два узла: губчатый 8 х 6 мм (EU-TIRADS 2) и гипоэхогенный 23 х 14 мм (EU-TIRADS 4). В левой доле очагов нет.\nЗаключение: Узловой зоб справа, без динамики.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 8,
+              "tirads": 2,
+              "tiradsSystem": "EU",
+              "growth": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 23,
+              "tirads": 4,
+              "tiradsSystem": "EU",
+              "growth": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-002.docx",
+      "studyType": "THYROID",
+      "text": "Описание: Левая доля: узел с неровными контурами 1,8 х 1,2 см, TI-RADS 4b. Правая доля: коллоидный узел 0,6 см, EU-TIRADS 2.\nЗаключение: Узловые образования обеих долей.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 18,
+              "tirads": 5,
+              "tiradsRaw": "4b",
+              "tiradsSystem": "KWAK",
+              "suspiciousFeatures": [
+                "неровный / нечёткий контур"
+              ],
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 6,
+              "tirads": 2,
+              "tiradsSystem": "EU",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-003.docx",
+      "studyType": "THYROID",
+      "text": "Анамнез: Ранее узел справа 31 мм.\nОписание: При текущем исследовании справа узел 19 х 12 х 10 мм, EU-TIRADS 3. Микрокальцинаты не выявлены.\nЗаключение: Узел правой доли щитовидной железы.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 19,
+              "tirads": 3,
+              "tiradsSystem": "EU",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-004.docx",
+      "studyType": "THYROID",
+      "text": "Описание: Общий объём щитовидной железы 27,6 мл. Паренхима неоднородная, диффузно сниженной эхогенности. В левой доле узел 11 х 8 мм, EU-TIRADS 4.\nЗаключение: Диффузный зоб. Изменения по типу АИТ. Узел слева.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_ENLARGEMENT",
+            "attributes": {
+              "volumeCm3": 27.6,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_DIFFUSE_AIT",
+            "attributes": {
+              "uncertain": true
+            }
+          },
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 11,
+              "tirads": 4,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-005.docx",
+      "studyType": "THYROID",
+      "text": "Описание: В нижней трети правой доли образование 22 х 16 мм, выраженно гипоэхогенное, с микрокальцинатами.\nЗаключение: Узел правой доли, EU-TIRADS 5.\nРекомендации: Контроль размеров узла, выполнить ТАБ.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 22,
+              "tirads": 5,
+              "suspiciousFeatures": [
+                "выраженно гипоэхогенный",
+                "микрокальцинаты"
+              ],
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-006.docx",
+      "studyType": "THYROID",
+      "text": "Описание: Правая и левая доли однородные, общий объём 13,8 мл. Узлы, кисты и очаговые образования в обеих долях отсутствуют.\nЗаключение: Без узловых изменений.\nРекомендации: При выявлении узла более 10 мм — консультация эндокринолога.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "v9-r1-007.docx",
+      "studyType": "BREAST",
+      "text": "Описание: Справа на 11 часах фиброаденома 16 х 9 мм, BI-RADS 3. Слева на 4 часах простая киста 7 мм, BI-RADS 2. Кожа не утолщена.\nЗаключение: Фиброаденома справа, киста слева.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 16,
+              "birads": 3,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 7,
+              "birads": 2,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-008.docx",
+      "studyType": "BREAST",
+      "text": "Описание: В левой молочной железе простая киста 5 мм. В этой же железе фиброаденома 20 х 13 мм.\nЗаключение: Киста слева, BI-RADS 2. Фиброаденома слева, BI-RADS 3.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 5,
+              "birads": 2,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 20,
+              "birads": 3,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-009.docx",
+      "studyType": "BREAST",
+      "text": "Описание: Справа образование неправильной формы 29 х 21 мм. Правые аксиллярные лимфоузлы увеличены, с нарушенной дифференцировкой. Слева очаговых изменений нет.\nЗаключение: Образование правой молочной железы, BI-RADS 4c. Слева BI-RADS 1.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 29,
+              "birads": 4,
+              "biradsSub": "c",
+              "suspiciousLymphNodes": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-010.docx",
+      "studyType": "BREAST",
+      "text": "Описание: Слева на 3 часах образование 1,3 х 0,8 см с ровными контурами.\nЗаключение: Вероятно, фиброаденома левой молочной железы, BI-RADS 3.\nРекомендации: Оценить динамику через 6 месяцев.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 13,
+              "birads": 3,
+              "benignChanges": true,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-011.docx",
+      "studyType": "BREAST",
+      "text": "Описание: В правой молочной железе расширенные протоки с содержимым. Кожа справа утолщена. В левой молочной железе киста 10 х 6 мм.\nЗаключение: Изменения правой молочной железы, BI-RADS 3. Киста слева, BI-RADS 2.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "birads": 3,
+              "ductContent": true,
+              "skinThickening": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 10,
+              "birads": 2,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-012.docx",
+      "studyType": "BREAST",
+      "text": "Анамнез: В 2021 году удалена фиброаденома справа.\nОписание: Объёмных образований нет. Регионарные лимфоузлы обычной структуры.\nЗаключение: Справа BI-RADS 1; слева BI-RADS 1.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "v9-r1-013.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: В желчном пузыре подвижный конкремент 17 мм и полип на широком основании 6 мм без тени. Холедох 4,6 мм, не расширен.\nЗаключение: Холецистолитиаз. Полип желчного пузыря.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "sizeMm": 17,
+              "location": "gallbladder",
+              "mobile": true,
+              "choledochMm": 4.6,
+              "ductsDilated": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "GALLBLADDER_POLYP",
+            "attributes": {
+              "sizeMm": 6,
+              "sessile": true,
+              "withStones": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-014.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: В просвете желчного пузыря несколько конкрементов до 12 мм, эхогенная взвесь. Холедох расширен до 10 мм, в дистальном отделе конкремент 6 мм.\nЗаключение: Камни желчного пузыря. Холедохолитиаз.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "sizeMm": 12,
+              "count": "множественные",
+              "location": "gallbladder",
+              "choledochMm": 10,
+              "ductsDilated": true,
+              "sludge": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "sizeMm": 6,
+              "location": "choledoch",
+              "choledochMm": 10,
+              "ductsDilated": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-015.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: Стенка желчного пузыря 5 мм, с двойным контуром. Перипузырная жидкость. Конкремент желчного пузыря 15 мм.\nЗаключение: Острый холецистит. Желчнокаменная болезнь.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "ACUTE_CHOLECYSTITIS",
+            "attributes": {
+              "wallThicknessMm": 5,
+              "doubleContour": true,
+              "pericholecysticFluid": true,
+              "withStones": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "sizeMm": 15,
+              "location": "gallbladder",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-016.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: Печень увеличена, эхогенность диффузно повышена. В VII сегменте однородный гиперэхогенный очаг 18 х 13 мм с чёткими контурами.\nЗаключение: Стеатоз печени, гепатомегалия. Гемангиома печени.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "HEPATIC_STEATOSIS",
+            "attributes": {
+              "hepatomegaly": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "LIVER_HEMANGIOMA",
+            "attributes": {
+              "sizeMm": 18,
+              "atypical": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-017.docx",
+      "studyType": "ABDOMEN",
+      "text": "Описание: В желчном пузыре мелкодисперсная взвесь; конкрементов нет. Свободная жидкость подпечёночно, анэхогенная, в объёме 65 мл.\nЗаключение: Билиарный сладж. Свободная жидкость в подпечёночном пространстве.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BILIARY_SLUDGE",
+            "attributes": {
+              "withStones": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "location": "подпечёночно",
+              "beyondPelvis": true,
+              "volumeMl": 65,
+              "echogenic": "анэхогенная",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-018.docx",
+      "studyType": "ABDOMEN",
+      "text": "Анамнез: Холецистэктомия по поводу конкремента 25 мм.\nОписание: Ложе желчного пузыря свободно. Холедох 5,5 мм, конкрементов в нём нет. Свободная жидкость отсутствует.\nЗаключение: Состояние после холецистэктомии, без осложнений.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "v9-r1-019.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: В эндометрии полип 12 х 7 мм. В передней стенке матки интрамуральный миоматозный узел 28 х 22 мм, FIGO 4, полость матки не деформирована.\nЗаключение: Полип эндометрия. Миома матки.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "ENDOMETRIAL_POLYP",
+            "attributes": {
+              "sizeMm": 12,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "sizeMm": 28,
+              "figo": 4,
+              "deformsCavity": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-020.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: Справа простая однокамерная киста яичника 32 х 25 мм, O-RADS 2. Слева эндометриоидная киста яичника 51 х 39 мм, O-RADS 2.\nЗаключение: Кисты правого и левого яичников.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 32,
+              "orads": 2,
+              "lesionType": "simple",
+              "uncertain": false
+            }
+          },
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 51,
+              "orads": 2,
+              "lesionType": "endometrioma",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-021.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: По задней стенке матки субмукозный миоматозный узел 16 мм, FIGO 1, деформирует полость матки. В дне субсерозный узел 41 мм, FIGO 6.\nЗаключение: Многоузловая миома матки.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "sizeMm": 16,
+              "figo": 1,
+              "deformsCavity": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "sizeMm": 41,
+              "figo": 6,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-022.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: В цервикальном канале образование 10 х 6 мм с кровотоком при ЦДК. Миометрий неоднородный, с асимметрией стенок.\nЗаключение: Полип цервикального канала. Аденомиоз, диффузная форма.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "CERVICAL_POLYP",
+            "attributes": {
+              "sizeMm": 10,
+              "vascularized": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "ADENOMYOSIS",
+            "attributes": {
+              "form": "diffuse",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-023.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: Справа тубулярное жидкостное образование 38 х 14 мм. В левом яичнике фолликулярная киста 27 мм, O-RADS 2.\nЗаключение: Гидросальпинкс справа. Фолликулярная киста левого яичника.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDROSALPINX",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 38,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 27,
+              "orads": 2,
+              "functional": true,
+              "lesionType": "functional",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-024.docx",
+      "studyType": "PELVIS_FEMALE",
+      "text": "Описание: Матка обычной формы, полость не расширена. В правом яичнике жёлтое тело 18 мм, в левом доминантный фолликул 20 мм. Свободная жидкость не определяется.\nЗаключение: Физиологические изменения яичников, O-RADS 1 с обеих сторон.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "v9-r1-025.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: Справа конкремент в лоханке 9 мм. Лоханка справа не расширена. Слева лоханка расширена до 22 мм, чашечки расширены, камней нет.\nЗаключение: Конкремент правой почки без обструкции. Гидронефроз слева 2 степени.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 9,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "left",
+              "pelvisMm": 22,
+              "grade": 2,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-026.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: В левой почке несколько конкрементов до 6 мм, ЧЛС не расширена. В правой почке конкремент 10 мм, ЧЛС не расширена.\nЗаключение: Двусторонний нефролитиаз без признаков обструкции.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 6,
+              "count": "множественные",
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 10,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-027.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: В правом мочеточнике конкремент 7 мм с обструкцией. Правый мочеточник расширен, лоханка справа 26 мм.\nЗаключение: Обтурирующий камень правого мочеточника. Гидронефроз справа 2 степени.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 7,
+              "location": "ureter",
+              "obstruction": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "right",
+              "pelvisMm": 26,
+              "grade": 2,
+              "ureterDilated": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-028.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: Слева конкремент в лоханке 1,1 х 0,7 см. Расширения чашечно-лоханочной системы слева нет.\nЗаключение: Нефролитиаз слева.\nРекомендации: При появлении признаков обструкции обратиться к урологу.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 11,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-029.docx",
+      "studyType": "KIDNEY",
+      "text": "Анамнез: Камень левого мочеточника 8 мм отошёл.\nОписание: В настоящее время справа лоханка расширена до 18 мм. Слева ЧЛС не расширена, конкременты не визуализируются.\nЗаключение: Пиелоэктазия справа.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "right",
+              "pelvisMm": 18,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-030.docx",
+      "studyType": "KIDNEY",
+      "text": "Описание: Паренхима почек сохранена. В синусах мелкие эхогенные включения без акустической тени. Конкременты почек и мочеточников не выявлены; расширения ЧЛС нет.\nЗаключение: Данных за нефролитиаз и гидронефроз не получено.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "v9-r1-031.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: До мочеиспускания объём мочевого пузыря 285 мл. Простата с гиперплазией переходных зон, объём 46 мл. Остаточная моча 58 мл.\nЗаключение: ДГПЖ с остаточной мочой.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 46
+            }
+          },
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 58
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-032.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Предстательная железа 57,2 см3, внутрипузырная протрузия 9 мм. После микции остаточная моча 135 мл.\nЗаключение: Аденома простаты. Нарушение пассажа мочи.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 57.2,
+              "intravesicalMm": 9
+            }
+          },
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 135
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-033.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Предстательная железа 34 мл, аденоматозные узлы. Структура неоднородная, с фиброзными участками. Остаточной мочи нет.\nЗаключение: ДГПЖ. Изменения по типу хронического простатита.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 34,
+              "prostatitisPattern": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-034.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Простата объёмом 72 мл, узловая гиперплазия. Остаточная моча 315 мл.\nЗаключение: Узловая форма ДГПЖ с динамикой роста. Избыточное количество остаточной мочи.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 72,
+              "growth": true
+            }
+          },
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 315
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-035.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Предстательная железа 29,7 мл, гиперплазия переходных зон. Остаточная моча 0 мл.\nЗаключение: ДГПЖ без отрицательной динамики.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 29.7,
+              "growth": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-036.docx",
+      "studyType": "PROSTATE",
+      "text": "Описание: Предстательная железа 21 мл, единичные кальцинаты, небольшая ретенционная киста. После мочеиспускания остаточная моча в пределах нормы.\nЗаключение: Кальцинаты и ретенционная киста простаты, без увеличения железы.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "v9-r1-037.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Описание: Справа варикозная трансформация БПВ; СФС несостоятельно, рефлюкс 1,7 с. Слева ствол МПВ расширен до 5 мм, рефлюкса нет.\nЗаключение: Варикозная болезнь справа. Эктазия ствола МПВ слева без рефлюкса.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "attributes": {
+              "side": "right",
+              "varicose": true,
+              "refluxSource": "СФС",
+              "refluxSec": 1.7,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "SAPHENOUS_DILATION",
+            "attributes": {
+              "side": "left",
+              "vein": "МПВ",
+              "diameterMm": 5,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-038.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Описание: В правой ПкВ окклюзивный тромб, без флотации. В левой БВ посттромботические изменения, частичная реканализация.\nЗаключение: Тромбоз глубоких вен справа. Посттромботические изменения слева.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "attributes": {
+              "side": "right",
+              "vein": "ПкВ",
+              "occlusive": true,
+              "floating": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "POST_THROMBOTIC_CHANGES",
+            "attributes": {
+              "side": "left",
+              "vein": "БВ",
+              "recanalization": "частичная",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-039.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Описание: Слева тромбоз ствола БПВ; верхушка находится в 2,4 см от СФС, не флотирует. Справа глубокие и поверхностные вены проходимы.\nЗаключение: Тромбофлебит левой БПВ.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+            "attributes": {
+              "side": "left",
+              "vein": "БПВ",
+              "location": "trunk",
+              "distanceToJunctionMm": 24,
+              "floating": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-040.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Описание: Правая ОБА: стеноз 30–40%. Левая ПБА: стеноз 65%. Кровоток справа магистральный.\nЗаключение: Двусторонний стенозирующий атеросклероз артерий нижних конечностей.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "right",
+              "artery": "ОБА",
+              "maxStenosisPct": 40,
+              "bloodFlowType": "магистральный",
+              "uncertain": false
+            }
+          },
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "left",
+              "artery": "ПБА",
+              "maxStenosisPct": 65,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-041.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Описание: В левой ОБА атеросклеротическая бляшка со стенозом 48%. На левой стопе отёк подкожной клетчатки.\nЗаключение: Атеросклероз артерий слева. Воспалительные изменения ПЖК левой стопы.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "left",
+              "artery": "ОБА",
+              "maxStenosisPct": 48,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "SOFT_TISSUE_INFLAMMATION",
+            "attributes": {
+              "location": "левая стопа",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-042.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "text": "Описание: Все глубокие вены сжимаются датчиком до конца. Тромбоз, тромбофлебит и посттромботические изменения не выявлены. При пробе Вальсальвы рефлюкса нет.\nЗаключение: Патологических изменений вен не выявлено.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "v9-r1-043.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: Паховая грыжа справа: ворота 16 мм, содержимое — сальник, вправляется. Паховая грыжа слева: ворота 24 мм, петля тонкой кишки, вправляется.\nЗаключение: Двусторонние паховые грыжи без признаков ущемления.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 16,
+              "content": "сальник",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 24,
+              "content": "петля тонкой кишки",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-044.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: В правой паховой области грыжевой дефект 19 мм. Содержимое мешка — петля тонкой кишки, не вправляется.\nЗаключение: Ущемлённая паховая грыжа справа, признаки кишечной непроходимости.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 19,
+              "content": "петля тонкой кишки",
+              "reducible": false,
+              "incarcerated": true,
+              "obstruction": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-045.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: В области пупка грыжевые ворота 12 мм, содержимое — предбрюшинная клетчатка. При компрессии вправляется.\nЗаключение: Пупочная грыжа без признаков ущемления и непроходимости.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "sizeMm": 12,
+              "content": "предбрюшинная клетчатка",
+              "reducible": true,
+              "incarcerated": false,
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-046.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: По послеоперационному рубцу грыжевой дефект апоневроза 3,4 см; содержимое — сальник, вправляется.\nЗаключение: Послеоперационная вентральная грыжа, без признаков ущемления.\nРекомендации: При невправимости исключить ущемление.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "sizeMm": 34,
+              "content": "сальник",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-047.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: На правой стопе утолщение и отёк подкожной клетчатки, инфильтрация мягких тканей. Жидкостных скоплений нет.\nЗаключение: Воспалительные изменения ПЖК правой стопы без абсцедирования.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": [
+          {
+            "code": "SOFT_TISSUE_INFLAMMATION",
+            "attributes": {
+              "location": "правая стопа",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "v9-r1-048.docx",
+      "studyType": "SOFT_TISSUE",
+      "text": "Описание: В зоне рубца непрерывный апоневроз. Диастаз прямых мышц 28 мм, грыжевые ворота не определяются. Отёк и инфильтрация мягких тканей отсутствуют.\nЗаключение: Диастаз без грыжевого дефекта.",
+      "partition": "prospective_complex_synthetic",
+      "expected": {
+        "findings": []
+      }
+    }
+  ]
+}

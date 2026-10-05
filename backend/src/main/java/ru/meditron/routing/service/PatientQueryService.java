@@ -30,15 +30,18 @@ public class PatientQueryService {
     private final DtoMapper mapper;
     /** Чтение маршрутов; наполнение карточки включается настройкой routes.enabled. */
     private final org.springframework.beans.factory.ObjectProvider<ru.meditron.routing.route.service.RouteQueryService> routeQuery;
+    private final ru.meditron.routing.route.service.PatientTrackingService tracking;
 
     public PatientQueryService(PatientRepository patients, ProtocolRepository protocols,
                                FindingRepository findings, DtoMapper mapper,
-                               org.springframework.beans.factory.ObjectProvider<ru.meditron.routing.route.service.RouteQueryService> routeQuery) {
+                               org.springframework.beans.factory.ObjectProvider<ru.meditron.routing.route.service.RouteQueryService> routeQuery,
+                               ru.meditron.routing.route.service.PatientTrackingService tracking) {
         this.patients = patients;
         this.protocols = protocols;
         this.findings = findings;
         this.mapper = mapper;
         this.routeQuery = routeQuery;
+        this.tracking = tracking;
     }
 
     /** Данные одного пациента, из которых собираются и строка инбокса, и карточка. */
@@ -52,7 +55,7 @@ public class PatientQueryService {
         return new Snapshot(p, ps, current, fs);
     }
 
-    private PatientShortDto shortDto(Snapshot s) {
+    private PatientShortDto shortDto(Snapshot s, ru.meditron.routing.route.service.PatientTrackingService.Batch batch) {
         int pending = (int) active(s).stream().filter(f -> f.getStatus() == FindingStatus.SUGGESTED).count();
         Protocol c = s.current();
         ReviewState state;
@@ -83,16 +86,12 @@ public class PatientQueryService {
                 maxLevel(s),
                 c == null ? null : c.getReceivedAt(),
                 pending,
-                activeRoutes(p.getId()),
+                batch.activeCount(p.getId()),
                 c == null ? null : c.getStudyDate(),
                 c == null ? null : c.getStudyType(),
                 active(s).size(),
-                active(s).stream().limit(TOP_FINDINGS).map(this::top).toList());
-    }
-
-    private int activeRoutes(UUID id) {
-        var q = routeQuery.getIfAvailable();
-        return routesEnabled && q != null ? q.activeRouteCount(id) : 0;
+                active(s).stream().limit(TOP_FINDINGS).map(this::top).toList(),
+                routesEnabled ? tracking.summarize(batch, p.getId(), active(s).isEmpty() ? null : active(s).getFirst().getId().toString()) : null);
     }
 
     private static final int TOP_FINDINGS = 2;
@@ -131,13 +130,12 @@ public class PatientQueryService {
             throw new BadRequestException("INVALID_FILTER", "page >= 0; size от 1 до 200; dateFrom <= dateTo");
         }
         List<PatientShortDto> all = new ArrayList<>();
-        for (Patient p : patients.findAll()) {
-            if (search != null && !search.isBlank()) {
-                String q = search.toLowerCase();
-                if (!p.getFullName().toLowerCase().contains(q) && !p.getExternalId().toLowerCase().contains(q)) {
-                    continue;
-                }
-            }
+        List<Patient> candidates = patients.findAll().stream().filter(p -> search == null || search.isBlank()
+                || p.getFullName().toLowerCase().contains(search.toLowerCase())
+                || p.getExternalId().toLowerCase().contains(search.toLowerCase())).toList();
+        var batch = routesEnabled ? tracking.load(candidates.stream().map(Patient::getId).toList())
+                : ru.meditron.routing.route.service.PatientTrackingService.Batch.empty();
+        for (Patient p : candidates) {
             Snapshot s = snapshot(p);
             if (studyType != null && s.protocols().stream().noneMatch(x -> x.getStudyType() == studyType)) {
                 continue;
@@ -149,7 +147,7 @@ public class PatientQueryService {
             if (dateTo != null && (last == null || last.isAfter(dateTo))) {
                 continue;
             }
-            PatientShortDto dto = shortDto(s);
+            PatientShortDto dto = shortDto(s, batch);
             if (needsRouteReview != null && dto.needsRouteReview() != needsRouteReview) continue;
             if (reviewState != null && dto.reviewState() != reviewState) {
                 continue;
@@ -197,7 +195,7 @@ public class PatientQueryService {
             banner = rq.banner(p.getId());
         }
         return new PatientCardDto(
-                shortDto(s),
+                shortDto(s, routesEnabled ? tracking.load(List.of(p.getId())) : ru.meditron.routing.route.service.PatientTrackingService.Batch.empty()),
                 s.current() == null ? null : mapper.protocolShort(s.current(), countFindings(s, s.current())),
                 current,
                 List.of(),

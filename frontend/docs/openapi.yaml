@@ -3446,6 +3446,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TopFindingDto'
+        tracking:
+          $ref: '#/components/schemas/PatientTrackingDto'
+    PatientTrackingDto:
+      type: object
+      description: Этап маршрута отображаемой находки и успешные отправки уведомлений пациенту. null при отключённых маршрутах.
+      properties:
+        routeId:
+          type: string
+        stage:
+          type: string
+        stageTitle:
+          type: string
+        progressPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Доля зафиксированных вех из route-config.yaml; null без маршрута.
+        lastNotifiedAt:
+          type: string
+          format: date-time
+          description: Последняя отправка со статусом SENT, DELIVERED или READ.
+        notificationCount:
+          type: integer
+          format: int64
+          minimum: 0
     TopFindingDto:
       type: object
       properties:

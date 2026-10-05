@@ -101,6 +101,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if b.section!=section:ovary_side=None;section=b.section
             if re.match(r'^(?:ПРАВЫЙ|ЛЕВЫЙ)\s+ЯИЧНИК',b.text,re.I):ovary_side=side_of(b.text)
             elif b.organ in {'cervix','uterus','endometrium'} or re.match(r'^(?:ШЕЙКА|МАТКА|ЭНДОМЕТРИЙ|М-ЭХО|Цервикальный)',b.text,re.I):ovary_side=None
+            elif b.organ=='ovary' and side_of(b.text):ovary_side=side_of(b.text)
             if ovary_side:b.organ='ovary';b.side=ovary_side
     conclusion = ' '.join(b.text for b in source if b.section == 'conclusion')
     clinical_text = ' '.join(b.text for b in source)
@@ -124,6 +125,8 @@ def analyze(parsed, raw, study, dictionary, context=None):
     def add(code, bs, attrs=None, flags=None):
         if code not in items or not bs: return
         a = dict(attrs or {})
+        if 'uncertain' in items[code].get('attributes',[]):
+            a.setdefault('uncertain',any(bool(UNCERTAIN.search(b.text)) for b in bs))
         side = {b.side for b in bs} - {None, 'both'}
         if 'side' in items[code].get('attributes', []) and len(side) == 1:
             a.setdefault('side', next(iter(side)))
@@ -232,6 +235,8 @@ def analyze(parsed, raw, study, dictionary, context=None):
         superficial = has(r'тромбофлебит|тромбоз\w*\s+(?:БПВ|МПВ|поверхност)', conclusion)
         post = has(r'посттромбот|реканализац', conclusion)
         explicit_deep=any(positive(r'тромбоз\w*\s+глубок\w*\s+вен|глубок\w*\s+вен\w*[^.;]{0,40}тромбоз',b.text) and not has(r'в\s+анамнезе|\d+\s*(?:лет|года?|месяц\w*)\s+назад|перенес[её]н',b.text) for b in source)
+        explicit_deep=explicit_deep or any(positive(r'\bтромб\w*',b.text) and has(r'\b(?:ОБВ|БВ|ГБВ|ПкВ|ЗББВ|ПББВ|МБВ)\b',b.text)
+                                          and not has(r'посттромбот|в\s+анамнезе|перенес[её]н',b.text) for b in source)
         if (arterial or superficial or post) and not explicit_deep:
             found = [f for f in found if f['code'] != 'DEEP_VEIN_THROMBOSIS']
         if post:
@@ -257,7 +262,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
     for f in list(found):
         code, a = f['code'], f['attributes']
         side = a.get('side')
-        if code == 'BREAST_LESION' and a.get('birads') == 1 and not any(has(r'кож',b.text) and positive(r'утолщ\w*',b.text) for b in source) and not any(a.get(k) for k in ('sizeMm','skinThickening','suspiciousLymphNodes','inflammation')):
+        if code == 'BREAST_LESION' and a.get('birads') == 1 and not any(b.side in {side,None,'both'} and has(r'кож',b.text) and positive(r'утолщ\w*',b.text) for b in source) and not any(a.get(k) for k in ('sizeMm','skinThickening','suspiciousLymphNodes','inflammation')):
             reject(code, [Block(f['evidence']['text'], f['evidence']['start'], f['evidence']['end'], 'conclusion')]);found.remove(f)
         if code == 'OVARIAN_LESION':
             same = [b for b in source if b.side in {side, None}]
@@ -273,6 +278,8 @@ def analyze(parsed, raw, study, dictionary, context=None):
         if code == 'BPH_URINARY_RETENTION' and not has(r'остаточн\w*\s+моч|остаточ\.', clinical_text): found.remove(f)
         elif code == 'BPH_URINARY_RETENTION' and (a.get('residualUrineMl') == 0 or asserted_bool(r'остаточн\w*\s+моч\w*',source) is False):
             found.remove(f)
+        elif code == 'BPH_URINARY_RETENTION' and any(has(r'остаточн\w*\s+моч\w*[^.;]{0,25}в\s+пределах\s+нормы',b.text) for b in source):
+            reject(code,[b for b in source if has(r'остаточн\w*\s+моч',b.text)],'NORMAL');found.remove(f)
         if code=='BILIARY_SLUDGE' and has(r'взвес\w*\s+и\s+конкремент\w*[^.;]{0,20}не\s+определ',f['evidence']['text']):
             reject(code,[Block(f['evidence']['text'],f['evidence']['start'],f['evidence']['end'],'description')],'NEGATION');found.remove(f)
         if code=='THYROID_NODULE' and 'sizeMm' not in a and has(r'узл\w*\s+нет|об[ъь][её]мн\w*\s+образовани\w*[^.;]*не\s+выявлен',clinical_text):found.remove(f)
@@ -357,13 +364,19 @@ def analyze(parsed, raw, study, dictionary, context=None):
         anchors = [b for b in source if f['evidence']['start'] <= b.start and b.end <= f['evidence']['end']]
         related = [b for b in source if (not side or b.side in {side, None, 'both'})]
         if code in organ_map: related = [b for b in related if b.organ in organ_map[code] or (code=='TUBO_OVARIAN_ABSCESS' and has(r'в\s+проекции\s+придатков',b.text))]
-        elif code not in {'HERNIA','DEEP_VEIN_THROMBOSIS','SUPERFICIAL_THROMBOPHLEBITIS','POST_THROMBOTIC_CHANGES','VENOUS_INSUFFICIENCY','ARTERIAL_STENOSIS','BPH','BPH_URINARY_RETENTION','FREE_FLUID','OVARIAN_APOPLEXY','ECTOPIC_PREGNANCY','IUD_MALPOSITION','HEPATIC_STEATOSIS','THYROID_NODULE','BREAST_LESION','THYROID_ENLARGEMENT'}:
+        elif code not in {'HERNIA','DEEP_VEIN_THROMBOSIS','SUPERFICIAL_THROMBOPHLEBITIS','POST_THROMBOTIC_CHANGES','SAPHENOUS_DILATION','VENOUS_INSUFFICIENCY','ARTERIAL_STENOSIS','BPH','BPH_URINARY_RETENTION','FREE_FLUID','OVARIAN_APOPLEXY','ECTOPIC_PREGNANCY','IUD_MALPOSITION','HEPATIC_STEATOSIS','THYROID_NODULE','BREAST_LESION','THYROID_ENLARGEMENT'}:
             related = anchors
         t = ' '.join(b.text for b in related)
         original = f['evidence']['text']
         a.update({k:v for k,v in patient_attrs.items() if k in items[code].get('attributes', [])})
         if has(r'по\s+типу', original) and code in {'ADENOMYOSIS','THYROID_DIFFUSE_AIT','ENDOCERVICITIS'}: a['uncertain'] = True
         if code == 'THYROID_NODULE':
+            stability=[b for b in source if b.section=='conclusion' and b.side in {side,None,'both'}
+                       and has(r'узл\w*|узел\b|зоб\w*',b.text) and not dimensions(b.text)]
+            stability += [b for i,b in enumerate(source) if i and b.section=='conclusion' and source[i-1] in stability
+                          and re.match(r'^без\s+(?:отрицательн\w*\s+)?динамик',b.text,re.I)]
+            if any(has(r'без\s+(?:признаков\s+роста|(?:отрицательной\s+)?динамики)|стабильн',b.text) for b in stability):a['growth']=False
+            if any(has(r'рост\w*[^.;]{0,30}не\s+(?:отмечен|выявлен|определ)',b.text) for b in stability):a['growth']=False
             category_text=' '.join(b.text for b in anchors if b.side==side) or original
             cats = list(re.finditer(r'(EU\s*[-–]?\s*T[IІ]\s*[-–]?\s*RADS|ACR\s*TI\s*[-–]?\s*RADS|TI\s*[-–]?\s*RADS|TR)\s*[-:=]?\s*([1-5])([abcабв])?', category_text, re.I))
             cat = next((c for c in cats if int(c[2]) == a.get('tirads')), cats[0] if len(cats)==1 else None)
@@ -388,9 +401,12 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if has(r'\bмастит|воспалительн\w*\s+изменен|гиперемир',t):a['inflammation']=True
             put(a,'skinThickening',asserted_bool(r'утолщ\w*',[b for b in related if has(r'кож',b.text)]))
             put(a,'ductContent',asserted_bool(r'содержим\w*',[b for b in related if has(r'проток',b.text)]))
+        if code=='THYROID_ENLARGEMENT':
+            put(a,'volumeCm3',number(rf'(?:общий\s+)?об[ъь][её]м\s+щитовидн\w*\s+желез\w*\s*[:—–-]?\s*({NUM})\s*(?:мл|см)',t))
         if code == 'OVARIAN_LESION':
+            lesion_text=' '.join(b.text for b in anchors if not side or b.side in {side,None,'both'})
             for pattern,value in [(r'параовариальн','paraovarian'),(r'эндометрио|эндометриома','endometrioma'),(r'дермоид|тератом','dermoid'),(r'фолликулярн\w*\s+кист|киста\s+ж[её]лт|геморрагическ\w*\s+кист','functional'),(r'прост\w*\s+кист|однокамерн','simple')]:
-                if has(pattern, original): a['lesionType'] = value;break
+                if has(pattern, lesion_text): a['lesionType'] = value;break
             if positive(r'солидн\w*\s+компонент|кистозно.солидн', t): a['solid'] = True
             if positive(r'многокамерн|перегородк', t): a['septated'] = True
             if has(r'локус\w*\s+кровоток|кровоток\s+в\s+(?:образован|солидн)', t): a['vascularized'] = True
@@ -408,6 +424,8 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if positive(r'некроз\w*\s+узл|нарушени\w*\s+кровообращени\w*\s+в\s+узле',original):a['degeneration']=True
             if positive(r'сдавлен\w*\s+(?:мочев|мочеточ|киш)',original):a['compression']=True
         if code=='ADENOMYOSIS':
+            confirmed=[b for b in source if b.section=='conclusion' and positive(r'аденомиоз\w*',b.text)]
+            if confirmed:a['uncertain']=any(bool(UNCERTAIN.search(b.text)) or has(r'по\s+типу',b.text) for b in confirmed)
             if has(r'узлов\w*\s+форм',original):a['form']='nodular'
             elif has(r'диффуз',original):a['form']='diffuse'
         if code in {'OVARIAN_TORSION','TUBO_OVARIAN_ABSCESS','GALLBLADDER_HYDROPS'}:
@@ -452,6 +470,8 @@ def analyze(parsed, raw, study, dictionary, context=None):
                 if has(r'локус\w*\s+кровоток', t): a['vascularized'] = True
             if code == 'ACUTE_CHOLECYSTITIS':
                 put(a, 'wallThicknessMm', measured(t, r'стенк\w*'))
+                reverse_wall=re.search(rf'утолщ[её]нн\w*\s+до\s+({NUM})\s*(мм|см)\s+стенк\w*',t,re.I)
+                if reverse_wall:a['wallThicknessMm']=float(reverse_wall[1].replace(',','.'))*(10 if reverse_wall[2].lower()=='см' else 1)
                 put(a, 'doubleContour', explicit_bool(t,r'двойн\w*\s+контур',r'двойн\w*\s+контур\w*\s+нет|без\s+двойн'))
                 put(a,'pericholecysticFluid',asserted_bool(r'(?:перивезик|перипузыр)\w*\s+жидкост\w*|жидкост\w*\s+перивезик\w*',related))
                 put(a, 'murphy', explicit_bool(t,r'Мерфи\s+положительн',r'Мерфи\s+отрицательн'))
@@ -459,7 +479,10 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if side and any(g['code']=='HERNIA' and g['attributes'].get('side') != side for g in found):
                 scoped=[b for b in related if b.side in {side,'both'} or (b.side is None and not has(r'грыж|ворот|дефект',b.text))]
                 if scoped:related=scoped;t=' '.join(b.text for b in related)
-            put(a, 'sizeMm', measured(t, r'(?:грыжев\w*\s+)?ворот\w*|дефект\w*\s+апоневроз\w*'))
+            put(a, 'sizeMm', measured(t, r'(?:грыжев\w*\s+)?ворот\w*|грыжев\w*\s+дефект\w*|дефект\w*\s+апоневроз\w*'))
+            if 'sizeMm' not in a:
+                defect_sizes=[v for b in related if positive(r'грыж\w*',b.text) and (v:=measured(b.text,r'дефект\w*')) is not None]
+                if defect_sizes:a['sizeMm']=max(defect_sizes)
             put(a, 'reducible', explicit_bool(t,r'вправим|вправляется',r'невправим|не\s+вправляется'))
             incarceration = list(re.finditer(r'ущемл\w*',t,re.I))
             if incarceration:
@@ -487,7 +510,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
                 put(a,'obstruction',asserted_bool(r'обструкци\w*',related))
                 same_side=[b for b in source if b.side in {side,None,'both'}]
                 put(a,'obstruction',asserted_bool(r'обструкци\w*',same_side))
-                cls=[b for b in related if has(r'ЧЛС',b.text)]
+                cls=[b for b in related if has(r'ЧЛС|чашечно.лоханочн|лоханк',b.text)]
                 if cls:put(a,'obstruction',asserted_bool(r'расширен\w*',cls))
                 if any(positive(r'уретерогидронефроз',b.text) for b in related):a['obstruction']=True
             else:
@@ -496,6 +519,8 @@ def analyze(parsed, raw, study, dictionary, context=None):
                 put(a,'ureterDilated',asserted_bool(r'расширен\w*',[b for b in related if has(r'мочеточник',b.text) and not has(r'лоханк|ЧЛС',b.text)]))
         if code in {'DEEP_VEIN_THROMBOSIS','POST_THROMBOTIC_CHANGES'}:
             names=[]
+            for vein in ('ОБВ','БВ','ПБВ','ГБВ','ПкВ','ЗББВ','ПББВ','МБВ'):
+                if has(r'\b'+vein+r'\b',t):names.append(vein)
             for pat,val in [(r'бедренн','бедренная'),(r'подколенн','подколенная'),(r'задни\w*\s+большеберцов','задние большеберцовые')]:
                 if has(pat,t): names.append(val)
             if names: a['vein'] = ', '.join(names)
@@ -507,9 +532,12 @@ def analyze(parsed, raw, study, dictionary, context=None):
                 put(a,'floating',asserted_bool(r'флотир\w*|флотаци\w*',related))
                 put(a,'occlusive',explicit_bool(t,r'окклюзивн|просвет\s+полностью\s+заполнен',r'неокклюзивн|не\s+окклюзивн'))
         if code == 'SUPERFICIAL_THROMBOPHLEBITIS':
-            veins = [v for v in ('БПВ','МПВ','ПДПВ') if has(r'\b'+v+r'\b', original)]
+            thrombus_rows=[b for b in related if positive(r'тромбофлебит\w*|тромбоз\w*|тромб\w*',b.text)
+                          and has(r'БПВ|МПВ|ПДПВ|поверхностн|приток|перфорант',b.text)]
+            thrombus_text=' '.join(b.text for b in thrombus_rows) or original
+            veins = [v for v in ('БПВ','МПВ','ПДПВ') if has(r'\b'+v+r'\b', thrombus_text)]
             if veins: a['vein']=', '.join(veins)
-            if has(r'ствол', original): a['location']='trunk'
+            if has(r'ствол', thrombus_text): a['location']='trunk'
             elif has(r'подфасциальн',original): a['location']='perforatorSubfascial'
             elif has(r'приустьев',original): a['location']='tributaryNearJunction'
             elif has(r'приток',original): a['location']='tributaryDistal'
@@ -524,10 +552,19 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if has(r'варикоз',original):a['varicose']=True
             elif has(r'рефлюкс|недостаточност',original):a['varicose']=False
             for val in ('СФС','СПС'):
-                if has(val+r'\s+несостоятельн',t):a['refluxSource']=val
+                if has(val+r'\s+(?:(?:справа|слева)\s+)?несостоятельн',t):a['refluxSource']=val
             if has(r'несостоятельност\w*\s+(?:прав\w*\s+|лев\w*\s+)?сафено.подколенн',t):a['refluxSource']='СПС'
             if has(r'несостоятельност\w*\s+(?:прав\w*\s+|лев\w*\s+)?сафено.феморальн',t):a['refluxSource']='СФС'
+            if 'refluxSource' not in a:
+                reflux=re.search(r'рефлюкс\w*\s+по\s+(?:стволу\s+)?(БПВ|МПВ|ПДПВ)\b',t,re.I)
+                if reflux:a['refluxSource']=reflux[1].upper()
             put(a,'refluxSec',number(rf'рефлюкс[^.;]{{0,65}}?({NUM})\s*с\b',t))
+        if code == 'SAPHENOUS_DILATION':
+            veins=[v for v in ('БПВ','МПВ','ПДПВ') if has(r'\b'+v+r'\b',original)]
+            if len(veins)==1:
+                a['vein']=veins[0]
+                vessel_rows=[b for b in related if has(r'\b'+veins[0]+r'\b',b.text)]
+                put(a,'diameterMm',measured(' '.join(b.text for b in vessel_rows),r'диаметр\w*|расширен\w*|'+veins[0]))
         if code == 'ARTERIAL_STENOSIS':
             descriptive=' '.join(b.text for b in related if b.section!='conclusion' and (b.side in {side,None} or side=='both') )
             values=re.findall(rf'({NUM})\s*%',descriptive)
@@ -535,13 +572,13 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if values:a['maxStenosisPct']=max(float(v.replace(',','.')) for v in values)
             m=re.search(r'\b(ОБА|ПБА|ГБА|ПкА|ЗББА|ПББА)\b',original)
             if m:a['artery']=m[1]
-            if has(r'кровоток\s+магистральн',t):a['bloodFlowType']='магистральный'
+            if has(r'кровоток\s+(?:(?:справа|слева)\s+)?магистральн',t):a['bloodFlowType']='магистральный'
             if has(r'без\s+отрицательн\w*\s+динамик|без\s+динамик',clinical_text):a['growth']=False
             if a.get('maxStenosisPct',100)<50 and has(r'гемодинамически\s+значим',conclusion):f.setdefault('flags',[]).append(flag('DISCREPANCY'))
         if code == 'BPH':
             volume_text=[re.sub(r'\([^)]*(?:мочев\w*\s+пузыр|остаточ|норм|N\s*объема)[^)]*\)','',b.text,flags=re.I) for b in source]
             clean=' '.join(re.split(r'остаточ|мочев\w*\s+пузыр|семенн',t,flags=re.I)[0] for t in volume_text)
-            put(a,'volumeCm3',number(rf'(?:об[ъь][её]м\w*(?:\s+(?:предстательн\w*\s+)?железы|\s+простаты)?|\bV(?:\s+предстательной\s+железы|\s+простаты)?|\bпростата)\s*(?:составля\w*\s*)?[:=—–-]?\s*({NUM})\s*(?:см|мл|куб)',clean))
+            put(a,'volumeCm3',number(rf'(?:об[ъь][её]м\w*(?:\s+(?:предстательн\w*\s+)?железы|\s+простаты)?|\bV(?:\s+предстательной\s+железы|\s+простаты)?|\bпростата|предстательн\w*\s+железа)\s*(?:составля\w*\s*)?[:=—–-]?\s*({NUM})\s*(?:см\s*[³3]|мл|куб)',clean))
             put(a,'intravesicalMm',measured(t,r'внутрипузырн\w*\s+протрузи\w*'))
             put(a,'prostatitisPattern',asserted_bool(r'простатит\w*',related))
         if code == 'BPH_URINARY_RETENTION':
@@ -566,7 +603,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
             if not has(r'гепатоз|стеатоз|жиров\w*\s+инфильтрац',conclusion):a['uncertain']=True;f.setdefault('flags',[]).append(flag('DISCREPANCY'))
             else:a['uncertain']=bool(UNCERTAIN.search(conclusion))
             if has(r'гепатомегал|печень\s*:?\s*увеличен',t):a['hepatomegaly']=True
-            if has(r'диффузн\w*\s+изменени\w*\s+поджелудочн',t):a['pancreasChanges']=True
+            if positive(r'диффузн\w*\s+изменени\w*\s+поджелудочн|поджелудочн\w*\s+желез\w*\s+с\s+диффузн\w*\s+изменени',t):a['pancreasChanges']=True
         if code == 'IUD_MALPOSITION':
             for pat,val in [(r'частичн\w*\s+экспульс','partialExpulsion'),(r'внедрен','myometrium'),(r'не\s+визуализ','notVisualized'),(r'цервикальн','cervical'),(r'низк','low')]:
                 if has(pat,original):a['position']=val;break
@@ -578,7 +615,8 @@ def analyze(parsed, raw, study, dictionary, context=None):
         if code=='PELVIC_VARICOSE_VEINS':
             vals=[v[0] for b in anchors for v in dimensions(b.text)]
             if vals:a['veinDiameterMm']=max(vals)
-        if code=='CERVICAL_POLYP' and has(r'активн\w*\s+кровоток|локус\w*\s+кровоток',t):a['vascularized']=True
+        if code=='CERVICAL_POLYP':
+            put(a,'vascularized',asserted_bool(r'кровоток\w*',[b for b in related if has(r'полип|образован|ЦДК',b.text)]))
         if code=='LOW_OVARIAN_RESERVE':
             put(a,'afc',int(number(r'КАФ\s*[:—–-]?\s*(\d+)',full)) if number(r'КАФ\s*[:—–-]?\s*(\d+)',full) is not None else None)
             if 'afc' not in a:
@@ -654,6 +692,7 @@ def analyze(parsed, raw, study, dictionary, context=None):
         old=groups[key]
         for k,v in a.items():
             if k in {'sizeMm','maxStenosisPct'} and k in old['attributes']:v=max(v,old['attributes'][k])
+            if k=='uncertain':v=bool(v or old['attributes'].get(k))
             old['attributes'][k]=v
         start=min(old['evidence']['start'],f['evidence']['start']);end=max(old['evidence']['end'],f['evidence']['end'])
         old['evidence']={'text':full[start:end],'start':start,'end':end}

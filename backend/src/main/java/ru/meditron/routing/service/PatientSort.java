@@ -22,11 +22,13 @@ public final class PatientSort {
             case "patient" -> by(PatientShortDto::fullName, text, desc);
             case "finding" -> by(p -> p.topFindings().isEmpty() ? null : p.topFindings().getFirst().name(), text, desc);
             case "due" -> by(p -> p.topFindings().isEmpty() ? null : p.topFindings().getFirst().targetDays(), Comparator.<Integer>naturalOrder(), desc);
+            case "stage" -> by(p -> p.tracking() == null ? null : p.tracking().progressPercent(), Comparator.<Integer>naturalOrder(), desc);
+            case "notified" -> by(p -> p.tracking() == null ? null : p.tracking().lastNotifiedAt(), Comparator.<java.time.Instant>naturalOrder(), desc);
             case "receivedAt" -> by(PatientShortDto::receivedAt, Comparator.naturalOrder(), desc);
             case "studyDate" -> by(PatientShortDto::lastStudyDate, Comparator.naturalOrder(), desc);
             case "default" -> Comparator.comparingInt((PatientShortDto p) -> p.maxLevel() == null ? 0 : p.maxLevel().rank()).reversed()
                     .thenComparing(by(PatientShortDto::receivedAt, Comparator.naturalOrder(), true));
-            default -> throw new BadRequestException("INVALID_SORT", "sortBy: patient, finding, due, receivedAt, studyDate или default; этапы и уведомления пока недоступны");
+            default -> throw new BadRequestException("INVALID_SORT", "sortBy: patient, finding, stage, due, notified, receivedAt, studyDate или default");
         };
         return result.thenComparing(PatientShortDto::id);
     }

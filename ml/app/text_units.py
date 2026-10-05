@@ -36,8 +36,10 @@ def logical_lines(text):
         terminated = previous.endswith(('.', '!', '?', ';', ':'))
         continuing = line[:1].islower() or line[:1].isdigit() or CONTINUATION.match(line)
         # A vessel acronym can start the continuation of a mixed-case diagnosis.
-        continuing = continuing or (re.search(r'\b(?:тромбофлебит|тромбоз|стеноз)\s*$',previous,re.I)
-                                    and re.match(r'^(?:БПВ|МПВ|ПДПВ|СФС|СПС|ПБА|ОБА|ГБА)\b',line))
+        continuing = continuing or (re.search(r'\b(?:тромбофлебит|тромбоз|стеноз|ствол\w*|вен[аы]|сегмент\w*)\s*$',previous,re.I)
+                                    and re.match(r'^(?:БПВ|МПВ|ПДПВ|СФС|СПС|ПБА|ОБА|ГБА|ОБВ|БВ|ГБВ|ПкВ|ЗББВ|ПББВ|МБВ)\b',line,re.I))
+        # Categories are frequently wrapped after a side or organ name.
+        continuing = continuing or re.match(r'^(?:[BВ]I|[OО]|EU\s*[-–]?\s*TI|ACR\s*TI|TI)\s*[-–]?\s*RADS\b',line,re.I)
         # Uppercase templates carry no sentence-case cue. A terminal adjective
         # needs its following noun; arbitrary uppercase fields must stay apart.
         if previous.isupper() and line.isupper() and not ANATOMY_HEADING.fullmatch(line):

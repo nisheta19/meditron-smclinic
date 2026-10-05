@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.meditron.routing.route.domain.*;
 
 public interface RouteRepository extends JpaRepository<Route, UUID> {
+    List<Route> findByPatientIdIn(Collection<UUID> patientIds);
     List<Route> findByPatientIdOrderByCreatedAtDesc(UUID patientId);
     List<Route> findByPatientIdAndOpenTrue(UUID patientId);
     List<Route> findByOpenTrue();

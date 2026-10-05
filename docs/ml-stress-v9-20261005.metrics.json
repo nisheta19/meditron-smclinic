@@ -1,0 +1,1057 @@
+{
+  "date": "2026-10-05",
+  "modelVersion": "dict-v2.1-extractor-9",
+  "evaluationType": "post-release synthetic stress test; single frozen run; no model or label adjustments",
+  "clinicalValidation": false,
+  "annotationAuthor": "assistant; no independent clinician",
+  "modelUnchangedFromPreviousRelease": true,
+  "dictionaryUnchanged": true,
+  "gold": "ml/eval/stress-v9-20261005/gold.json",
+  "goldSha256": "b00ec24d58c8cd57a8699a166101c4454cab02d77f066ec54944f42fe9a8b300",
+  "documents": 96,
+  "positiveDocuments": 72,
+  "negativeDocuments": 24,
+  "expectedFindings": 113,
+  "labeledAttributes": 439,
+  "formattingVariants": 9,
+  "docxExecutions": 864,
+  "expectedCodesCovered": 44,
+  "activeDictionaryCodes": 48,
+  "uncoveredCodes": [
+    "OVARIAN_APOPLEXY",
+    "ENDOCERVICITIS",
+    "INTRAUTERINE_SYNECHIAE",
+    "PELVIC_VARICOSE_VEINS"
+  ],
+  "fullyCorrectOriginalDocuments": 60,
+  "variants": {
+    "original": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 76,
+        "fp": 35,
+        "fn": 37,
+        "precision": 0.6846846846846847,
+        "recall": 0.672566371681416,
+        "f1": 0.6785714285714286
+      },
+      "attributes": {
+        "correct": 374,
+        "total": 439,
+        "accuracy": 0.8519362186788155
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.05679027603885819,
+        "max": 0.1061980000231415
+      }
+    },
+    "wrap35": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 74,
+        "fp": 37,
+        "fn": 39,
+        "precision": 0.6666666666666666,
+        "recall": 0.6548672566371682,
+        "f1": 0.6607142857142857
+      },
+      "attributes": {
+        "correct": 372,
+        "total": 439,
+        "accuracy": 0.8473804100227791
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.05048368020773827,
+        "max": 0.09238380007445812
+      }
+    },
+    "wrap55": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 75,
+        "fp": 36,
+        "fn": 38,
+        "precision": 0.6756756756756757,
+        "recall": 0.6637168141592921,
+        "f1": 0.6696428571428571
+      },
+      "attributes": {
+        "correct": 373,
+        "total": 439,
+        "accuracy": 0.8496583143507973
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.06134214166741003,
+        "max": 0.11411710001993924
+      }
+    },
+    "upper": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 75,
+        "fp": 36,
+        "fn": 38,
+        "precision": 0.6756756756756757,
+        "recall": 0.6637168141592921,
+        "f1": 0.6696428571428571
+      },
+      "attributes": {
+        "correct": 373,
+        "total": 439,
+        "accuracy": 0.8496583143507973
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.055262431251321686,
+        "max": 0.14458650001324713
+      }
+    },
+    "upper_wrap55": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 74,
+        "fp": 37,
+        "fn": 39,
+        "precision": 0.6666666666666666,
+        "recall": 0.6548672566371682,
+        "f1": 0.6607142857142857
+      },
+      "attributes": {
+        "correct": 372,
+        "total": 439,
+        "accuracy": 0.8473804100227791
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.050566759371577064,
+        "max": 0.0828351000091061
+      }
+    },
+    "nbsp": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 76,
+        "fp": 35,
+        "fn": 37,
+        "precision": 0.6846846846846847,
+        "recall": 0.672566371681416,
+        "f1": 0.6785714285714286
+      },
+      "attributes": {
+        "correct": 374,
+        "total": 439,
+        "accuracy": 0.8519362186788155
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.0590438843719312,
+        "max": 0.11328049993608147
+      }
+    },
+    "decimal_dot": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 76,
+        "fp": 35,
+        "fn": 37,
+        "precision": 0.6846846846846847,
+        "recall": 0.672566371681416,
+        "f1": 0.6785714285714286
+      },
+      "attributes": {
+        "correct": 374,
+        "total": 439,
+        "accuracy": 0.8519362186788155
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.06276705417379465,
+        "max": 0.1258125000167638
+      }
+    },
+    "multiplication": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 76,
+        "fp": 35,
+        "fn": 37,
+        "precision": 0.6846846846846847,
+        "recall": 0.672566371681416,
+        "f1": 0.6785714285714286
+      },
+      "attributes": {
+        "correct": 374,
+        "total": 439,
+        "accuracy": 0.8519362186788155
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.0668359354203858,
+        "max": 0.13372829998843372
+      }
+    },
+    "headers": {
+      "documents": 96,
+      "entities": {
+        "tp": 105,
+        "fp": 6,
+        "fn": 8,
+        "precision": 0.9459459459459459,
+        "recall": 0.9292035398230089,
+        "f1": 0.9375
+      },
+      "fullFacts": {
+        "tp": 76,
+        "fp": 35,
+        "fn": 37,
+        "precision": 0.6846846846846847,
+        "recall": 0.672566371681416,
+        "f1": 0.6785714285714286
+      },
+      "attributes": {
+        "correct": 374,
+        "total": 439,
+        "accuracy": 0.8519362186788155
+      },
+      "failedDocuments": [],
+      "negativeCases": {
+        "total": 24,
+        "withFalseFindings": 2
+      },
+      "timingSeconds": {
+        "mean": 0.05372165208488392,
+        "max": 0.10589280002750456
+      }
+    }
+  },
+  "byStudyType": {
+    "ABDOMEN": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 9,
+        "fp": 6,
+        "fn": 5,
+        "precision": 0.6,
+        "recall": 0.6428571428571429,
+        "f1": 0.6206896551724138
+      },
+      "entities": {
+        "tp": 14,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9333333333333333,
+        "recall": 1.0,
+        "f1": 0.9655172413793104
+      },
+      "attributes": {
+        "correct": 41,
+        "total": 48,
+        "accuracy": 0.8541666666666666
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 0
+    },
+    "BREAST": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 8,
+        "fp": 2,
+        "fn": 4,
+        "precision": 0.8,
+        "recall": 0.6666666666666666,
+        "f1": 0.7272727272727273
+      },
+      "entities": {
+        "tp": 10,
+        "fp": 0,
+        "fn": 2,
+        "precision": 1.0,
+        "recall": 0.8333333333333334,
+        "f1": 0.9090909090909091
+      },
+      "attributes": {
+        "correct": 44,
+        "total": 56,
+        "accuracy": 0.7857142857142857
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 0
+    },
+    "KIDNEY": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 10,
+        "fp": 5,
+        "fn": 4,
+        "precision": 0.6666666666666666,
+        "recall": 0.7142857142857143,
+        "f1": 0.6896551724137931
+      },
+      "entities": {
+        "tp": 13,
+        "fp": 2,
+        "fn": 1,
+        "precision": 0.8666666666666667,
+        "recall": 0.9285714285714286,
+        "f1": 0.896551724137931
+      },
+      "attributes": {
+        "correct": 60,
+        "total": 67,
+        "accuracy": 0.8955223880597015
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 0
+    },
+    "LOWER_LIMB_VESSELS": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 7,
+        "fp": 7,
+        "fn": 7,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entities": {
+        "tp": 13,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.9285714285714286,
+        "recall": 0.9285714285714286,
+        "f1": 0.9285714285714286
+      },
+      "attributes": {
+        "correct": 53,
+        "total": 66,
+        "accuracy": 0.803030303030303
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 1
+    },
+    "PELVIS_FEMALE": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 13,
+        "fp": 7,
+        "fn": 7,
+        "precision": 0.65,
+        "recall": 0.65,
+        "f1": 0.65
+      },
+      "entities": {
+        "tp": 20,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "attributes": {
+        "correct": 60,
+        "total": 69,
+        "accuracy": 0.8695652173913043
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 0
+    },
+    "PROSTATE": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 8,
+        "fp": 1,
+        "fn": 4,
+        "precision": 0.8888888888888888,
+        "recall": 0.6666666666666666,
+        "f1": 0.7619047619047619
+      },
+      "entities": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 3,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571
+      },
+      "attributes": {
+        "correct": 13,
+        "total": 20,
+        "accuracy": 0.65
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 0
+    },
+    "SOFT_TISSUE": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 10,
+        "fp": 2,
+        "fn": 2,
+        "precision": 0.8333333333333334,
+        "recall": 0.8333333333333334,
+        "f1": 0.8333333333333334
+      },
+      "entities": {
+        "tp": 11,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.9166666666666666,
+        "recall": 0.9166666666666666,
+        "f1": 0.9166666666666666
+      },
+      "attributes": {
+        "correct": 51,
+        "total": 57,
+        "accuracy": 0.8947368421052632
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 1
+    },
+    "THYROID": {
+      "documents": 12,
+      "fullFacts": {
+        "tp": 11,
+        "fp": 5,
+        "fn": 4,
+        "precision": 0.6875,
+        "recall": 0.7333333333333333,
+        "f1": 0.7096774193548387
+      },
+      "entities": {
+        "tp": 15,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9375,
+        "recall": 1.0,
+        "f1": 0.967741935483871
+      },
+      "attributes": {
+        "correct": 52,
+        "total": 56,
+        "accuracy": 0.9285714285714286
+      },
+      "failedDocuments": [],
+      "negativeDocuments": 3,
+      "negativeDocumentsWithFalseFindings": 0
+    }
+  },
+  "byCode": {
+    "ACUTE_CHOLECYSTITIS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "ADENOMYOSIS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "AMENORRHEA_HISTORY": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "ARTERIAL_STENOSIS": {
+      "tp": 2,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.5,
+      "recall": 0.5,
+      "f1": 0.5
+    },
+    "BILIARY_SLUDGE": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "BPH": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 4,
+      "precision": 0.8,
+      "recall": 0.5,
+      "f1": 0.6153846153846154
+    },
+    "BPH_URINARY_RETENTION": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "BREAST_LESION": {
+      "tp": 8,
+      "fp": 2,
+      "fn": 4,
+      "precision": 0.8,
+      "recall": 0.6666666666666666,
+      "f1": 0.7272727272727273
+    },
+    "CERVICAL_POLYP": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "CERVICAL_RETENTION_CYSTS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "CHRONIC_CHOLECYSTITIS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "COLON_DIVERTICULA": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "DEEP_VEIN_THROMBOSIS": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.5,
+      "recall": 0.5,
+      "f1": 0.5
+    },
+    "ECTOPIC_PREGNANCY": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "ENDOMETRIAL_HYPERPLASIA": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "ENDOMETRIAL_POLYP": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "FREE_FLUID": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.5,
+      "recall": 0.5,
+      "f1": 0.5
+    },
+    "GALLBLADDER_HYDROPS": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "GALLBLADDER_POLYP": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "GALLSTONES": {
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.3333333333333333,
+      "recall": 0.5,
+      "f1": 0.4
+    },
+    "HEPATIC_STEATOSIS": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "HERNIA": {
+      "tp": 9,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.9,
+      "recall": 0.9,
+      "f1": 0.9
+    },
+    "HYDRONEPHROSIS": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.8,
+      "recall": 0.8,
+      "f1": 0.8
+    },
+    "HYDROSALPINX": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "IUD_MALPOSITION": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "KIDNEY_STONES": {
+      "tp": 6,
+      "fp": 4,
+      "fn": 3,
+      "precision": 0.6,
+      "recall": 0.6666666666666666,
+      "f1": 0.631578947368421
+    },
+    "LIVER_HEMANGIOMA": {
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "LOW_OVARIAN_RESERVE": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "OVARIAN_LESION": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "OVARIAN_TORSION": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "PCOM": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "POST_THROMBOTIC_CHANGES": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "SAPHENOUS_DILATION": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": null,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "SOFT_TISSUE_INFLAMMATION": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.6666666666666666,
+      "recall": 0.6666666666666666,
+      "f1": 0.6666666666666666
+    },
+    "SUPERFICIAL_THROMBOPHLEBITIS": {
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.3333333333333333,
+      "recall": 0.5,
+      "f1": 0.4
+    },
+    "THYROID_DIFFUSE_AIT": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "THYROID_ENLARGEMENT": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "THYROID_NODULE": {
+      "tp": 7,
+      "fp": 5,
+      "fn": 4,
+      "precision": 0.5833333333333334,
+      "recall": 0.6363636363636364,
+      "f1": 0.6086956521739131
+    },
+    "TUBO_OVARIAN_ABSCESS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "UNRECOGNIZED_ABNORMALITY": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "UTERINE_CAVITY_FLUID": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "UTERINE_FIBROID": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "UTERINE_PROLAPSE": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "VENOUS_INSUFFICIENCY": {
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    }
+  },
+  "negativeFalsePositiveFiles": [
+    "stress-v9-083.docx",
+    "stress-v9-094.docx"
+  ],
+  "above90InAllVariants": false,
+  "standard95ZeroNegativeFpGatePassed": false,
+  "manifest": {
+    "frozenAt": "2026-10-05T08:55:31.018102+00:00",
+    "files": {
+      "ml/app/__init__.py": "814ef1ca6acc2685e4648365b5a8d83fd2dde8fdb63b7b28edddc69ce692b127",
+      "ml/app/__main__.py": "5e7672ea9596ee2a943c009ad934e23861f95a7fa818df234c8299c51e0e7850",
+      "ml/app/annotation.py": "db715371d9a71c768daa5c2742cc2bcb37e144b53c221bb69626ea00dd658627",
+      "ml/app/asgi.py": "7beb06c8b6276976aed47116eb9450c578bdb7af713cc0434ed584ec612d4bef",
+      "ml/app/attributes.py": "1cd96ac230c75c596d2da134689c7a3cdb364e5ae7a38d1180f4269f0ab84273",
+      "ml/app/backend.py": "341130094425857859f9486c36050da50248132f557fecb6fe9eabb6bfa07501",
+      "ml/app/benchmark_v2.py": "4532497da82b9f1c828383db22d123a71436e0539c72bcc7ad49e66de586928b",
+      "ml/app/check.py": "221b6e4f9e757ed94d961f04b2d33b9d9a034972993e9980899e27c0bea9c98c",
+      "ml/app/clinical.py": "55f84075dc00be1289259399c4f19e2a9111095c61a3071a70c6f5239740bb7b",
+      "ml/app/clinical_v2.py": "ddb07285931b1571d5f2e7436c2d7d40fdb04b4010fbcbb3deae15beb2bd323a",
+      "ml/app/contracts.py": "9e2e8b7732956bc9909d6a38319ef686793cd708fe9ffe0b307b755189c85cbe",
+      "ml/app/corpus.py": "32cbad3782238971124d90932292ba1d8a9f062f7ec0a70d2f599d13d3c33a9a",
+      "ml/app/dataset.py": "4161a96ecdbbe0d81811c0c2de8473a5bbdbb45317583e68fa8a6fd8733d7231",
+      "ml/app/demo.py": "5d435981956569900d462a325560933ea23cf1937babb5c7c9c9313eaa752a26",
+      "ml/app/dictionary.py": "f5934e1bb95af653555bf1624c4cba0c60e3e79d6a5f3e558fdbdfd179383ab3",
+      "ml/app/evaluate.py": "8acb973ea6846c8b5181977f9f0220f8de98a2d430daf95c300ce326e30b9217",
+      "ml/app/extensions.py": "88351fb7e9b0448ec6dd95a5962988b0310da53b36ed03f0d67aa5202837f59d",
+      "ml/app/findings.py": "ad89be8860b3f39f8186677c89d233a1d56e106e04d88f906038d9a6d69c5081",
+      "ml/app/generalization.py": "5e2452742b86125c5dc1d102a33f2e58a649f4d7f7f6c0929c12279e0d2cbabe",
+      "ml/app/mis.py": "dc00340e73708223e1f1e88c547ba7f191b9a4007f0002583f5666035198e4cb",
+      "ml/app/parser.py": "6964bf662afb173f1ca6bbc98b8a5130eccc63d6e4759706e3a442dde81a1102",
+      "ml/app/processing.py": "f89b1537b160841a98898663578dc9eac50839c54d76fc42cbad653cf261fe32",
+      "ml/app/release.py": "dfe8e8840dadef8df937f2e315196ac5a35c3b9bb377de09d47d6db82a984dbc",
+      "ml/app/sections.py": "d20b2ff43436240afe945089faa89d9f0a0ba9bdb6728d25c9126f81139821ae",
+      "ml/app/server.py": "1c990ea4462552a104e8b4a3e46eb51c067c65c55b06ee744d59d3700e036918",
+      "ml/app/service.py": "1ddf36f37bbcbe27f206c349e1d44b879a057e920c231ca38a66f720e8ea75fa",
+      "ml/app/text_units.py": "895d9f3fe982a05a9d365d22172e0b3b2ffd9f140794d013af485b2b1ceb8d9a",
+      "ml/app/validation.py": "e9c5d18b52e8a625ae6458146210a3580363d46472d375729bfe44ecdd75f5b1",
+      "ml/app/verify_corpus.py": "8f77f2c73868e29f638513ca2d680309f82752e0dd4c40fcc6366d6cc78e034d",
+      "ml/configs/findings-dictionary.yaml": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b",
+      "backend/src/main/resources/dictionary/findings-dictionary.yaml": "e8a4a9dc163b4f68956f190db7acf59706e0d4777aed3312eb4a795ed3aee66b",
+      "ml/eval/stress-v9-20261005/gold.json": "b00ec24d58c8cd57a8699a166101c4454cab02d77f066ec54944f42fe9a8b300"
+    },
+    "goldSha256": "b00ec24d58c8cd57a8699a166101c4454cab02d77f066ec54944f42fe9a8b300",
+    "previousUniqueNormalizedTexts": 800,
+    "duplicates": 0,
+    "documents": 96,
+    "expectedFindings": 113,
+    "labeledAttributes": 439
+  },
+  "unchangedDuringEvaluation": true,
+  "independentCountsAgree": true,
+  "verification": {
+    "mlUnit": {
+      "tests": 376,
+      "errors": 0,
+      "failures": 0
+    },
+    "maven": {
+      "tests": 72,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 31,
+      "errors": 0,
+      "failures": 0,
+      "backend": "http://127.0.0.1:18081",
+      "ml": "http://127.0.0.1:18001",
+      "coverage": {
+        "backend": {
+          "covered": [
+            "DELETE /api/findings/{findingId}",
+            "GET /api/auth/csrf",
+            "GET /api/auth/me",
+            "GET /api/dashboard/escalations",
+            "GET /api/dashboard/funnel",
+            "GET /api/dashboard/losses",
+            "GET /api/dashboard/patients",
+            "GET /api/dictionary/findings",
+            "GET /api/escalations",
+            "GET /api/integration/events/status",
+            "GET /api/journal",
+            "GET /api/notification-templates",
+            "GET /api/patients",
+            "GET /api/patients/{patientId}",
+            "GET /api/patients/{patientId}/findings",
+            "GET /api/patients/{patientId}/journal",
+            "GET /api/patients/{patientId}/notifications",
+            "GET /api/patients/{patientId}/routes",
+            "GET /api/ping",
+            "GET /api/protocols/{protocolId}",
+            "GET /api/route-templates",
+            "GET /api/routes",
+            "GET /api/routes/{routeId}",
+            "GET /api/routes/{routeId}/notification-preview",
+            "GET /api/routes/{routeId}/notifications",
+            "GET /api/schedule/slots",
+            "GET /api/sim/clock",
+            "GET /api/sim/crm/outbox",
+            "GET /api/sim/scenarios",
+            "GET /api/sim/scenarios/runs/{runId}",
+            "GET /api/tasks",
+            "PATCH /api/findings/{findingId}",
+            "POST /api/auth/login",
+            "POST /api/auth/logout",
+            "POST /api/escalations/{id}/accept",
+            "POST /api/escalations/{id}/close",
+            "POST /api/escalations/{id}/contacted",
+            "POST /api/integration/crm/callbacks",
+            "POST /api/integration/events",
+            "POST /api/integration/events/retry",
+            "POST /api/integration/ml/results",
+            "POST /api/integration/protocols",
+            "POST /api/integration/route-events",
+            "POST /api/patients/{patientId}/findings",
+            "POST /api/patients/{patientId}/findings/confirm",
+            "POST /api/routes/{routeId}/notifications",
+            "POST /api/schedule/bookings",
+            "POST /api/sim/clock/advance",
+            "POST /api/sim/clock/reset",
+            "POST /api/sim/scenarios/{name}/start",
+            "POST /api/sim/scenarios/{runId}/next",
+            "POST /api/tasks/{taskId}/done"
+          ],
+          "uncovered": [],
+          "total": 52
+        },
+        "ml": {
+          "covered": [
+            "GET /api/mis/events/{event_id}",
+            "GET /health",
+            "POST /api/mis/events",
+            "POST /api/mis/events/{event_id}/retry"
+          ],
+          "uncovered": [],
+          "total": 4
+        }
+      }
+    },
+    "isolatedComposeProject": "meditron-verification",
+    "testContainerSourceMatches": true
+  },
+  "comparison": {
+    "previousSelectedSetF1": 94.44444444444444,
+    "currentOriginalF1": 67.85714285714286,
+    "sameModel": true,
+    "previousDocuments": 48,
+    "previousCoveredCodes": 30,
+    "note": "Different authored case mixes. This shows sensitivity to unseen wording and broader coverage, not a code regression."
+  },
+  "limitations": [
+    "Synthetic cases and labels were authored by the assistant familiar with prior model weaknesses, before new predictions.",
+    "No independent medical annotation or representative sample of real patients; stress F1 is not clinical population performance.",
+    "Formatting variants are correlated versions of 96 documents, not 864 independent examples.",
+    "Only gold-labeled attributes are scored; extra unlabelled attributes and flags are outside this F1.",
+    "No labels were changed after inference, including missing false-valued attributes; strict full-fact scoring matches previous tests."
+  ],
+  "rawEvidenceLocal": ".local/ml-v9-stress-20261005/first-run"
+}

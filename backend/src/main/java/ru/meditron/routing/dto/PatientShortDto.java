@@ -29,5 +29,6 @@ public record PatientShortDto(
         LocalDate lastStudyDate,
         StudyType studyType,
         int activeFindings,
-        List<TopFindingDto> topFindings) {
+        List<TopFindingDto> topFindings,
+        PatientTrackingDto tracking) {
 }

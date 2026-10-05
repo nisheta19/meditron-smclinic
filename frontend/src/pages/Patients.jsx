@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api';
 import { PAGE_SIZE } from '../config';
-import { REVIEW, STUDY, ageText, fmtDate, fmtStamp, targetDaysText, deadlineTone } from '../lib/format';
+import { REVIEW, STUDY, ageText, fmtDate, fmtStamp, targetDaysText, deadlineTone, daysAgo, notesText } from '../lib/format';
 import { go, hashParam, useAsync, useSelection } from '../lib/hooks';
 import { Checkbox, ChipRow, RowList, SearchBar, Stack } from '../components/kit';
 import { DateField, ErrorBox, Select } from '../components/ui';
@@ -26,18 +26,31 @@ const COLS = [
   { key: 'finding', label: 'Находка', sort: true, width: 'minmax(0, 213fr)',
     cell: (p) => <Stack main={p.topFindings?.[0]?.name ?? '—'}
       sub={STUDY[p.studyType] ?? p.studyType} faint={fmtStamp(p.receivedAt)} /> },
-  { key: 'stage', label: 'Этап', title: 'Сортировка недоступна: этапы пока не передаются', width: 'minmax(0, 199fr)',
-    cell: () => <div className="progress stage-stub" title="Заглушка: этап и прогресс не передаются">
-      <span className="p-name">—</span>
-      <span className="s-cap">—</span><span className="bar" aria-hidden="true" />
-    </div> },
+  { key: 'stage', label: 'Этап', sort: true, width: 'minmax(0, 199fr)',
+    cell: (p) => <TrackingProgress tracking={p.tracking} /> },
   { key: 'due', label: 'Срок записи', sort: true, width: 'minmax(0, 187fr)',
     cell: (p) => <div title="Рекомендованный срок из справочника; дата записи пока не назначена">
       <Stack main={targetDaysText(p.topFindings?.[0]?.targetDays) ?? '—'} tone={deadlineTone(p.topFindings?.[0]?.targetDays)} />
     </div> },
-  { key: 'notified', label: 'Уведомлён', title: 'Сортировка недоступна: уведомления пока не передаются', width: 'minmax(0, 132fr)',
-    cell: () => <div title="Заглушка: сведения об уведомлениях пока не передаются"><Stack main="—" sub="—" /></div> },
+  { key: 'notified', label: 'Уведомлён', sort: true, width: 'minmax(0, 132fr)',
+    cell: (p) => <div title={p.tracking?.lastNotifiedAt ? `Последняя успешная отправка: ${fmtStamp(p.tracking.lastNotifiedAt)}` : undefined}>
+      <Stack main={!p.tracking ? '—' : daysAgo(p.tracking.lastNotifiedAt)}
+        sub={p.tracking ? notesText(p.tracking.notificationCount) : '—'} />
+    </div> },
 ];
+
+function TrackingProgress({ tracking }) {
+  const value = tracking?.progressPercent;
+  const known = Number.isFinite(value) && value >= 0 && value <= 100;
+  const label = tracking?.stageTitle ?? 'Маршрут для этой находки не создан';
+  return <div className="progress list-progress" title={label}>
+    <span className="bar" role={known ? 'progressbar' : undefined} aria-label={label}
+      aria-valuemin={known ? 0 : undefined} aria-valuemax={known ? 100 : undefined} aria-valuenow={known ? value : undefined}>
+      {known && value > 0 && <i style={{ width:`${value}%` }} />}
+    </span>
+    <span className="s-cap">{known ? `${value}% пройдено` : tracking?.stageTitle ?? '—'}</span>
+  </div>;
+}
 
 export default function Patients({ preset }) {
   const chips = preset === 'inbox' ? CHIPS.filter((c) => ['all', 'new', 'attention', 'emergency', 'urgent'].includes(c.key)) : CHIPS.slice(0, 6);

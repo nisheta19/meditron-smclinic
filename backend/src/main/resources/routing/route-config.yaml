@@ -3,6 +3,15 @@
 # Длительности: «30m» — минуты, «24h» — часы, «5d» — дни.
 version: routes-v1
 
+# Индикатор списка: доля зафиксированных вех, а не оценка состояния здоровья.
+# Повтор одного этапа не добавляет проценты. 100% — завершение или решение «операция не показана».
+# Эскалация без обычного маршрута не получает выдуманный процент.
+listProgress:
+  consultation: [CREATED, NOTIFIED, BOOKED, VISIT, COMPLETED]
+  surgical: [CREATED, NOTIFIED, BOOKED, VISIT, REFERRED, DATE_SET, HOSPITALIZED, OPERATED, DISCHARGED, COMPLETED]
+  observation: [CREATED, NOTIFIED, BOOKED, CONTROL_ULTRASOUND, VISIT, COMPLETED]
+  procedure: [CREATED, NOTIFIED, BOOKED, VISIT, PROCEDURE_REFERRED, PROCEDURE_DONE, COMPLETED]
+
 messages:
   firstMessageDelay: 1m          # первое сообщение через 1–5 мин после создания маршрута (6.1)
   dailyLimitPerPatient: 1        # не больше одного автоматического сообщения в сутки на пациента (6.5)

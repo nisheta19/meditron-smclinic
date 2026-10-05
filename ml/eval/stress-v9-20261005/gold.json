@@ -1,0 +1,2044 @@
+{
+  "annotationStatus": "synthetic",
+  "clinicalValidation": false,
+  "author": "assistant",
+  "design": "New post-release stress test of frozen v9: 96 fictional protocols, 12 per study, 9 positive and 3 negative per study. Manual expected labels fixed before first inference. No tuning on this set.",
+  "protocols": [
+    {
+      "file": "stress-v9-001.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "three_lesions_and_sides",
+      "text": "Описание: Правая доля: в верхнем полюсе узел 9×7 мм категории EU-TIRADS 3; в нижнем полюсе узел 21×14 мм категории EU-TIRADS 5. Левая доля: коллоидный узел 5×4 мм категории EU-TIRADS 2.\nЗаключение: Три узла щитовидной железы, распределение категорий приведено в описании.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 9,
+              "tirads": 3,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 21,
+              "tirads": 5,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 5,
+              "tirads": 2,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-002.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "named_growth_vs_other_side",
+      "text": "Описание: Слева узел 17,5 х 11 мм, ACR TI-RADS 4; справа узел 8 х 6 мм, ACR TI-RADS 3.\nЗаключение: Узел левой доли с ростом. Узел правой доли стабилен.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 17.5,
+              "tirads": 4,
+              "tiradsSystem": "ACR",
+              "growth": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 8,
+              "tirads": 3,
+              "tiradsSystem": "ACR",
+              "growth": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-003.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "colloid_and_ait",
+      "text": "Описание: На фоне неоднородной паренхимы в правой доле определяется губчатый узел 12 х 8 мм. Узлов в левой доле не найдено.\nЗаключение: Губчатый узел справа. Диффузные изменения по типу аутоиммунного тиреоидита.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 12,
+              "tirads": 2,
+              "tiradsSystem": "UNKNOWN",
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_DIFFUSE_AIT",
+            "attributes": {
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-004.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "organ_volume_vs_node_dimensions",
+      "text": "Описание: Общий объём щитовидной железы равен 34,6 см³. В перешейке гипоэхогенный узел 14 х 9 х 6 мм, EU-TIRADS 4.\nЗаключение: Увеличение щитовидной железы. Узел перешейка.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_ENLARGEMENT",
+            "attributes": {
+              "volumeCm3": 34.6,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "sizeMm": 14,
+              "tirads": 4,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-005.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "negated_history_and_current_node",
+      "text": "Анамнез: В старом протоколе описан левосторонний узел 27 мм.\nОписание: В настоящее время слева узловых образований нет. Справа узел размером 0,9 см, EU-TIRADS 3.\nЗаключение: Единственный узел правой доли.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 9,
+              "tirads": 3,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-006.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "category_after_description",
+      "text": "Описание: В левой доле овальное образование 18×12 мм с чётким контуром. В правой доле очагов нет.\nЗаключение: Узловое образование левой доли, категория EU TI-RADS 4.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 18,
+              "tirads": 4,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-007.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "multiple_same_category",
+      "text": "Описание: В правой доле три узла: 4 мм, 6 мм и 10 мм; все относятся к EU-TIRADS 2. Лимфоузлы не изменены.\nЗаключение: Коллоидные узлы правой доли. Признаков роста нет.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 10,
+              "count": 3,
+              "tirads": 2,
+              "growth": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-008.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "two_diffuse_diagnoses_without_nodes",
+      "text": "Описание: Объём щитовидной железы 29,8 мл. Структура диффузно неоднородная, узлы не определяются.\nЗаключение: Аутоиммунный тиреоидит. Диффузный зоб.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_DIFFUSE_AIT",
+            "attributes": {
+              "uncertain": false
+            }
+          },
+          {
+            "code": "THYROID_ENLARGEMENT",
+            "attributes": {
+              "volumeCm3": 29.8,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-009.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "uncertain_current_finding",
+      "text": "Описание: В нижней трети левой доли сомнительный гипоэхогенный участок 7 х 5 мм.\nЗаключение: Нельзя исключить узел левой доли, EU-TIRADS 4. Рекомендовано сопоставить с предыдущим УЗИ.",
+      "expected": {
+        "findings": [
+          {
+            "code": "THYROID_NODULE",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 7,
+              "tirads": 4,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-010.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_follicles",
+      "text": "Описание: Обе доли обычной структуры. Фолликулы до 2,4 мм, в том числе макрофолликулы справа.\nЗаключение: Узлов нет; расширенные фолликулы без очаговой патологии.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-011.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_historical_and_advice",
+      "text": "Анамнез: Ранее подозревались АИТ и узел слева.\nОписание: Железа однородная, объём 13 мл, очаговых образований нет.\nЗаключение: Ультразвуковых признаков узлового зоба и тиреоидита не выявлено.\nРекомендации: При появлении узла оценить категорию TI-RADS.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-012.docx",
+      "studyType": "THYROID",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_coordinated_denial",
+      "text": "Описание: Щитовидная железа не увеличена, перешеек 2 мм.\nЗаключение: Ни узлов, ни кист, ни диффузных изменений щитовидной железы не обнаружено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-013.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "separate_kinds_one_side",
+      "text": "Описание: В левой молочной железе простая киста 8×5 мм и рядом фиброаденома 19×12 мм. Справа образований нет.\nЗаключение: Киста и фиброаденома слева, BI-RADS 3. Правая молочная железа BI-RADS 1.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 8,
+              "birads": 3,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 19,
+              "birads": 3,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-014.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "bilateral_categories_and_subcategory",
+      "text": "Описание: Справа гипоэхогенное образование 2,3 х 1,7 см с неровными контурами. Слева киста 6 мм.\nЗаключение: Образование справа — BI-RADS 4b. Киста слева — BI-RADS 2.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 23,
+              "birads": 4,
+              "biradsSub": "b",
+              "uncertain": false
+            }
+          },
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 6,
+              "birads": 2,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-015.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "mastitis_skin_and_unrelated_measurement",
+      "text": "Описание: Левая молочная железа: кожа утолщена до 4,2 мм, локальная гиперемия, неоднородный участок 25×18 мм. Справа кожа 1,5 мм, структура без изменений.\nЗаключение: Нельзя исключить мастит слева; BI-RADS 3 слева и BI-RADS 1 справа.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 25,
+              "birads": 3,
+              "skinThickening": true,
+              "inflammation": true,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-016.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "duct_content_without_mass",
+      "text": "Описание: В правой молочной железе расширены млечные протоки, в просветах внутрипротоковое содержимое. Локального образования не видно. Левая железа без изменений.\nЗаключение: Дуктэктазия справа, BI-RADS 3. Слева BI-RADS 1.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "birads": 3,
+              "ductContent": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-017.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "category_one_with_abnormal_skin",
+      "text": "Описание: Очаговых образований в обеих железах нет. Справа имеется утолщение кожи; слева кожа не утолщена.\nЗаключение: BI-RADS 1 с обеих сторон. Утолщение кожи правой молочной железы.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "birads": 1,
+              "skinThickening": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-018.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "implants_with_explicit_category",
+      "text": "Описание: Эндопротезы обеих молочных желез интактны, периимплантной жидкости нет, образований не обнаружено.\nЗаключение: Состояние после эндопротезирования. BI-RADS 2 справа, BI-RADS 2 слева.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "birads": 2,
+              "benignChanges": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "birads": 2,
+              "benignChanges": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-019.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "current_small_mass_vs_old_size",
+      "text": "Анамнез: Фиброаденома справа 32 мм удалена в прошлом году.\nОписание: Послеоперационная область без образования. В левой железе фиброаденома 11 х 8 мм.\nЗаключение: Фиброаденома слева, категория BI-RADS 3. Справа BI-RADS 1.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 11,
+              "birads": 3,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-020.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "mass_and_abnormal_nodes",
+      "text": "Описание: В правой железе образование 28 х 16 мм. Правые аксиллярные лимфоузлы с нарушенной дифференцировкой; слева лимфоузлы обычные.\nЗаключение: Образование правой молочной железы BI-RADS 5. Подозрительные регионарные лимфоузлы справа.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 28,
+              "birads": 5,
+              "suspiciousLymphNodes": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-021.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "missing_category_size_and_kind",
+      "text": "Описание: Слева несколько простых кист, наибольшая 9,6 мм. Справа очаговых изменений не определяется.\nЗаключение: Кисты левой молочной железы. Категория в протоколе не указана.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BREAST_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 9.6,
+              "benignChanges": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-022.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_implants_without_category",
+      "text": "Описание: После маммопластики импланты интактны. Кожа не утолщена, жидкость и образования не определяются.\nЗаключение: Осложнений после маммопластики не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-023.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_involution_and_history",
+      "text": "Анамнез: Подозрение на мастит в 2022 году.\nОписание: Жировая инволюция обеих молочных желез; ни кист, ни объёмных образований нет. Кожа обычная.\nЗаключение: Жировая инволюция, BI-RADS 1 справа и слева.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-024.docx",
+      "studyType": "BREAST",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_diagnostic_advice",
+      "text": "Описание: Молочные железы без очаговых изменений, протоки не расширены и не содержат включений. Лимфоузлы не увеличены.\nЗаключение: Патологических изменений не выявлено.\nРекомендации: При выявлении образования категории BI-RADS 4 на последующих обследованиях консультация маммолога.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-025.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "polyp_stones_separate_measurements",
+      "text": "Описание: Желчный пузырь: у дна подвижный конкремент 13 мм с тенью; у передней стенки полип 4,5 мм на ножке, без кровотока. Холедох 4 мм.\nЗаключение: Камень и полип желчного пузыря. Полип без роста.",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "sizeMm": 13,
+              "location": "gallbladder",
+              "mobile": true,
+              "choledochMm": 4,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "GALLBLADDER_POLYP",
+            "attributes": {
+              "sizeMm": 4.5,
+              "sessile": false,
+              "vascularized": false,
+              "withStones": true,
+              "growth": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-026.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "duct_vs_gallbladder",
+      "text": "Описание: В желчном пузыре конкременты не визуализируются. Холедох расширен до 11,2 мм; в его дистальной части конкремент 7 х 5 мм. Внутрипечёночные протоки расширены.\nЗаключение: Холедохолитиаз. Билиарная гипертензия.",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLSTONES",
+            "attributes": {
+              "sizeMm": 7,
+              "location": "choledoch",
+              "choledochMm": 11.2,
+              "ductsDilated": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-027.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "acute_without_stones_negated_attribute",
+      "text": "Описание: Стенка желчного пузыря 5,5 мм, с двойным контуром; имеется перипузырная жидкость, УЗ-симптом Мерфи положительный. Камней нет.\nЗаключение: Острый бескаменный холецистит.",
+      "expected": {
+        "findings": [
+          {
+            "code": "ACUTE_CHOLECYSTITIS",
+            "attributes": {
+              "wallThicknessMm": 5.5,
+              "doubleContour": true,
+              "pericholecysticFluid": true,
+              "murphy": true,
+              "withStones": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-028.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "hydrops_vs_acute",
+      "text": "Описание: Желчный пузырь растянут, длина 118 мм, стенка 2 мм. Перипузырной жидкости нет, симптом Мерфи отрицательный.\nЗаключение: Водянка желчного пузыря без УЗ-признаков острого воспаления.",
+      "expected": {
+        "findings": [
+          {
+            "code": "GALLBLADDER_HYDROPS",
+            "attributes": {
+              "sizeMm": 118,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-029.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "liver_pancreas_and_focal_lesion",
+      "text": "Описание: Печень увеличена, эхогенность диффузно повышена. В сегменте VII определяется очаг размером 22 х 17 мм, гиперэхогенный, однородный, контуры чёткие. Поджелудочная железа с диффузными изменениями.\nЗаключение: Жировой гепатоз с гепатомегалией. Гемангиома печени.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HEPATIC_STEATOSIS",
+            "attributes": {
+              "hepatomegaly": true,
+              "pancreasChanges": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "LIVER_HEMANGIOMA",
+            "attributes": {
+              "sizeMm": 22,
+              "atypical": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-030.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "sludge_and_chronic_vs_acute",
+      "text": "Описание: В желчном пузыре густая желчь и взвесь без акустической тени, камней нет. Стенка уплотнена, 3 мм, перипузырной жидкости нет.\nЗаключение: Билиарный сладж. Хронический холецистит вне обострения.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BILIARY_SLUDGE",
+            "attributes": {
+              "withStones": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "CHRONIC_CHOLECYSTITIS",
+            "attributes": {
+              "withStones": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-031.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "bowel_and_fluid_location",
+      "text": "Описание: В сигмовидной кишке дивертикулы. Между петлями кишечника свободная анэхогенная жидкость в объёме 75 мл.\nЗаключение: Дивертикулы толстой кишки. Межпетельная свободная жидкость.",
+      "expected": {
+        "findings": [
+          {
+            "code": "COLON_DIVERTICULA",
+            "attributes": {
+              "uncertain": false
+            }
+          },
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "location": "межпетельно",
+              "beyondPelvis": true,
+              "volumeMl": 75,
+              "echogenic": "анэхогенная",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-032.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "hernia_and_organ_pathology",
+      "text": "Описание: Печень диффузно гиперэхогенна. В белой линии живота дефект апоневроза 17 мм, грыжевой мешок с сальником; содержимое вправляется.\nЗаключение: Стеатоз печени. Грыжа белой линии живота, без ущемления.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HEPATIC_STEATOSIS",
+            "attributes": {
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "sizeMm": 17,
+              "content": "сальник",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-033.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "uncertain_hemangioma_and_missing_size",
+      "text": "Описание: В печени очаг неоднородной структуры с нечёткими контурами. Измерение затруднено из-за межрёберного доступа.\nЗаключение: Подозрение на атипичную гемангиому печени.",
+      "expected": {
+        "findings": [
+          {
+            "code": "LIVER_HEMANGIOMA",
+            "attributes": {
+              "atypical": true,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-034.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_postsurgery",
+      "text": "Анамнез: Холецистэктомия по поводу камней желчного пузыря.\nОписание: Желчный пузырь удалён, ложе без особенностей. В холедохе конкрементов нет.\nЗаключение: Состояние после холецистэктомии, признаков холедохолитиаза не получено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-035.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_sludge_polyp_stone_list",
+      "text": "Описание: Желчный пузырь с тонкой стенкой, просвет однородный.\nЗаключение: Ни камней, ни полипов, ни билиарного сладжа не обнаружено. Свободная жидкость отсутствует.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-036.docx",
+      "studyType": "ABDOMEN",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_history_current_normal",
+      "text": "Анамнез: В предыдущем исследовании предполагали гемангиому 12 мм.\nОписание: Печень обычных размеров и эхогенности, очагов не определяется. Желчный пузырь перегнут, без включений.\nЗаключение: Очаговой патологии печени и признаков стеатоза нет.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-037.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "three_separate_anatomic_findings",
+      "text": "Описание: В полости матки полип эндометрия 12 х 7 мм. В цервикальном канале полип 5 мм с сосудистой ножкой, кровоток регистрируется. В шейке наботовы кисты до 4 мм, канал не деформирован.\nЗаключение: Полип эндометрия, полип цервикального канала и ретенционные кисты шейки матки.",
+      "expected": {
+        "findings": [
+          {
+            "code": "ENDOMETRIAL_POLYP",
+            "attributes": {
+              "sizeMm": 12,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "CERVICAL_POLYP",
+            "attributes": {
+              "sizeMm": 5,
+              "vascularized": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "CERVICAL_RETENTION_CYSTS",
+            "attributes": {
+              "sizeMm": 4,
+              "deformsCanal": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-038.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "fibroid_distinct_types_and_adenomyosis",
+      "text": "Описание: В задней стенке миоматозный узел 33 мм, FIGO 4; в дне матки субмукозный узел 16 мм, FIGO 1, деформирующий полость. Миометрий с диффузными изменениями.\nЗаключение: Миома матки. Диффузный аденомиоз.",
+      "expected": {
+        "findings": [
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "sizeMm": 33,
+              "figo": 4,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "UTERINE_FIBROID",
+            "attributes": {
+              "sizeMm": 16,
+              "figo": 1,
+              "deformsCavity": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "ADENOMYOSIS",
+            "attributes": {
+              "form": "diffuse",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-039.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "bilateral_distinct_ovarian_types",
+      "text": "Описание: Правый яичник содержит геморрагическую кисту 31 х 23 мм, O-RADS 2. В левом яичнике дермоидная киста 46 х 35 мм, O-RADS 2.\nЗаключение: Геморрагическая киста справа, дермоидная киста слева.",
+      "expected": {
+        "findings": [
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 31,
+              "orads": 2,
+              "lesionType": "functional",
+              "functional": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "OVARIAN_LESION",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 46,
+              "orads": 2,
+              "lesionType": "dermoid",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-040.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "torsion_opposite_normal_flow",
+      "text": "Описание: Правый яичник 57 мм, кровоток в нём не регистрируется, визуализируется симптом водоворота. В левом яичнике кровоток сохранён.\nЗаключение: Перекрут правого яичника.",
+      "expected": {
+        "findings": [
+          {
+            "code": "OVARIAN_TORSION",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 57,
+              "noFlow": true,
+              "whirlpool": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-041.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "tubal_vs_abscess_opposite_sides",
+      "text": "Описание: Слева тубулярная жидкостная структура 19 мм без гнойного содержимого. Справа тубоовариальное образование с гнойным содержимым 54 х 41 мм.\nЗаключение: Гидросальпинкс слева. Тубоовариальный абсцесс справа.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDROSALPINX",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 19,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "TUBO_OVARIAN_ABSCESS",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 54,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-042.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "ectopic_iud_and_fluid",
+      "text": "Клинические данные: ХГЧ положительный.\nОписание: ВМС смещена в цервикальный канал. Плодного яйца в полости матки нет. Справа в трубе образование, свободная жидкость в малом тазу 35 мл.\nЗаключение: Подозрение на правостороннюю трубную беременность. ВМС в цервикальном канале. Свободная жидкость малого таза.",
+      "expected": {
+        "findings": [
+          {
+            "code": "ECTOPIC_PREGNANCY",
+            "attributes": {
+              "side": "right",
+              "hcgPositive": true,
+              "freeFluid": true,
+              "iudInPlace": true,
+              "uncertain": true
+            }
+          },
+          {
+            "code": "IUD_MALPOSITION",
+            "attributes": {
+              "position": "cervical",
+              "uncertain": false
+            }
+          },
+          {
+            "code": "FREE_FLUID",
+            "attributes": {
+              "location": "малый таз",
+              "volumeMl": 35,
+              "beyondPelvis": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-043.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "menopause_endometrium_vs_total_echo",
+      "text": "Клинические данные: Менопауза 8 лет, кровянистые выделения.\nОписание: Полость матки содержит серозную жидкость. М-эхо вместе с жидкостью 19 мм, собственно эндометрий 8 мм, неоднородный.\nЗаключение: Серозометра. Гиперплазия эндометрия.",
+      "expected": {
+        "findings": [
+          {
+            "code": "UTERINE_CAVITY_FLUID",
+            "attributes": {
+              "content": "serous",
+              "menopause": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "ENDOMETRIAL_HYPERPLASIA",
+            "attributes": {
+              "thicknessMm": 8,
+              "heterogeneous": true,
+              "menopause": true,
+              "bleeding": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-044.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "ovarian_volume_and_follicle_counts",
+      "text": "Описание: Левый яичник объёмом 12,4 см³, 24 фолликула размером 2–8 мм; доминантных структур нет. Правый яичник 6,8 см³, 8 фолликулов.\nЗаключение: Поликистозная морфология левого яичника.",
+      "expected": {
+        "findings": [
+          {
+            "code": "PCOM",
+            "attributes": {
+              "side": "left",
+              "follicleCount": 24,
+              "ovaryVolumeCm3": 12.4,
+              "dominantStructure": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-045.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "low_reserve_amenorrhea_and_prolapse",
+      "text": "Клинические данные: Менструаций нет 6 месяцев, менопаузы нет, ЗГТ не принимает.\nОписание: Суммарный КАФ 3. Матка опущена.\nЗаключение: Снижение овариального резерва. Аменорея. Опущение матки 2 степени.",
+      "expected": {
+        "findings": [
+          {
+            "code": "LOW_OVARIAN_RESERVE",
+            "attributes": {
+              "afc": 3,
+              "menopause": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "AMENORRHEA_HISTORY",
+            "attributes": {
+              "monthsSinceLmp": 6,
+              "menopause": false,
+              "hrt": false
+            }
+          },
+          {
+            "code": "UTERINE_PROLAPSE",
+            "attributes": {
+              "grade": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-046.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_physiologic_structures",
+      "text": "Описание: Справа доминантный фолликул 21 мм, слева жёлтое тело 18 мм. Других образований не определяется.\nЗаключение: Физиологические структуры яичников, O-RADS 1 справа и слева; кист не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-047.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_iud_and_torsion",
+      "text": "Описание: ВМС расположена у дна полости матки правильно. Яичники обычных размеров, кровоток сохранён с обеих сторон, свободной жидкости нет.\nЗаключение: Данных за смещение ВМС, перекрут или апоплексию яичников не получено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-048.docx",
+      "studyType": "PELVIS_FEMALE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_history_and_normal_myometrium",
+      "text": "Анамнез: Гистологически подтверждённый полип эндометрия удалён.\nОписание: Миометрий однородный, эндометрий 5 мм на 5-й день цикла. Цервикальный канал без включений.\nЗаключение: Ни полипов, ни миоматозных узлов, ни признаков аденомиоза сейчас не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-049.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "bilateral_stones_different_numbers",
+      "text": "Описание: В чашечках справа конкременты 3, 5 и 8 мм; в лоханке слева одиночный камень 10 мм. ЧЛС с обеих сторон не расширена.\nЗаключение: Конкременты обеих почек без обструкции.",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 8,
+              "count": 3,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 10,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-050.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "contralateral_obstruction_and_stone",
+      "text": "Описание: Лоханка правой почки расширена до 27 мм, правый мочеточник расширен. Слева конкремент нижней чашечки 6 мм; ЧЛС слева обычная.\nЗаключение: Гидронефроз справа 2 степени. Камень левой почки без обструкции.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "right",
+              "pelvisMm": 27,
+              "grade": 2,
+              "ureterDilated": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 6,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-051.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "ureter_stone_with_obstruction",
+      "text": "Описание: Дистальный отдел левого мочеточника: обтурирующий конкремент 0,8 см. Выше камня мочеточник расширен, лоханка левой почки 31 мм.\nЗаключение: Обструкция левого мочеточника камнем. Гидронефроз слева 3 степени.",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 8,
+              "location": "ureter",
+              "obstruction": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "left",
+              "pelvisMm": 31,
+              "grade": 3,
+              "ureterDilated": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-052.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "bladder_vs_renal_stone",
+      "text": "Описание: В мочевом пузыре подвижный конкремент 16 х 10 мм. В правой почке камень 4 мм. Лоханки обеих почек не расширены.\nЗаключение: Камни мочевого пузыря и правой почки; обструкции нет.",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "sizeMm": 16,
+              "location": "bladder",
+              "obstruction": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 4,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-053.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "bilateral_pelvis_elliptical_size",
+      "text": "Описание: Переднезадний размер расширенной лоханки слева — 23 мм, справа — 15 мм. Мочеточники не расширены.\nЗаключение: Двусторонняя пиелоэктазия, более выраженная слева.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "left",
+              "pelvisMm": 23,
+              "ureterDilated": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "right",
+              "pelvisMm": 15,
+              "ureterDilated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-054.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "uncertain_microlith_vs_calcification",
+      "text": "Описание: В нижней чашечке правой почки включение 2,8 мм со слабой акустической тенью. В паренхиме слева кальцинат 9 мм без связи с ЧЛС.\nЗаключение: Подозрение на микролит правой почки. ЧЛС не расширена.",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 2.8,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-055.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "stone_size_range",
+      "text": "Описание: Слева в верхней чашечке конкремент, размер при повторных измерениях 7–9 мм. Справа камней не определяется.\nЗаключение: Нефролитиаз слева без признаков обструкции.",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 9,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-056.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "historical_large_stone_removed",
+      "text": "Анамнез: Ранее удалён камень правого мочеточника 14 мм.\nОписание: Мочеточники сейчас не расширены, камней в них нет. В левой почке конкремент 5,5 мм.\nЗаключение: Конкремент левой почки без обструкции.",
+      "expected": {
+        "findings": [
+          {
+            "code": "KIDNEY_STONES",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 5.5,
+              "location": "kidney",
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-057.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "hydronephrosis_without_measured_pelvis",
+      "text": "Описание: Слева расширены чашечки и лоханка; размер лоханки не указан. Мочеточник не расширен. Камни не визуализируются.\nЗаключение: Гидронефроз левой почки 1 степени.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HYDRONEPHROSIS",
+            "attributes": {
+              "side": "left",
+              "grade": 1,
+              "ureterDilated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-058.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_anatomic_variant",
+      "text": "Описание: Справа внепочечная ампулярная лоханка 14 мм, чашечки не расширены. Слева ЧЛС обычная.\nЗаключение: Ампулярная лоханка как вариант строения; гидронефроза и камней нет.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-059.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_calcification_and_icd",
+      "text": "Код МКБ: N80.0.\nОписание: Единичные кальцинаты паренхимы и фиброз почечных синусов. Включения без акустической тени.\nЗаключение: Убедительных признаков конкрементов и обструкции не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-060.docx",
+      "studyType": "KIDNEY",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_history_only",
+      "text": "Анамнез: Обструктивный камень слева 11 мм, литотрипсия.\nОписание: Сейчас просветы мочеточников свободны, ЧЛС не расширена с обеих сторон.\nЗаключение: Ни нефролитиаза, ни уретеролитиаза, ни гидронефроза не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-061.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "three_volumes_distinct_targets",
+      "text": "Описание: Простата: объём 58,4 см³, гиперплазия переходной зоны, внутрипузырная протрузия 9 мм. Мочевой пузырь до микции 425 мл; после микции остаточная моча 142 мл.\nЗаключение: ДГПЖ. Избыточная остаточная моча.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 58.4,
+              "intravesicalMm": 9
+            }
+          },
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 142
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-062.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "volume_after_adjective",
+      "text": "Описание: Предстательная железа увеличена, её объём составляет 74 мл. Средняя доля вдаётся в мочевой пузырь на 12 мм. Остаточная моча — 0 мл.\nЗаключение: Доброкачественная гиперплазия простаты без остаточной мочи.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 74,
+              "intravesicalMm": 12
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-063.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "chronology_different_volumes",
+      "text": "Анамнез: Год назад объём простаты составлял 44 мл.\nОписание: Сегодня объём предстательной железы 61 мл, аденоматозная перестройка. Остаточная моча 85 мл.\nЗаключение: ДГПЖ с ростом. Наличие остаточной мочи.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 61,
+              "growth": true
+            }
+          },
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 85
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-064.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "stable_prostatitis_pattern",
+      "text": "Описание: Объём простаты 36,7 мл, переходные зоны гиперплазированы. В паренхиме фиброзные участки и кальцинаты 3 мм.\nЗаключение: ДГПЖ без отрицательной динамики. Изменения по типу хронического простатита.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 36.7,
+              "growth": false,
+              "prostatitisPattern": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-065.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "retention_without_bph",
+      "text": "Описание: Предстательная железа 22 мл, без гиперплазии. После повторной микции остаточная моча 190 мл.\nЗаключение: Нарушение опорожнения мочевого пузыря. Данных за ДГПЖ нет.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 190
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-066.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "small_prostatitis_without_adenoma",
+      "text": "Описание: Простата неоднородная, объём 24,3 см³. Узловой гиперплазии нет.\nЗаключение: УЗ-изменения по типу хронического простатита. Остаточной мочи не выявлено.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 24.3,
+              "prostatitisPattern": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-067.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "large_bph_and_small_residual",
+      "text": "Описание: Предстательная железа объёмом 96 мл, внутрипузырный компонент 18 мм. Мочевой пузырь после опорожнения содержит 24 мл остаточной мочи.\nЗаключение: Аденома предстательной железы. Остаточная моча 24 мл.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 96,
+              "intravesicalMm": 18
+            }
+          },
+          {
+            "code": "BPH_URINARY_RETENTION",
+            "attributes": {
+              "residualUrineMl": 24
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-068.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "missing_prostate_volume",
+      "text": "Описание: Переходные зоны предстательной железы гиперплазированы, внутрипузырная протрузия 6,5 мм. Объём железы не рассчитан.\nЗаключение: Доброкачественная гиперплазия простаты. Признаков роста не отмечено.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "intravesicalMm": 6.5,
+              "growth": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-069.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "normal_residual_does_not_negate_bph",
+      "text": "Описание: Простата 48 мл, аденоматозные узлы. Объём остаточной мочи 9 мл, в пределах нормы.\nЗаключение: ДГПЖ. Пассаж мочи не нарушен.",
+      "expected": {
+        "findings": [
+          {
+            "code": "BPH",
+            "attributes": {
+              "volumeCm3": 48
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-070.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_calculi_not_bph",
+      "text": "Описание: Простата объёмом 17,8 мл, переходные зоны не увеличены. Единичные кальцинаты 2–3 мм, остаточной мочи нет.\nЗаключение: Кальцинаты простаты. Признаков ДГПЖ и задержки мочи не получено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-071.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_prostate_retention_cyst",
+      "text": "Описание: В простате небольшая ретенционная киста 4 мм, объём железы 19 мл. Мочевой пузырь опорожняется полностью.\nЗаключение: Ретенционная киста простаты без гиперплазии.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-072.docx",
+      "studyType": "PROSTATE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_past_urinary_retention",
+      "text": "Анамнез: Эпизод задержки мочи с остатком 310 мл месяц назад.\nОписание: Простата не увеличена, после микции мочевой пузырь пуст.\nЗаключение: Остаточной мочи нет; УЗ-признаков аденомы простаты не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-073.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "current_deep_thrombus_and_contralateral_old_changes",
+      "text": "Описание: Справа ПкВ окклюзирована свежим тромбом, флотации нет. Слева в БВ посттромботические изменения с частичной реканализацией.\nЗаключение: Острый тромбоз ПкВ справа. Посттромботические изменения БВ слева.",
+      "expected": {
+        "findings": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "attributes": {
+              "side": "right",
+              "vein": "ПкВ",
+              "occlusive": true,
+              "floating": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "POST_THROMBOTIC_CHANGES",
+            "attributes": {
+              "side": "left",
+              "vein": "БВ",
+              "recanalization": "частичная",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-074.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "deep_and_superficial_thrombi_same_leg",
+      "text": "Описание: В левой ОБВ неокклюзивный тромб с флотирующей верхушкой. В стволе левой БПВ также тромб; проксимальная граница в 24 мм от СФС, флотации у него нет.\nЗаключение: Тромбоз ОБВ и тромбофлебит БПВ слева.",
+      "expected": {
+        "findings": [
+          {
+            "code": "DEEP_VEIN_THROMBOSIS",
+            "attributes": {
+              "side": "left",
+              "vein": "ОБВ",
+              "occlusive": false,
+              "floating": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+            "attributes": {
+              "side": "left",
+              "vein": "БПВ",
+              "location": "trunk",
+              "distanceToJunctionMm": 24,
+              "floating": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-075.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "varicose_vs_dilation",
+      "text": "Описание: Стоя справа БПВ варикозно изменена; через СФС рефлюкс 1,8 с. Слева МПВ расширена до 6,2 мм, извитости нет, рефлюкс не регистрируется.\nЗаключение: Варикозная болезнь справа. Эктазия МПВ слева.",
+      "expected": {
+        "findings": [
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "attributes": {
+              "side": "right",
+              "varicose": true,
+              "refluxSource": "СФС",
+              "refluxSec": 1.8,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "SAPHENOUS_DILATION",
+            "attributes": {
+              "side": "left",
+              "vein": "МПВ",
+              "diameterMm": 6.2,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-076.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "functional_reflux_without_varices",
+      "text": "Описание: При исследовании стоя слева через СПС рефлюкс длительностью 0,9 с. Варикозной трансформации МПВ нет. Справа рефлюкса нет.\nЗаключение: Функциональная клапанная недостаточность слева без варикозного расширения.",
+      "expected": {
+        "findings": [
+          {
+            "code": "VENOUS_INSUFFICIENCY",
+            "attributes": {
+              "side": "left",
+              "varicose": false,
+              "refluxSource": "СПС",
+              "refluxSec": 0.9,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-077.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "bilateral_arterial_range_and_flow",
+      "text": "Описание: Справа в ПБА стеноз 52–58%, слева в ОБА стеноз 32%. Кровоток справа коллатеральный, слева магистральный.\nЗаключение: Атеросклероз артерий обеих нижних конечностей, без роста стенозов.",
+      "expected": {
+        "findings": [
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "right",
+              "artery": "ПБА",
+              "maxStenosisPct": 58,
+              "bloodFlowType": "коллатеральный",
+              "growth": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "left",
+              "artery": "ОБА",
+              "maxStenosisPct": 32,
+              "bloodFlowType": "магистральный",
+              "growth": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-078.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "same_side_stenosis_and_other_segment_occlusion",
+      "text": "Описание: Слева ОБА со стенозом 41%. В левой ПБА окклюзия, кровоток в этом сегменте не регистрируется.\nЗаключение: Атеросклероз артерий слева: стеноз ОБА и окклюзия ПБА.",
+      "expected": {
+        "findings": [
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "left",
+              "artery": "ОБА",
+              "maxStenosisPct": 41,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "ARTERIAL_STENOSIS",
+            "attributes": {
+              "side": "left",
+              "artery": "ПБА",
+              "occlusion": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-079.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "post_thrombotic_without_fresh_clot",
+      "text": "Описание: В правой БВ утолщённые стенки, полная реканализация после перенесённого тромбоза. Свежих тромботических масс и флотирующих структур нет.\nЗаключение: Посттромботические изменения правой БВ. Признаков острого тромбоза не выявлено.",
+      "expected": {
+        "findings": [
+          {
+            "code": "POST_THROMBOTIC_CHANGES",
+            "attributes": {
+              "side": "right",
+              "vein": "БВ",
+              "recanalization": "полная",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-080.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "superficial_distance_in_centimeters",
+      "text": "Описание: Справа ствол МПВ тромбирован; верхняя граница тромба находится на 4,1 см дистальнее СПС, флотирующей части нет. Глубокие вены проходимы.\nЗаключение: Тромбофлебит правой МПВ.",
+      "expected": {
+        "findings": [
+          {
+            "code": "SUPERFICIAL_THROMBOPHLEBITIS",
+            "attributes": {
+              "side": "right",
+              "vein": "МПВ",
+              "location": "trunk",
+              "distanceToJunctionMm": 41,
+              "floating": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-081.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "unsupported_abnormality",
+      "text": "Описание: Левая подколенная артерия локально расширена до 23 мм. Тромботических масс в просвете нет.\nЗаключение: Аневризма левой подколенной артерии.",
+      "expected": {
+        "findings": [
+          {
+            "code": "UNRECOGNIZED_ABNORMALITY",
+            "attributes": {
+              "text": "Аневризма левой подколенной артерии",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-082.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_reticular_veins",
+      "text": "Описание: Телеангиэктазы и единичные ретикулярные вены. Стволы БПВ и МПВ не расширены; при пробах рефлюкса нет.\nЗаключение: Изменения класса C1. Данных за варикозную трансформацию и клапанную недостаточность не получено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-083.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_deep_and_superficial_denial",
+      "text": "Описание: Глубокие и поверхностные вены сжимаются полностью, просветы свободны.\nЗаключение: Ни тромбоза глубоких вен, ни поверхностного тромбофлебита, ни посттромботических изменений не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-084.docx",
+      "studyType": "LOWER_LIMB_VESSELS",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_arterial_no_flow_gradient",
+      "text": "Описание: Артерии проходимы, перепад скорости кровотока не картируется, поток магистральный с обеих сторон.\nЗаключение: Стенозов и окклюзий артерий не обнаружено.\nРекомендации: При подозрении на тромбоз выполнить повторное УЗИ.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-085.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "bilateral_hernia_different_sizes",
+      "text": "Описание: Правая паховая грыжа: дефект 29 мм, содержимое — сальник, вправляется. Левая паховая грыжа: дефект 13 мм, в мешке предбрюшинная клетчатка, вправляется.\nЗаключение: Двусторонние паховые грыжи без признаков ущемления.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 29,
+              "content": "сальник",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 13,
+              "content": "предбрюшинная клетчатка",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-086.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "incarceration_and_obstruction",
+      "text": "Описание: Слева бедренная грыжа, ворота 18 мм, в мешке петля тонкой кишки. Содержимое не вправляется. Петли кишечника расширены, маятникообразная перистальтика.\nЗаключение: Ущемлённая бедренная грыжа слева. Кишечная непроходимость.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 18,
+              "content": "петля тонкой кишки",
+              "reducible": false,
+              "incarcerated": true,
+              "obstruction": true,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-087.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "postoperative_hernia_size_vs_sac",
+      "text": "Описание: В зоне послеоперационного рубца грыжевые ворота 2,2 см, размеры мешка 56 х 31 мм. Содержимое — сальник, вправляется.\nЗаключение: Послеоперационная вентральная грыжа, ущемления нет.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "sizeMm": 22,
+              "content": "сальник",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-088.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "suspected_strangulation",
+      "text": "Описание: Паховая грыжа справа с воротами 20 мм. Содержимое невправимое, в мешке небольшое количество жидкости.\nЗаключение: Подозрение на ущемление правой паховой грыжи.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 20,
+              "reducible": false,
+              "incarcerated": true,
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-089.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "opposite_reducibility",
+      "text": "Описание: Справа паховая грыжа с воротами 24 мм, сальник в мешке не вправляется. Слева паховая грыжа с воротами 16 мм и сальником, полностью вправляется.\nЗаключение: Ущемлённая паховая грыжа справа. Паховая грыжа слева без ущемления.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "right",
+              "sizeMm": 24,
+              "content": "сальник",
+              "reducible": false,
+              "incarcerated": true,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "side": "left",
+              "sizeMm": 16,
+              "content": "сальник",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-090.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "two_unrelated_soft_tissue_findings",
+      "text": "Описание: Пупочная грыжа, дефект апоневроза 9 мм, содержимое — предбрюшинная клетчатка, вправляется. На левой стопе инфильтрация мягких тканей.\nЗаключение: Пупочная грыжа без ущемления. Воспалительные изменения ПЖК левой стопы.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "sizeMm": 9,
+              "content": "предбрюшинная клетчатка",
+              "reducible": true,
+              "incarcerated": false,
+              "uncertain": false
+            }
+          },
+          {
+            "code": "SOFT_TISSUE_INFLAMMATION",
+            "attributes": {
+              "location": "левая стопа",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-091.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "inflammation_does_not_require_abscess",
+      "text": "Описание: На правой стопе подкожная клетчатка отёчна, инфильтрирована. Полостей с жидкостью нет.\nЗаключение: Воспалительные изменения мягких тканей правой стопы. Сформированного абсцесса не выявлено.",
+      "expected": {
+        "findings": [
+          {
+            "code": "SOFT_TISSUE_INFLAMMATION",
+            "attributes": {
+              "location": "правая стопа",
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-092.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "uncertain_soft_tissue_inflammation",
+      "text": "Описание: Подкожная клетчатка левой стопы неоднородная, умеренно отёчная. Справа клетчатка обычная.\nЗаключение: Возможны воспалительные изменения ПЖК левой стопы.",
+      "expected": {
+        "findings": [
+          {
+            "code": "SOFT_TISSUE_INFLAMMATION",
+            "attributes": {
+              "location": "левая стопа",
+              "uncertain": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-093.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "hernia_without_numeric_measurement",
+      "text": "Описание: В белой линии живота небольшая грыжа; содержимое — сальник, вправляется. Размер ворот в протоколе не приведён.\nЗаключение: Грыжа белой линии без признаков ущемления и кишечной непроходимости.",
+      "expected": {
+        "findings": [
+          {
+            "code": "HERNIA",
+            "attributes": {
+              "content": "сальник",
+              "reducible": true,
+              "incarcerated": false,
+              "obstruction": false,
+              "uncertain": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "file": "stress-v9-094.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_diastasis",
+      "text": "Описание: Диастаз прямых мышц живота 28 мм; грыжевого дефекта апоневроза нет.\nЗаключение: Диастаз прямых мышц, признаков вентральной грыжи не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-095.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_hernia_in_wrong_anatomy",
+      "text": "Анамнез: Грыжа межпозвонкового диска L4–L5.\nОписание: Мягкие ткани передней брюшной стенки без изменений, грыжевых ворот нет.\nЗаключение: Паховые, пупочные и вентральные грыжи не обнаружены.",
+      "expected": {
+        "findings": []
+      }
+    },
+    {
+      "file": "stress-v9-096.docx",
+      "studyType": "SOFT_TISSUE",
+      "partition": "new_synthetic_stress",
+      "challenge": "negative_after_hernia_repair",
+      "text": "Анамнез: Операция по поводу ущемлённой паховой грыжи справа.\nОписание: Послеоперационный рубец без дефекта, при натуживании выпячивания нет. Мягкие ткани не отёчны.\nЗаключение: Рецидива грыжи и воспалительных изменений не выявлено.",
+      "expected": {
+        "findings": []
+      }
+    }
+  ]
+}

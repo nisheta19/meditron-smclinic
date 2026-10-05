@@ -453,7 +453,7 @@ class Integration(RouteIntegrationMixin, unittest.TestCase):
         call('GET', '/api/auth/me', 401)
 
     def test_17_server_sort_and_pagination(self):
-        for key in ('patient', 'finding', 'due', 'receivedAt', 'studyDate'):
+        for key in ('patient', 'finding', 'stage', 'due', 'notified', 'receivedAt', 'studyDate'):
             for direction in ('asc', 'desc'):
                 query = {'search': RUN, 'sortBy': key, 'sortDirection': direction}
                 all_items = call('GET', '/api/patients', params=dict(query, size=200))['items']
@@ -463,7 +463,7 @@ class Integration(RouteIntegrationMixin, unittest.TestCase):
                     values = [p['topFindings'][0]['targetDays'] if p['topFindings'] else None for p in all_items]
                     ordered = sorted([v for v in values if v is not None], reverse=direction == 'desc')
                     self.assertEqual(values, ordered + [None] * values.count(None))
-        for key in ('stage', 'notified', 'invalid'):
+        for key in ('invalid',):
             call('GET', '/api/patients', 400, params={'sortBy': key})
         call('GET', '/api/patients', 400, params={'sortDirection': 'invalid'})
 
